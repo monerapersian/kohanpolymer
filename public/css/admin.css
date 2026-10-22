@@ -1,0 +1,188 @@
+@font-face {
+  font-family: 'kohan';
+  src: url('../font/Kohan-Medium.woff2');
+}
+
+@font-face {
+  font-family: 'kohanBold';
+  src: url('../font/Kohan-Bold.woff2');
+}
+
+body {
+  font-family: 'kohan';
+}
+
+h1, h2, h3, h4{
+  font-family: 'kohanBold';
+}
+
+.kohan-bold{
+    font-family: kohanBold;
+}
+
+/* Firefox */
+html {
+    scrollbar-width: thin;
+    scrollbar-color: #380a0d #FAF8F4;
+}
+
+/* Chrome, Edge, Safari */
+::-webkit-scrollbar {
+    width: 12px;
+}
+
+::-webkit-scrollbar-track {
+    background: #FAF8F4;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+        180deg,
+        #380a0d 0%,
+        #0f4c3a 100%
+    );
+    border-radius: 10px;
+    border: 3px solid #FAF8F4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+        180deg,
+        #8d6945 0%,
+        #0c3d2f 100%
+    );
+}
+
+::-webkit-scrollbar-corner {
+    background: #FAF8F4;
+}
+
+/* ========================================
+   KOHAN POLYMER — ADMIN BACKGROUND
+   CSS Only | No Images
+======================================== */
+
+:root {
+    --wine: #681b21;
+    --dark: #222222;
+    --silver: #BFBFBF;
+    --light: #DDDDDD;
+    --white: #FFFFFF;
+}
+
+/* Main background */
+.admin-background {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 12% 8%,
+            rgba(104, 27, 33, 0.24) 0%,
+            transparent 42%
+        ),
+        radial-gradient(
+            ellipse at 92% 88%,
+            rgba(104, 27, 33, 0.17) 0%,
+            transparent 38%
+        ),
+        linear-gradient(
+            135deg,
+            #181818 0%,
+            #222222 48%,
+            #292324 100%
+        );
+}
+
+/* Soft ambient color glows */
+.admin-background__glow {
+    position: absolute;
+    width: min(48vw, 650px);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.42;
+}
+
+.admin-background__glow--wine {
+    top: -24%;
+    right: -12%;
+
+    background: radial-gradient(
+        circle,
+        rgba(104, 27, 33, 0.85) 0%,
+        rgba(104, 27, 33, 0.22) 42%,
+        transparent 72%
+    );
+}
+
+.admin-background__glow--green {
+    bottom: -32%;
+    left: -16%;
+
+    background: radial-gradient(
+        circle,
+        rgba(15, 76, 58, 0.34) 0%,
+        rgba(15, 76, 58, 0.10) 45%,
+        transparent 72%
+    );
+}
+
+/* Very subtle technical grid */
+.admin-background__grid {
+    position: absolute;
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.022) 1px,
+            transparent 1px
+        );
+
+    background-size: 48px 48px;
+
+    mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        rgba(0, 0, 0, 0.65) 55%,
+        transparent 100%
+    );
+
+    -webkit-mask-image: linear-gradient(
+        to bottom,
+        black 0%,
+        rgba(0, 0, 0, 0.65) 55%,
+        transparent 100%
+    );
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+    .admin-background__glow {
+        width: 90vw;
+        filter: blur(75px);
+        opacity: 0.32;
+    }
+
+    .admin-background__grid {
+        background-size: 36px 36px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .admin-background,
+    .admin-background__glow {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
