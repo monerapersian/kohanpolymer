@@ -110,81 +110,370 @@
                 aria-labelledby="tab-main"
                 data-panel="main"
             >
-                <form action="{{ route('admin.site-content.update') }}" method="POST" class="space-y-8">
+                <form
+                    action="{{ route('admin.site-content.update') }}"
+                    method="POST"
+                    enctype="multipart/form-data"
+                    class="space-y-8"
+                >
                     @csrf
                     @method('PUT')
 
-                    <div>
+                    {{-- Logo and Hero --}}
+                    <section>
                         <div class="mb-5">
                             <h2 class="text-lg font-extrabold text-white sm:text-xl">
-                                محتوای اصلی وب‌سایت
+                                لوگو و بخش ابتدایی سایت
                             </h2>
                             <p class="mt-2 text-sm leading-6 text-white/45">
-                                متن‌ها و اطلاعات ارتباطی نمایش‌داده‌شده در سایت عمومی را ویرایش کنید.
+                                لوگو و تصویر اصلی سایت را مدیریت کنید.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                            <div>
+                                <label for="logo" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    لوگوی سایت
+                                </label>
+
+                                @if ($content?->logo)
+                                    <div class="mb-4 flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
+                                        <img
+                                            src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->logo) }}"
+                                            alt="لوگوی فعلی سایت"
+                                            class="h-20 w-32 rounded-lg bg-white p-2 object-contain"
+                                        >
+                                        <span class="text-xs leading-6 text-white/50">
+                                            لوگوی فعلی
+                                        </span>
+                                    </div>
+                                @endif
+
+                                <input
+                                    type="file"
+                                    id="logo"
+                                    name="logo"
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10"
+                                >
+
+                                <p class="mt-2 text-xs leading-6 text-white/40">
+                                    JPG، PNG یا WebP؛ حداکثر ۵ مگابایت. تصویر به WebP تبدیل می‌شود.
+                                </p>
+                            </div>
+
+                            <div>
+                                <label for="hero_image" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    تصویر Hero
+                                </label>
+
+                                @if ($content?->hero_image)
+                                    <div class="mb-4 rounded-xl border border-white/10 bg-black/20 p-3">
+                                        <img
+                                            src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->hero_image) }}"
+                                            alt="تصویر فعلی Hero"
+                                            class="h-40 w-full rounded-lg object-cover"
+                                        >
+                                        <p class="mt-2 text-xs text-white/50">
+                                            تصویر فعلی
+                                        </p>
+                                    </div>
+                                @endif
+
+                                <input
+                                    type="file"
+                                    id="hero_image"
+                                    name="hero_image"
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10"
+                                >
+
+                                <p class="mt-2 text-xs leading-6 text-white/40">
+                                    JPG، PNG یا WebP؛ حداکثر ۵ مگابایت.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="mt-6">
+                            <label for="hero_slogan" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                شعار Hero
+                            </label>
+
+                            <textarea
+                                id="hero_slogan"
+                                name="hero_slogan"
+                                rows="4"
+                                maxlength="2000"
+                                placeholder="شعار اصلی صفحه نخست را وارد کنید..."
+                                class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            >{{ old('hero_slogan', $content?->hero_slogan) }}</textarea>
+                        </div>
+                    </section>
+
+                    {{-- Industry Section --}}
+                    <section class="border-t border-white/[0.08] pt-7">
+                        <div class="mb-5">
+                            <h2 class="text-lg font-extrabold text-white">نگاه ما به صنعت</h2>
+                            <p class="mt-2 text-sm leading-6 text-white/45">
+                                عنوان و متن این بخش از صفحه اصلی را وارد کنید.
                             </p>
                         </div>
 
                         <div class="space-y-5">
                             <div>
-                                <label for="hero_slogan" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                                    شعار هیرو
+                                <label for="industry_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    عنوان بخش
                                 </label>
+
+                                <input
+                                    type="text"
+                                    id="industry_title"
+                                    name="industry_title"
+                                    maxlength="255"
+                                    value="{{ old('industry_title', $content?->industry_title) }}"
+                                    placeholder="نگاه ما به صنعت"
+                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                >
+                            </div>
+
+                            <div>
+                                <label for="industry_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    متن بخش
+                                </label>
+
                                 <textarea
-                                    id="hero_slogan"
-                                    name="hero_slogan"
-                                    rows="4"
-                                    maxlength="2000"
-                                    placeholder="در کهن پلیمر البرز، به جزئیاتی فکر می‌کنیم که عملکرد یک مجموعه را متحول می‌کنند؛ راهکارهای پلیمری برای دوام بیشتر، عملکرد بهتر و حرکت رو به جلوی صنعت."
+                                    id="industry_text"
+                                    name="industry_text"
+                                    rows="5"
+                                    maxlength="10000"
+                                    placeholder="متن معرفی نگاه مجموعه به صنعت..."
                                     class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
-                                >{{ old('hero_slogan', $content?->hero_slogan) }}</textarea>
-                                <p class="mt-2 text-xs text-white/35">متن اصلی بخش ابتدایی صفحه اصلی سایت.</p>
+                                >{{ old('industry_text', $content?->industry_text) }}</textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    {{-- Difference Section --}}
+                    <section class="border-t border-white/[0.08] pt-7">
+                        <div class="mb-5">
+                            <h2 class="text-lg font-extrabold text-white">نگاه متفاوت</h2>
+                            <p class="mt-2 text-sm leading-6 text-white/45">
+                                عنوان و توضیحات بخش نگاه متفاوت را مدیریت کنید.
+                            </p>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label for="difference_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    عنوان بخش
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="difference_title"
+                                    name="difference_title"
+                                    maxlength="255"
+                                    value="{{ old('difference_title', $content?->difference_title) }}"
+                                    placeholder="نگاه متفاوت"
+                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                >
+                            </div>
+
+                            <div>
+                                <label for="difference_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    توضیحات بخش
+                                </label>
+
+                                <textarea
+                                    id="difference_text"
+                                    name="difference_text"
+                                    rows="5"
+                                    maxlength="10000"
+                                    placeholder="توضیحات مربوط به تفاوت‌ها و مزیت‌های مجموعه..."
+                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                >{{ old('difference_text', $content?->difference_text) }}</textarea>
+                            </div>
+                        </div>
+                    </section>
+
+                    {{-- About Section --}}
+                    <section class="border-t border-white/[0.08] pt-7">
+                        <div class="mb-5">
+                            <h2 class="text-lg font-extrabold text-white">درباره کهن پلیمر</h2>
+                            <p class="mt-2 text-sm leading-6 text-white/45">
+                                عنوان و متن معرفی مجموعه را مدیریت کنید.
+                            </p>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label for="about_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    عنوان بخش
+                                </label>
+
+                                <input
+                                    type="text"
+                                    id="about_title"
+                                    name="about_title"
+                                    maxlength="255"
+                                    value="{{ old('about_title', $content?->about_title) }}"
+                                    placeholder="درباره کهن پلیمر"
+                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                >
                             </div>
 
                             <div>
                                 <label for="about_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                                    درباره کهن پلیمر
+                                    متن درباره مجموعه
                                 </label>
+
                                 <textarea
                                     id="about_text"
                                     name="about_text"
                                     rows="6"
                                     maxlength="10000"
-                                    placeholder="کهن پلیمر البرز با تمرکز بر محصولات پلیمری صنعتی، در مسیر فراهم‌کردن راهکارهای متناسب با نیاز مشتریان حرکت می‌کند. هدف ما ایجاد ارتباطی روشن میان نیاز، مشخصات محصول و انتخاب آگاهانه است."
+                                    placeholder="متن معرفی کهن پلیمر البرز..."
                                     class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
                                 >{{ old('about_text', $content?->about_text) }}</textarea>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
-                    <div class="border-t border-white/[0.08] pt-7">
+                    {{-- Activity Areas --}}
+                    <section class="border-t border-white/[0.08] pt-7">
+                        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div>
+                                <h2 class="text-lg font-extrabold text-white">حوزه‌های فعالیت</h2>
+                                <p class="mt-2 text-sm leading-6 text-white/45">
+                                    هر حوزه فعالیت را در یک فیلد جداگانه وارد کنید.
+                                </p>
+                            </div>
+
+                            <button
+                                type="button"
+                                data-add-field="activity_areas"
+                                class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold"
+                            >
+                                <span>+</span>
+                                افزودن حوزه
+                            </button>
+                        </div>
+
+                        <div id="activity-areas-container" class="space-y-3">
+                            @php
+                                $activityAreas = old('activity_areas', $content?->activity_areas ?? []);
+                                $activityAreas = is_array($activityAreas) ? $activityAreas : [];
+                            @endphp
+
+                            @forelse ($activityAreas as $activityArea)
+                                <div class="dynamic-field-row flex items-center gap-3">
+                                    <input
+                                        type="text"
+                                        name="activity_areas[]"
+                                        maxlength="255"
+                                        value="{{ $activityArea }}"
+                                        placeholder="مثلاً: تولید قطعات پلیمری صنعتی"
+                                        class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    >
+
+                                    <button
+                                        type="button"
+                                        data-remove-field
+                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                        aria-label="حذف حوزه فعالیت"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            @empty
+                                <div class="dynamic-field-row flex items-center gap-3">
+                                    <input
+                                        type="text"
+                                        name="activity_areas[]"
+                                        maxlength="255"
+                                        placeholder="مثلاً: تولید قطعات پلیمری صنعتی"
+                                        class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    >
+
+                                    <button
+                                        type="button"
+                                        data-remove-field
+                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                        aria-label="حذف حوزه فعالیت"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            @endforelse
+                        </div>
+                    </section>
+
+                    {{-- Contact Information --}}
+                    <section class="border-t border-white/[0.08] pt-7">
                         <div class="mb-5">
                             <h2 class="text-lg font-extrabold text-white">راه‌های ارتباطی</h2>
                             <p class="mt-2 text-sm leading-6 text-white/45">
-                                اطلاعات تماس مجموعه را وارد کنید تا در بخش‌های مرتبط سایت قابل استفاده باشند.
+                                شماره تماس، ایمیل و شبکه‌های اجتماعی مجموعه را مدیریت کنید.
                             </p>
                         </div>
 
-                        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                        <div class="space-y-6">
                             <div>
-                                <label for="phone" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                                    شماره تماس
-                                </label>
-                                <input
-                                    type="text"
-                                    id="phone"
-                                    name="phone"
-                                    maxlength="16"
-                                    value="{{ old('phone', $content?->phone) }}"
-                                    placeholder="02612345678"
-                                    dir="ltr"
-                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
-                                >
+                                <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                                    <label class="block text-sm font-bold text-white/80 kohan-bold">
+                                        شماره‌های تماس
+                                    </label>
+
+                                    <button
+                                        type="button"
+                                        data-add-field="phones"
+                                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold"
+                                    >
+                                        <span>+</span>
+                                        افزودن شماره
+                                    </button>
+                                </div>
+
+                                <div id="phones-container" class="space-y-3">
+                                    @php
+                                        $phones = old('phones', $content?->phones ?? []);
+
+                                        if (! is_array($phones) || count($phones) === 0) {
+                                            $phones = [''];
+                                        }
+                                    @endphp
+
+                                    @foreach ($phones as $phone)
+                                        <div class="dynamic-field-row flex items-center gap-3">
+                                            <input
+                                                type="text"
+                                                name="phones[]"
+                                                maxlength="30"
+                                                value="{{ $phone }}"
+                                                inputmode="tel"
+                                                dir="ltr"
+                                                placeholder="02612345678"
+                                                class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                            >
+
+                                            <button
+                                                type="button"
+                                                data-remove-field
+                                                class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                                aria-label="حذف شماره تلفن"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    @endforeach
+                                </div>
                             </div>
 
                             <div>
                                 <label for="email" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
                                     ایمیل
                                 </label>
+
                                 <input
                                     type="email"
                                     id="email"
@@ -193,70 +482,81 @@
                                     value="{{ old('email', $content?->email) }}"
                                     placeholder="info@example.com"
                                     dir="ltr"
-                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
                                 >
                             </div>
 
-                            <div>
-                                <label for="instagram" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                                    آیدی اینستاگرام
-                                </label>
+                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                                <div>
+                                    <label for="instagram" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                        آیدی اینستاگرام
+                                    </label>
 
-                                <div class="flex overflow-hidden rounded-2xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
-                                    <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45 sm:px-4">
-                                        instagram.com/
-                                    </span>
-                                    <input
-                                        type="text"
-                                        id="instagram"
-                                        name="instagram"
-                                        maxlength="150"
-                                        value="{{ old('instagram', $content?->instagram) }}"
-                                        placeholder="kohanpolymer"
-                                        class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25 sm:px-4"
-                                    >
+                                    <div class="flex overflow-hidden rounded-xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
+                                        <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45">
+                                            instagram.com/
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            id="instagram"
+                                            name="instagram"
+                                            maxlength="150"
+                                            value="{{ old('instagram', $content?->instagram) }}"
+                                            placeholder="kohanpolymer"
+                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25"
+                                        >
+                                    </div>
+
+                                    <p class="mt-2 text-xs text-white/35">
+                                        فقط آیدی را وارد کنید.
+                                    </p>
                                 </div>
-                                <p class="mt-2 text-xs text-white/35">فقط آیدی را وارد کنید؛ نیازی به نوشتن آدرس کامل نیست.</p>
-                            </div>
 
-                            <div>
-                                <label for="whatsapp" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                                    شماره واتساپ
-                                </label>
+                                <div>
+                                    <label for="whatsapp" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                        شماره واتساپ
+                                    </label>
 
-                                <div class="flex overflow-hidden rounded-2xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
-                                    <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45 sm:px-4">
-                                        wa.me/
-                                    </span>
-                                    <input
-                                        type="text"
-                                        id="whatsapp"
-                                        name="whatsapp"
-                                        maxlength="50"
-                                        value="{{ old('whatsapp', $content?->whatsapp) }}"
-                                        placeholder="989121234567"
-                                        inputmode="tel"
-                                        class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25 sm:px-4"
-                                    >
+                                    <div class="flex overflow-hidden rounded-xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
+                                        <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45">
+                                            wa.me/
+                                        </span>
+
+                                        <input
+                                            type="text"
+                                            id="whatsapp"
+                                            name="whatsapp"
+                                            maxlength="50"
+                                            value="{{ old('whatsapp', $content?->whatsapp) }}"
+                                            placeholder="989121234567"
+                                            inputmode="tel"
+                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25"
+                                        >
+                                    </div>
+
+                                    <p class="mt-2 text-xs text-white/35">
+                                        شماره را همراه کد کشور وارد کنید.
+                                    </p>
                                 </div>
-                                <p class="mt-2 text-xs text-white/35">شماره را همراه کد کشور و بدون صفر ابتدایی وارد کنید.</p>
                             </div>
                         </div>
-                    </div>
+                    </section>
 
+                    {{-- Save Actions --}}
                     <div class="flex flex-col-reverse gap-3 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
                         <p class="text-xs leading-6 text-white/35">
-                            تغییرات پس از ذخیره در پایگاه داده ثبت می‌شوند.
+                            تصاویر پس از بارگذاری به WebP تبدیل می‌شوند. در صورت انتخاب‌نکردن تصویر جدید، تصویر فعلی حفظ می‌شود.
                         </p>
 
                         <button
                             type="submit"
-                            class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#681b21] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#681b21]/20 transition hover:bg-[#7c242b] focus:outline-none focus:ring-2 focus:ring-[#a64b52] focus:ring-offset-2 focus:ring-offset-[#222222] kohan-bold cursor-pointer"
+                            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#681b21] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#681b21]/20 transition hover:bg-[#7c242b] focus:outline-none focus:ring-2 focus:ring-[#a64b52] focus:ring-offset-2 focus:ring-offset-[#222222] kohan-bold"
                         >
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
                             </svg>
-                            بروزرسانی محتوا
+                            ذخیره تغییرات
                         </button>
                     </div>
                 </form>
@@ -1084,6 +1384,98 @@
                     ? requestedTab
                     : 'main'
             );
+        })();
+    </script>
+
+    <script>
+        (() => {
+            const containers = {
+                activity_areas: document.getElementById('activity-areas-container'),
+                phones: document.getElementById('phones-container'),
+            };
+
+            const createField = (type) => {
+                const row = document.createElement('div');
+                row.className = 'dynamic-field-row flex items-center gap-3';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = type === 'phones' ? 'phones[]' : 'activity_areas[]';
+                input.className = type === 'phones'
+                    ? 'min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20'
+                    : 'min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20';
+
+                input.maxLength = type === 'phones' ? 30 : 255;
+                input.placeholder = type === 'phones'
+                    ? '02612345678'
+                    : 'حوزه فعالیت را وارد کنید';
+
+                if (type === 'phones') {
+                    input.inputMode = 'tel';
+                    input.dir = 'ltr';
+                }
+
+                const removeButton = document.createElement('button');
+                removeButton.type = 'button';
+                removeButton.dataset.removeField = '';
+                removeButton.className = 'inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10';
+                removeButton.setAttribute(
+                    'aria-label',
+                    type === 'phones' ? 'حذف شماره تلفن' : 'حذف حوزه فعالیت'
+                );
+                removeButton.textContent = '×';
+
+                row.append(input, removeButton);
+
+                return row;
+            };
+
+            document.querySelectorAll('[data-add-field]').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const type = button.dataset.addField;
+                    const container = containers[type];
+
+                    if (!container || container.children.length >= 30) {
+                        return;
+                    }
+
+                    const row = createField(type);
+                    container.appendChild(row);
+                    row.querySelector('input')?.focus();
+                });
+            });
+
+            Object.entries(containers).forEach(([type, container]) => {
+                if (!container) {
+                    return;
+                }
+
+                container.addEventListener('click', (event) => {
+                    const button = event.target.closest('[data-remove-field]');
+
+                    if (!button) {
+                        return;
+                    }
+
+                    const row = button.closest('.dynamic-field-row');
+
+                    if (!row) {
+                        return;
+                    }
+
+                    if (container.children.length > 1) {
+                        row.remove();
+                        return;
+                    }
+
+                    const input = row.querySelector('input');
+
+                    if (input) {
+                        input.value = '';
+                        input.focus();
+                    }
+                });
+            });
         })();
     </script>
 

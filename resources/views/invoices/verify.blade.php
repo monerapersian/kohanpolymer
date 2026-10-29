@@ -4,6 +4,8 @@
 @section('description', 'بررسی اصالت، وضعیت اعتبار و جزئیات سند صادرشده از کهن پلیمر البرز.')
 
 @php
+    $siteContent = \App\Models\SiteContent::first();
+
     $isVoided = $invoice->status === 'voided';
     $isExpired = !$isVoided && $invoice->isExpired();
     $isValid = !$isVoided && !$isExpired;
@@ -18,21 +20,20 @@
             ? 'مهلت اعتبار این سند به پایان رسیده است.'
             : 'این سند در حال حاضر از نظر سامانه معتبر است.');
 
-    $documentType = $invoice->type === 'proforma'
-        ? 'پیش‌فاکتور'
-        : 'فاکتور';
+    $documentType = $invoice->type === 'invoice'
+        ? 'فاکتور'
+        : 'پیش‌فاکتور';
 
-    $customerName = $invoice->customer->company_name
-        ?? $invoice->customer->name
-        ?? '—';
+    $customerName = $invoice->customer?->company_name
+        ?: ($invoice->customer?->name ?: '—');
 
     $items = $invoice->items;
 
-    $subtotal = (float) $items->sum(
+    $totalAmount = (float) $items->sum(
         fn ($item) => (float) ($item->total_amount ?? 0)
     );
 
-    $taxAmount = (float) $items->sum(
+    $totalVatAmount = (float) $items->sum(
         fn ($item) => (float) ($item->vat_amount ?? 0)
     );
 
@@ -43,510 +44,577 @@
         )
     );
 
-    $formatMoney = fn ($amount) => number_format((float) $amount, 0, '.', ',');
+    $formatNumber = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 0, true);
 
-    $formatDate = fn ($date) => $date
-        ? $date->format('Y/m/d')
+    $formatTaxRate = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 1, true);
+
+    $formatMeasurement = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 2, true);
+
+    $formatDigits = static fn ($value) =>
+        \App\Support\NumberHelper::toPersian($value);
+
+    $formatDate = static fn ($value) => $value
+        ? \App\Support\NumberHelper::toPersian(
+            \App\Support\DateHelper::toPersian($value, 'Y/m/d')
+        )
         : '—';
+
+    $logoUrl = $siteContent?->logo
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($siteContent->logo)
+        : asset('img/kohan-logo.png');
+
+    $printPhone = $siteContent?->phone;
+    $printEmail = $siteContent?->email;
+    $printWebsite = 'www.kohanpolymeralborz.ir';
+
+    $verificationUrl = route('invoices.verify', $invoice->qr_token);
+
+    $printNotes = collect();
+
+    if ($invoice->description) {
+        $printNotes->push($invoice->description);
+    }
+
+    foreach ($invoice->notes as $note) {
+        if ($note->description) {
+            $printNotes->push($note->description);
+        }
+    }
+
+    if ($printNotes->isEmpty()) {
+        $printNotes = collect([
+            'این سند بر اساس اطلاعات ثبت‌شده در سامانه کهن پلیمر البرز صادر شده است.',
+            'برای بررسی اصالت سند، کد QR را اسکن کنید.',
+        ]);
+    }
+
+    $qrCodeDataUri = $qrCodeDataUri ?? null;
 @endphp
 
 @push('styles')
 <style>
     .verification-page {
-        --brand: #681b21;
-        --brand-dark: #4b1116;
-        --brand-soft: #f8edef;
-        --ink: #222222;
-        --muted: #666666;
-        --line: #e7e7e7;
-        --surface: #f7f7f7;
-        color: var(--ink);
-        font-family: 'Vazirmatn', sans-serif;
+        color: #362727;
+        font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+        direction: rtl;
+        padding: 28px 16px 48px;
+        background: #f2f2f2;
     }
 
-    .verification-page * {
+    .verification-page *,
+    .verification-page *::before,
+    .verification-page *::after {
         box-sizing: border-box;
     }
 
-    .verification-page .document-shell {
-        width: min(1120px, calc(100% - 32px));
-        margin: 42px auto 64px;
-    }
-
-    .verification-page .document-card {
-        overflow: hidden;
-        background: #fff;
-        border: 1px solid #e9e9e9;
-        border-radius: 22px;
-        box-shadow: 0 20px 65px rgba(34, 34, 34, .07);
-    }
-
-    .verification-page .document-banner {
-        position: relative;
-        overflow: hidden;
-        padding: 34px;
-        color: #fff;
-        background: linear-gradient(125deg, #681b21 0%, #4b1116 100%);
-    }
-
-    .verification-page .document-banner::after {
-        position: absolute;
-        top: -95px;
-        left: -45px;
-        width: 260px;
-        height: 260px;
-        content: "";
-        border: 1px solid rgba(255, 255, 255, .1);
-        border-radius: 50%;
-        box-shadow:
-            0 0 0 35px rgba(255, 255, 255, .035),
-            0 0 0 70px rgba(255, 255, 255, .025);
-        pointer-events: none;
-    }
-
-    .verification-page .brand-row {
-        position: relative;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-    }
-
-    .verification-page .brand-info {
-        display: flex;
-        align-items: center;
-        gap: 18px;
-        min-width: 0;
-    }
-
-    .verification-page .brand-logo {
-        display: flex;
-        width: 76px;
-        height: 76px;
-        flex: 0 0 76px;
-        align-items: center;
-        justify-content: center;
-        padding: 8px;
-        background: #fff;
-        border-radius: 16px;
-    }
-
-    .verification-page .brand-logo img {
-        display: block;
-        width: 100%;
-        height: 100%;
-        object-fit: contain;
-    }
-
-    .verification-page .brand-name {
-        margin: 0;
-        font-size: clamp(20px, 3vw, 29px);
-        font-weight: 900;
-        line-height: 1.7;
-    }
-
-    .verification-page .brand-caption {
-        margin-top: 3px;
-        color: rgba(255, 255, 255, .75);
-        font-size: 13px;
-    }
-
-    .verification-page .document-type-box {
-        position: relative;
-        z-index: 1;
-        min-width: 145px;
-        padding: 13px 18px;
-        text-align: center;
-        background: rgba(255, 255, 255, .09);
-        border: 1px solid rgba(255, 255, 255, .18);
-        border-radius: 14px;
-    }
-
-    .verification-page .document-type-box span {
-        display: block;
-        color: rgba(255, 255, 255, .72);
-        font-size: 12px;
-    }
-
-    .verification-page .document-type-box strong {
-        display: block;
-        margin-top: 3px;
-        font-size: 19px;
-        font-weight: 800;
-    }
-
-    .verification-page .banner-bottom {
-        position: relative;
-        z-index: 1;
+    .verification-page .verification-actions {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 16px;
-        margin-top: 28px;
-        padding-top: 20px;
-        border-top: 1px solid rgba(255, 255, 255, .17);
+        width: min(210mm, 100%);
+        margin: 0 auto 16px;
     }
 
-    .verification-page .document-number-label {
-        color: rgba(255, 255, 255, .72);
-        font-size: 12px;
-    }
-
-    .verification-page .document-number {
-        margin-top: 4px;
-        font-size: 18px;
-        font-weight: 800;
-        overflow-wrap: anywhere;
-        direction: ltr;
-        text-align: right;
-    }
-
-    .verification-page .verification-label {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 14px;
-        color: #fff;
-        background: rgba(255, 255, 255, .1);
-        border: 1px solid rgba(255, 255, 255, .2);
-        border-radius: 999px;
-        font-size: 12px;
-        white-space: nowrap;
-    }
-
-    .verification-page .document-content {
-        padding: 32px;
-    }
-
-    .verification-page .status-panel {
-        display: flex;
-        align-items: flex-start;
-        gap: 16px;
-        padding: 20px;
-        margin-bottom: 32px;
-        border: 1px solid;
-        border-radius: 16px;
-    }
-
-    .verification-page .status-panel.valid {
-        color: #166534;
-        background: #f0fdf4;
-        border-color: #bbf7d0;
-    }
-
-    .verification-page .status-panel.expired,
-    .verification-page .status-panel.voided {
-        color: #991b1b;
-        background: #fef2f2;
-        border-color: #fecaca;
-    }
-
-    .verification-page .status-icon {
-        display: flex;
-        width: 42px;
-        height: 42px;
-        flex: 0 0 42px;
-        align-items: center;
-        justify-content: center;
-        border-radius: 12px;
-        background: rgba(255, 255, 255, .8);
-        font-size: 22px;
-        font-weight: 900;
-    }
-
-    .verification-page .status-title {
-        margin: 0;
-        font-size: 17px;
-        font-weight: 900;
-    }
-
-    .verification-page .status-description {
-        margin: 5px 0 0;
+    .verification-page .verification-message {
+        color: #666;
         font-size: 13px;
         line-height: 2;
-    }
-
-    .verification-page .section {
-        margin-top: 34px;
-    }
-
-    .verification-page .section-heading {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin: 0 0 18px;
-        font-size: 17px;
-        font-weight: 900;
-    }
-
-    .verification-page .section-heading::before {
-        width: 4px;
-        height: 24px;
-        flex: 0 0 4px;
-        content: "";
-        background: var(--brand);
-        border-radius: 8px;
-    }
-
-    .verification-page .section-caption {
-        margin: -10px 0 18px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .verification-page .details-grid {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 14px;
-    }
-
-    .verification-page .detail-card {
-        min-width: 0;
-        padding: 17px;
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: 13px;
-    }
-
-    .verification-page .detail-label {
-        display: block;
-        margin-bottom: 8px;
-        color: var(--muted);
-        font-size: 12px;
-    }
-
-    .verification-page .detail-value {
-        display: block;
-        font-size: 14px;
-        font-weight: 800;
-        overflow-wrap: anywhere;
-    }
-
-    .verification-page .table-frame {
-        overflow: hidden;
-        border: 1px solid var(--line);
-        border-radius: 14px;
-    }
-
-    .verification-page .items-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: right;
-    }
-
-    .verification-page .items-table thead {
-        color: #fff;
-        background: var(--brand);
-    }
-
-    .verification-page .items-table th {
-        padding: 15px 13px;
-        font-size: 12px;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    .verification-page .items-table td {
-        padding: 16px 13px;
-        border-bottom: 1px solid #eeeeee;
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    .verification-page .items-table tbody tr:nth-child(even) {
-        background: #fafafa;
-    }
-
-    .verification-page .items-table tbody tr:last-child td {
-        border-bottom: 0;
-    }
-
-    .verification-page .product-description {
-        min-width: 160px;
-        font-weight: 700;
-        line-height: 1.9;
-    }
-
-    .verification-page .number-cell {
-        white-space: nowrap;
-        font-variant-numeric: tabular-nums;
-    }
-
-    .verification-page .empty-row {
-        padding: 28px !important;
-        color: var(--muted);
-        text-align: center;
-    }
-
-    .verification-page .summary-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(280px, 390px);
-        gap: 22px;
-        align-items: start;
-    }
-
-    .verification-page .summary-note {
-        padding: 20px;
-        background: #fafafa;
-        border: 1px solid var(--line);
-        border-radius: 15px;
-    }
-
-    .verification-page .summary-note-title {
-        margin: 0 0 10px;
-        font-size: 14px;
-        font-weight: 900;
-    }
-
-    .verification-page .summary-note-text {
-        margin: 0;
-        color: #555;
-        font-size: 13px;
-        line-height: 2.2;
-        white-space: pre-line;
-        overflow-wrap: anywhere;
-    }
-
-    .verification-page .totals-card {
-        padding: 22px;
-        background: #fafafa;
-        border: 1px solid var(--line);
-        border-radius: 15px;
-    }
-
-    .verification-page .total-row {
-        display: flex;
-        align-items: flex-start;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 10px 0;
-        font-size: 13px;
-    }
-
-    .verification-page .total-label {
-        color: var(--muted);
-    }
-
-    .verification-page .total-value {
-        font-weight: 800;
-        text-align: left;
-        white-space: nowrap;
-    }
-
-    .verification-page .grand-total {
-        margin-top: 10px;
-        padding: 18px 0 0;
-        border-top: 1px solid #dedede;
-    }
-
-    .verification-page .grand-total .total-label,
-    .verification-page .grand-total .total-value {
-        color: var(--brand);
-        font-size: 16px;
-        font-weight: 900;
-    }
-
-    .verification-page .currency-note {
-        margin: 12px 0 0;
-        color: var(--muted);
-        font-size: 11px;
-        line-height: 1.9;
-    }
-
-    .verification-page .notes-list {
-        display: grid;
-        gap: 10px;
-    }
-
-    .verification-page .note-card {
-        padding: 15px 18px;
-        background: #fafafa;
-        border: 1px solid var(--line);
-        border-radius: 12px;
-        font-size: 13px;
-        line-height: 2.1;
-        white-space: pre-line;
-        overflow-wrap: anywhere;
-    }
-
-    .verification-page .document-bottom {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 24px;
-        margin-top: 34px;
-        padding-top: 26px;
-        border-top: 1px solid var(--line);
-    }
-
-    .verification-page .verification-footnote {
-        max-width: 620px;
-        color: var(--muted);
-        font-size: 12px;
-        line-height: 2.1;
-    }
-
-    .verification-page .verification-footnote strong {
-        display: block;
-        margin-bottom: 5px;
-        color: var(--ink);
-        font-size: 13px;
     }
 
     .verification-page .print-button {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        gap: 9px;
-        min-height: 46px;
-        padding: 0 22px;
+        gap: 8px;
+        flex-shrink: 0;
+        min-height: 42px;
+        padding: 9px 18px;
         color: #fff;
-        background: var(--brand);
-        border: 1px solid var(--brand);
-        border-radius: 11px;
+        background: #674040;
+        border: 1px solid #674040;
+        border-radius: 9px;
         font: inherit;
         font-size: 13px;
         font-weight: 700;
         cursor: pointer;
-        transition: background .2s ease, transform .2s ease;
-        white-space: nowrap;
+        transition: background .2s ease;
     }
 
     .verification-page .print-button:hover {
-        background: var(--brand-dark);
-        transform: translateY(-1px);
+        background: #4d2d2d;
     }
 
-    .verification-page .document-footer {
-        padding: 20px 32px;
-        color: var(--muted);
-        background: #fafafa;
-        border-top: 1px solid var(--line);
-        font-size: 11px;
-        line-height: 2;
+    .verification-page #invoice-print-sheet {
+        width: min(210mm, 100%);
+        min-height: 297mm;
+        margin: 0 auto;
+        padding: 10mm;
+        color: #362727;
+        background: #fff;
+        border: 1px solid #e5e5e5;
+        box-shadow: 0 12px 40px rgba(34, 34, 34, .09);
+        font-family: Tahoma, Arial, sans-serif;
+        font-size: 10px;
+        line-height: 1.8;
+    }
+
+    .verification-page #invoice-print-sheet * {
+        box-sizing: border-box;
+    }
+
+    .verification-page .print-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 12px;
+        padding: 5px 0 13px;
+        border-bottom: 2px solid #674040;
+    }
+
+    .verification-page .print-brand {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 12px;
+        min-width: 0;
+    }
+
+    .verification-page .print-logo {
+        display: block;
+        width: auto;
+        max-width: 100px;
+        max-height: 75px;
+        object-fit: contain;
+    }
+
+    .verification-page .print-brand-name {
+        color: #362727;
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 1.5;
+    }
+
+    .verification-page .print-subtitle {
+        margin-top: 2px;
+        color: #674040;
+        font-size: 9px;
+    }
+
+    .verification-page .print-company-info {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        color: #362727;
+        font-size: 9px;
+    }
+
+    .verification-page .print-company-line {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-company-icon {
+        display: inline-flex;
+        flex: 0 0 14px;
+        align-items: center;
+        justify-content: center;
+        color: #674040;
+        font-weight: bold;
+    }
+
+    .verification-page .print-overview {
+        display: grid;
+        grid-template-columns: 1fr 1.1fr 1fr;
+        align-items: center;
+        gap: 12px;
+        margin: 14px 0 16px;
+    }
+
+    .verification-page .print-qr-card {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        padding: 9px;
+        border: 1px solid #d8dfe4;
+        border-radius: 8px;
+        background: #F4F0EE;
+    }
+
+    .verification-page .print-qr-card img {
+        flex: 0 0 65px;
+        width: 65px;
+        height: 65px;
+        padding: 3px;
+        background: #fff;
+        object-fit: contain;
+    }
+
+    .verification-page .print-qr-copy {
+        min-width: 0;
+        font-size: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-qr-copy strong {
+        display: block;
+        margin-bottom: 4px;
+        font-size: 9px;
+    }
+
+    .verification-page .print-main-title {
         text-align: center;
     }
 
+    .verification-page .print-document-heading {
+        margin: 0 0 8px;
+        color: #362727;
+        font-size: 20px;
+        font-weight: 900;
+        line-height: 1.5;
+    }
+
+    .verification-page .print-document-number {
+        padding: 7px 9px;
+        border-radius: 24px;
+        background: #674040;
+        color: #fff;
+        font-size: 10px;
+        font-weight: bold;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-document-meta {
+        display: grid;
+        gap: 7px;
+        padding-right: 12px;
+        border-right: 1px solid #baadad;
+    }
+
+    .verification-page .print-meta-row {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .verification-page .print-meta-row strong {
+        white-space: nowrap;
+    }
+
+    .verification-page .print-meta-value {
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-status {
+        display: inline-block;
+        padding: 2px 12px;
+        border-radius: 20px;
+        background: #d8f5e2;
+        color: #16803d;
+        font-weight: bold;
+        text-align: center;
+        white-space: nowrap;
+    }
+
+    .verification-page .print-status.is-invalid {
+        background: #f9e0e0;
+        color: #a51d2d;
+    }
+
+    .verification-page .print-info-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .verification-page .print-card {
+        min-width: 0;
+        overflow: hidden;
+        border: 1px solid #d8dfe4;
+        border-radius: 8px;
+        background: #fff;
+        break-inside: avoid;
+    }
+
+    .verification-page .print-card-title {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        min-height: 34px;
+        padding: 7px 11px;
+        background: #F4F0EE;
+        color: #362727;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .verification-page .print-card-title .print-card-icon {
+        color: #674040;
+        font-size: 14px;
+    }
+
+    .verification-page .print-card-body {
+        padding: 8px 11px;
+    }
+
+    .verification-page .print-info-row {
+        display: grid;
+        grid-template-columns: 40% 60%;
+        gap: 6px;
+        padding: 5px 0;
+        align-items: start;
+    }
+
+    .verification-page .print-info-row + .print-info-row {
+        border-top: 1px solid #f0ebeb;
+    }
+
+    .verification-page .print-info-label {
+        font-weight: bold;
+    }
+
+    .verification-page .print-info-value {
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-items {
+        margin-bottom: 15px;
+        overflow: hidden;
+        border: 1px solid #d8dfe4;
+        border-radius: 8px;
+    }
+
+    .verification-page .print-items table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+        font-size: 8px;
+    }
+
+    .verification-page .print-items th,
+    .verification-page .print-items td {
+        padding: 7px 4px;
+        border-left: 1px solid #e1e5e8;
+        border-bottom: 1px solid #e1e5e8;
+        text-align: center;
+        vertical-align: middle;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-items th {
+        background: #674040;
+        color: #fff;
+        font-weight: bold;
+    }
+
+    .verification-page .print-items tbody tr:nth-child(even) {
+        background: #F4F0EE;
+    }
+
+    .verification-page .print-items tbody tr {
+        break-inside: avoid;
+    }
+
+    .verification-page .print-product-name {
+        text-align: right !important;
+    }
+
+    .verification-page .print-product-dimensions {
+        display: block;
+        margin-top: 2px;
+        color: #8d6666;
+        font-size: 8px;
+    }
+
+    .verification-page .print-empty-row {
+        padding: 20px !important;
+        text-align: center !important;
+    }
+
+    .verification-page .print-bottom-grid {
+        display: grid;
+        grid-template-columns: 1.05fr 1fr;
+        gap: 12px;
+        align-items: stretch;
+    }
+
+    .verification-page .print-notes-list {
+        margin: 0;
+        padding: 0 15px 0 0;
+    }
+
+    .verification-page .print-notes-list li {
+        margin: 0 0 5px;
+        padding-right: 2px;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-notes-list li:last-child {
+        margin-bottom: 0;
+    }
+
+    .verification-page .print-totals-body {
+        padding: 8px 11px;
+    }
+
+    .verification-page .print-total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 0;
+        border-bottom: 1px solid #e8e0e0;
+    }
+
+    .verification-page .print-total-row strong {
+        white-space: nowrap;
+    }
+
+    .verification-page .print-grand-total {
+        margin-top: 5px;
+        padding: 10px;
+        border: 0;
+        border-radius: 5px;
+        background: #f8e9ec;
+        color: #674040;
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .verification-page .print-footer {
+        display: grid;
+        grid-template-columns: 1fr 1.3fr .8fr;
+        align-items: center;
+        gap: 12px;
+        margin-top: 16px;
+        padding: 8px 0 12px;
+    }
+
+    .verification-page .print-verification-badge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        min-height: 54px;
+        padding: 8px;
+        border-radius: 8px;
+        background: #674040;
+        color: #fff;
+        text-align: center;
+    }
+
+    .verification-page .print-verification-badge strong {
+        display: block;
+        font-size: 10px;
+    }
+
+    .verification-page .print-verification-badge small {
+        display: block;
+        margin-top: 3px;
+        font-size: 8px;
+    }
+
+    .verification-page .print-shield {
+        font-size: 25px;
+        line-height: 1;
+    }
+
+    .verification-page .print-footer-qr {
+        text-align: center;
+        font-size: 8px;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-footer-qr img {
+        display: block;
+        width: 65px;
+        height: 65px;
+        margin: 0 auto 4px;
+        object-fit: contain;
+    }
+
+    .verification-page .print-footer-brand {
+        color: #362727;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .verification-page .print-bottom-bar {
+        margin-top: 3px;
+        padding: 12px 8px;
+        background: #674040;
+        color: #fff;
+        text-align: center;
+        font-size: 10px;
+        font-weight: bold;
+    }
+
+    .verification-page .print-note-text {
+        white-space: pre-line;
+        overflow-wrap: anywhere;
+    }
+
+    .verification-page .print-plain-url {
+        display: block;
+        margin-top: 4px;
+        direction: ltr;
+        text-align: center;
+        overflow-wrap: anywhere;
+        font-size: 8px;
+    }
+
     @media (max-width: 800px) {
-        .verification-page .document-shell {
-            margin-top: 24px;
+        .verification-page {
+            padding: 18px 10px 30px;
         }
 
-        .verification-page .document-banner,
-        .verification-page .document-content {
-            padding: 24px;
+        .verification-page #invoice-print-sheet {
+            padding: 18px;
         }
 
-        .verification-page .details-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .verification-page .print-overview {
+            grid-template-columns: 1fr 1fr;
         }
 
-        .verification-page .summary-layout {
+        .verification-page .print-main-title {
+            grid-column: 1 / -1;
+            grid-row: 1;
+        }
+
+        .verification-page .print-qr-card,
+        .verification-page .print-document-meta {
+            grid-row: 2;
+        }
+
+        .verification-page .print-info-grid {
             grid-template-columns: 1fr;
         }
 
-        .verification-page .document-bottom {
+        .verification-page .print-bottom-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .verification-page .print-footer {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .verification-page .print-verification-badge {
+            grid-column: 1 / -1;
+            grid-row: 1;
+        }
+    }
+
+    @media (max-width: 560px) {
+        .verification-page .verification-actions {
             align-items: stretch;
             flex-direction: column;
         }
@@ -554,188 +622,90 @@
         .verification-page .print-button {
             width: 100%;
         }
-    }
 
-    @media (max-width: 560px) {
-        .verification-page .document-shell {
-            width: calc(100% - 20px);
-            margin: 14px auto 30px;
+        .verification-page #invoice-print-sheet {
+            padding: 12px;
+            font-size: 9px;
         }
 
-        .verification-page .document-card {
-            border-radius: 16px;
-        }
-
-        .verification-page .document-banner,
-        .verification-page .document-content {
-            padding: 18px;
-        }
-
-        .verification-page .brand-row {
+        .verification-page .print-header {
             align-items: flex-start;
             flex-direction: column;
-            gap: 18px;
         }
 
-        .verification-page .brand-info {
-            gap: 12px;
+        .verification-page .print-brand-name {
+            font-size: 17px;
         }
 
-        .verification-page .brand-logo {
-            width: 58px;
-            height: 58px;
-            flex-basis: 58px;
-            border-radius: 12px;
-        }
-
-        .verification-page .brand-caption {
-            font-size: 11px;
-        }
-
-        .verification-page .document-type-box {
-            min-width: 0;
-            padding: 8px 14px;
-            text-align: right;
-        }
-
-        .verification-page .document-type-box strong {
-            font-size: 16px;
-        }
-
-        .verification-page .banner-bottom {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 12px;
-            margin-top: 20px;
-        }
-
-        .verification-page .document-number {
-            font-size: 15px;
-        }
-
-        .verification-page .status-panel {
-            gap: 12px;
-            padding: 15px;
-            margin-bottom: 26px;
-        }
-
-        .verification-page .status-icon {
-            width: 36px;
-            height: 36px;
-            flex-basis: 36px;
-        }
-
-        .verification-page .status-title {
-            font-size: 15px;
-        }
-
-        .verification-page .details-grid {
+        .verification-page .print-overview {
             grid-template-columns: 1fr;
-            gap: 10px;
         }
 
-        .verification-page .detail-card {
-            padding: 13px 15px;
+        .verification-page .print-main-title,
+        .verification-page .print-qr-card,
+        .verification-page .print-document-meta {
+            grid-column: auto;
+            grid-row: auto;
         }
 
-        .verification-page .detail-label {
-            margin-bottom: 4px;
+        .verification-page .print-document-meta {
+            padding-right: 0;
+            border-right: 0;
         }
 
-        .verification-page .section {
-            margin-top: 28px;
+        .verification-page .print-footer {
+            grid-template-columns: 1fr;
         }
 
-        .verification-page .section-heading {
-            font-size: 15px;
+        .verification-page .print-verification-badge {
+            grid-column: auto;
+            grid-row: auto;
         }
 
-        .verification-page .table-frame {
+        .verification-page .print-items {
             overflow-x: auto;
         }
 
-        .verification-page .items-table {
+        .verification-page .print-items table {
             min-width: 680px;
-        }
-
-        .verification-page .document-footer {
-            padding: 18px;
         }
     }
 
     @page {
-        size: A4;
-        margin: 12mm;
+        size: A4 portrait;
+        margin: 7mm;
     }
 
     @media print {
         html,
         body {
+            margin: 0 !important;
+            padding: 0 !important;
+            background: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
+        body * {
+            visibility: hidden !important;
+        }
+
+        .verification-page,
+        .verification-page * {
+            visibility: visible !important;
+        }
+
+        .verification-page {
+            position: absolute !important;
+            top: 0 !important;
+            right: 0 !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff !important;
         }
 
-        body {
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        .verification-page .document-shell {
-            width: 100%;
-            max-width: none;
-            margin: 0;
-        }
-
-        .verification-page .document-card {
-            overflow: visible;
-            border: 0;
-            border-radius: 0;
-            box-shadow: none;
-        }
-
-        .verification-page .document-banner {
-            padding: 20px 24px;
-        }
-
-        .verification-page .document-content {
-            padding: 22px 0;
-        }
-
-        .verification-page .status-panel,
-        .verification-page .detail-card,
-        .verification-page .totals-card,
-        .verification-page .summary-note,
-        .verification-page .note-card,
-        .verification-page .table-frame {
-            break-inside: avoid;
-        }
-
-        .verification-page .section {
-            break-inside: avoid;
-        }
-
-        .verification-page .items-table {
-            min-width: 0;
-        }
-
-        .verification-page .items-table th,
-        .verification-page .items-table td {
-            padding: 9px 7px;
-            font-size: 10px;
-        }
-
-        .verification-page .details-grid {
-            gap: 8px;
-        }
-
-        .verification-page .detail-card {
-            padding: 11px;
-        }
-
-        .verification-page .document-bottom {
-            margin-top: 22px;
-        }
-
-        .verification-page .print-button,
+        .verification-page .verification-actions,
         .verification-page .no-print,
         body > header,
         body > footer,
@@ -746,321 +716,511 @@
             display: none !important;
         }
 
+        .verification-page #invoice-print-sheet {
+            display: block !important;
+            width: 100% !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            border: 0 !important;
+            box-shadow: none !important;
+            color: #362727 !important;
+            background: #fff !important;
+            font-family: Tahoma, Arial, sans-serif !important;
+            font-size: 8pt !important;
+            line-height: 1.7 !important;
+        }
+
+        .verification-page #invoice-print-sheet .print-header {
+            padding: 5px 0 13px;
+        }
+
+        .verification-page #invoice-print-sheet .print-brand-name {
+            font-size: 19pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-subtitle {
+            font-size: 8pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-company-info {
+            font-size: 7.5pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-overview {
+            grid-template-columns: 1fr 1.1fr 1fr;
+            margin: 14px 0 16px;
+        }
+
+        .verification-page #invoice-print-sheet .print-main-title {
+            grid-column: auto;
+            grid-row: auto;
+        }
+
+        .verification-page #invoice-print-sheet .print-qr-card,
+        .verification-page #invoice-print-sheet .print-document-meta {
+            grid-row: auto;
+        }
+
+        .verification-page #invoice-print-sheet .print-document-heading {
+            font-size: 20pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-document-number {
+            font-size: 10pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-info-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .verification-page #invoice-print-sheet .print-bottom-grid {
+            grid-template-columns: 1.05fr 1fr;
+        }
+
+        .verification-page #invoice-print-sheet .print-items {
+            overflow: hidden;
+        }
+
+        .verification-page #invoice-print-sheet .print-items table {
+            min-width: 0;
+            font-size: 6.5pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-items th,
+        .verification-page #invoice-print-sheet .print-items td {
+            padding: 7px 4px;
+            font-size: 6.5pt;
+        }
+
+        .verification-page #invoice-print-sheet .print-footer {
+            grid-template-columns: 1fr 1.3fr .8fr;
+        }
+
+        .verification-page #invoice-print-sheet .print-verification-badge {
+            grid-column: auto;
+            grid-row: auto;
+        }
+
+        .verification-page #invoice-print-sheet .print-footer-qr img {
+            width: 65px;
+            height: 65px;
+        }
+
+        .verification-page #invoice-print-sheet .print-card,
+        .verification-page #invoice-print-sheet .print-items,
+        .verification-page #invoice-print-sheet .print-bottom-grid,
+        .verification-page #invoice-print-sheet .print-footer {
+            break-inside: avoid;
+        }
+
+        .verification-page #invoice-print-sheet .print-status,
+        .verification-page #invoice-print-sheet .print-document-number,
+        .verification-page #invoice-print-sheet .print-card-title,
+        .verification-page #invoice-print-sheet .print-items th,
+        .verification-page #invoice-print-sheet .print-items tbody tr:nth-child(even),
+        .verification-page #invoice-print-sheet .print-grand-total,
+        .verification-page #invoice-print-sheet .print-verification-badge,
+        .verification-page #invoice-print-sheet .print-bottom-bar {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+        }
+
         a {
             color: inherit !important;
             text-decoration: none !important;
+        }
+        @font-face {
+            font-family: 'kohan';
+            src: url('../font/Kohan-Medium.woff2');
+        }
+
+        @font-face {
+            font-family: 'kohanBold';
+            src: url('../font/Kohan-Bold.woff2');
+        }
+
+        body {
+            font-family: 'kohan';
+        }
+
+        h1, h2, h3, h4{
+            font-family: 'kohanBold';
+        }
+
+        .kohan-bold{
+            font-family: kohanBold;
         }
     }
 </style>
 @endpush
 
 @section('content')
-<div class="verification-page">
-    <div class="document-shell">
-        <article class="document-card">
+<div class="verification-page" style="padding-top: 125px;">
+    <div class="verification-actions no-print ">
+        <div class="verification-message kohan-bold">
+            وضعیت اعتبار سند در زمان مشاهده بررسی می‌شود.
+        </div>
 
-            <header class="document-banner">
-                <div class="brand-row">
-                    <div class="brand-info">
-                        <div class="brand-logo">
-                            <img
-                                src="{{ asset('img/kohan-logo.png') }}"
-                                alt="لوگوی کهن پلیمر البرز"
-                            >
-                        </div>
+        <button
+            type="button"
+            class="print-button"
+            onclick="window.print()"
+        >
+            <span>▤</span>
+            <span>چاپ یا ذخیره PDF</span>
+        </button>
+    </div>
 
-                        <div>
-                            <h1 class="brand-name">کهن پلیمر البرز</h1>
-                            <p class="brand-caption">
-                                سامانه بررسی اصالت و اعتبار اسناد
-                            </p>
-                        </div>
-                    </div>
-
-                    <div class="document-type-box">
-                        <span>نوع سند صادرشده</span>
-                        <strong>{{ $documentType }}</strong>
-                    </div>
-                </div>
-
-                <div class="banner-bottom">
-                    <div>
-                        <div class="document-number-label">شماره سند</div>
-                        <div class="document-number">
-                            {{ $invoice->document_number }}
-                        </div>
-                    </div>
-
-                    <div class="verification-label">
-                        <span>●</span>
-                        <span>بررسی آنلاین سند</span>
-                    </div>
-                </div>
-            </header>
-
-            <div class="document-content">
-
-                <section
-                    class="status-panel {{ $isVoided ? 'voided' : ($isExpired ? 'expired' : 'valid') }}"
-                    aria-live="polite"
-                >
-                    <div class="status-icon">
-                        @if($isVoided)
-                            ×
-                        @elseif($isExpired)
-                            !
-                        @else
-                            ✓
-                        @endif
-                    </div>
-
-                    <div>
-                        <h2 class="status-title">
-                            وضعیت اعتبار سند: {{ $statusText }}
-                        </h2>
-
-                        <p class="status-description">
-                            {{ $statusDescription }}
-                        </p>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <h2 class="section-heading">مشخصات سند</h2>
-
-                    <div class="details-grid">
-                        <div class="detail-card">
-                            <span class="detail-label">شماره سند</span>
-                            <strong class="detail-value">
-                                {{ $invoice->document_number }}
-                            </strong>
-                        </div>
-
-                        <div class="detail-card">
-                            <span class="detail-label">نام مشتری</span>
-                            <strong class="detail-value">
-                                {{ $customerName }}
-                            </strong>
-                        </div>
-
-                        <div class="detail-card">
-                            <span class="detail-label">تاریخ صدور</span>
-                            <strong class="detail-value">
-                                {{ $formatDate($invoice->issue_date) }}
-                            </strong>
-                        </div>
-
-                        @if($invoice->type === 'proforma')
-                            <div class="detail-card">
-                                <span class="detail-label">معتبر تا تاریخ</span>
-                                <strong class="detail-value">
-                                    {{ $formatDate($invoice->valid_until) }}
-                                </strong>
-                            </div>
-                        @endif
-
-                        <div class="detail-card">
-                            <span class="detail-label">نوع پرداخت</span>
-                            <strong class="detail-value">
-                                {{ $invoice->payment_type ?: '—' }}
-                            </strong>
-                        </div>
-
-                        <div class="detail-card">
-                            <span class="detail-label">نوع صدور</span>
-                            <strong class="detail-value">
-                                {{ $invoice->is_formal ? 'رسمی' : 'غیررسمی' }}
-                            </strong>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <h2 class="section-heading">جزئیات اقلام</h2>
-                    <p class="section-caption">
-                        فهرست اقلام و مبالغ ثبت‌شده در سند صادرشده
-                    </p>
-
-                    <div class="table-frame">
-                        <table class="items-table">
-                            <thead>
-                                <tr>
-                                    <th>ردیف</th>
-                                    <th>شرح محصول</th>
-                                    <th>تعداد</th>
-                                    <th>واحد</th>
-                                    <th>قیمت واحد</th>
-                                    <th>مبلغ اقلام</th>
-                                    <th>مالیات</th>
-                                    <th>مبلغ نهایی</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                                @forelse($items as $item)
-                                    @php
-                                        $quantity = (float) ($item->quantity ?? 0);
-                                        $unitPrice = (float) ($item->unit_price ?? 0);
-                                        $lineSubtotal = (float) ($item->total_amount ?? ($quantity * $unitPrice));
-                                        $lineTax = (float) ($item->vat_amount ?? 0);
-                                        $lineGrandTotal = (float) (
-                                            $item->grand_total
-                                            ?? ($lineSubtotal + $lineTax)
-                                        );
-                                    @endphp
-
-                                    <tr>
-                                        <td class="number-cell">
-                                            {{ $loop->iteration }}
-                                        </td>
-
-                                        <td class="product-description">
-                                            {{ $item->description ?: '—' }}
-
-                                            @if($item->width || $item->thickness)
-                                                <div class="text-xs font-normal text-gray-500">
-                                                    @if($item->width)
-                                                        عرض: {{ $item->width }}
-                                                    @endif
-
-                                                    @if($item->width && $item->thickness)
-                                                        |
-                                                    @endif
-
-                                                    @if($item->thickness)
-                                                        ضخامت: {{ $item->thickness }}
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        </td>
-
-                                        <td class="number-cell">
-                                            {{ number_format($quantity, 2, '.', ',') }}
-                                        </td>
-
-                                        <td>{{ $item->unit ?: '—' }}</td>
-
-                                        <td class="number-cell">
-                                            {{ $formatMoney($unitPrice) }}
-                                        </td>
-
-                                        <td class="number-cell">
-                                            {{ $formatMoney($lineSubtotal) }}
-                                        </td>
-
-                                        <td class="number-cell">
-                                            {{ $formatMoney($lineTax) }}
-                                        </td>
-
-                                        <td class="number-cell font-bold">
-                                            {{ $formatMoney($lineGrandTotal) }}
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="8" class="empty-row">
-                                            هیچ قلمی برای این سند ثبت نشده است.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
-
-                <section class="section">
-                    <h2 class="section-heading">خلاصه مالی سند</h2>
-
-                    <div class="summary-layout">
-                        <div>
-                            @if($invoice->description)
-                                <div class="summary-note">
-                                    <h3 class="summary-note-title">
-                                        توضیحات سند
-                                    </h3>
-
-                                    <p class="summary-note-text">{{ $invoice->description }}</p>
-                                </div>
-                            @else
-                                <div class="summary-note">
-                                    <h3 class="summary-note-title">
-                                        اطلاعات مالی
-                                    </h3>
-
-                                    <p class="summary-note-text">
-                                        مبالغ این بخش بر اساس اطلاعات ثبت‌شده برای اقلام سند محاسبه شده‌اند.
-                                    </p>
-                                </div>
-                            @endif
-                        </div>
-
-                        <div class="totals-card">
-                            <div class="total-row">
-                                <span class="total-label">جمع اقلام</span>
-                                <strong class="total-value">
-                                    {{ $formatMoney($subtotal) }}
-                                </strong>
-                            </div>
-
-                            <div class="total-row">
-                                <span class="total-label">مالیات و عوارض</span>
-                                <strong class="total-value">
-                                    {{ $formatMoney($taxAmount) }}
-                                </strong>
-                            </div>
-
-                            <div class="total-row grand-total">
-                                <span class="total-label">مبلغ نهایی</span>
-                                <strong class="total-value">
-                                    {{ $formatMoney($grandTotal) }}
-                                </strong>
-                            </div>
-
-                            <p class="currency-note">
-                                واحد پول مطابق اطلاعات ثبت‌شده در سامانه است.
-                            </p>
-                        </div>
-                    </div>
-                </section>
-
-                @if($invoice->notes->isNotEmpty())
-                    <section class="section">
-                        <h2 class="section-heading">یادداشت‌ها</h2>
-
-                        <div class="notes-list">
-                            @foreach($invoice->notes as $note)
-                                <div class="note-card">
-                                    {{ $note->description ?? '—' }}
-                                </div>
-                            @endforeach
-                        </div>
-                    </section>
+    <div id="invoice-print-sheet" dir="rtl">
+        <header class="print-header kohan-bold">
+            <div class="print-brand">
+                @if($logoUrl)
+                    <img
+                        src="{{ $logoUrl }}"
+                        alt="لوگوی کهن پلیمر البرز"
+                        class="print-logo"
+                    >
                 @endif
 
-                <div class="document-bottom">
-                    <div class="verification-footnote">
-                        <strong>درباره تأیید اصالت سند</strong>
-                        این صفحه برای بررسی وضعیت سند صادرشده از سامانه کهن پلیمر البرز ارائه شده است.
-                        وضعیت اعتبار در زمان مشاهده محاسبه می‌شود.
-                    </div>
-
-                    <button
-                        type="button"
-                        class="print-button no-print"
-                        onclick="window.print()"
-                    >
-                        <span>▤</span>
-                        <span>چاپ یا ذخیره PDF</span>
-                    </button>
+                <div>
+                    <div class="print-brand-name">کهن پلیمر البرز</div>
+                    <div class="print-subtitle">KOHAN POLYMER ALBORZ</div>
                 </div>
             </div>
 
-            <footer class="document-footer">
-                کهن پلیمر البرز | مهندسی آینده در صنعت پلیمر
-                <br>
-                این صفحه صرفاً برای بررسی اصالت و وضعیت سند صادرشده است.
-            </footer>
-        </article>
+            <div class="print-company-info" style="direction: ltr;">
+                @if($printPhone)
+                    <div class="print-company-line">
+                        <span class="print-company-icon">☎</span>
+                        <span>{{ $formatDigits($printPhone) }}</span>
+                    </div>
+                @endif
+
+                @if($printEmail)
+                    <div class="print-company-line">
+                        <span class="print-company-icon">✉</span>
+                        <span>{{ $printEmail }}</span>
+                    </div>
+                @endif
+
+                <div class="print-company-line">
+                    <span class="print-company-icon">◎</span>
+                    <span>{{ $printWebsite }}</span>
+                </div>
+            </div>
+        </header>
+
+        <section class="print-overview kohan-bold">
+            <div class="print-qr-card">
+                @if(!empty($qrCodeDataUri))
+                    <img
+                        src="{{ $qrCodeDataUri }}"
+                        alt="QR اعتبارسنجی سند"
+                    >
+                @endif
+
+                <div class="print-qr-copy">
+                    <strong>کد اعتبارسنجی سند</strong>
+                    <div>برای بررسی اصالت سند، کد QR را اسکن کنید.</div>
+                </div>
+            </div>
+
+            <div class="print-main-title">
+                <h1 class="print-document-heading">
+                    {{ $documentType }} فروش
+                </h1>
+
+                <div class="print-document-number">
+                    شماره {{ $documentType }}:
+                    {{ $formatDigits($invoice->document_number) }}
+                </div>
+            </div>
+
+            <div class="print-document-meta">
+                <div class="print-meta-row">
+                    <strong>تاریخ صدور:</strong>
+                    <span class="print-meta-value">
+                        {{ $formatDate($invoice->issue_date) }}
+                    </span>
+                </div>
+
+                @if($invoice->type === 'proforma')
+                    <div class="print-meta-row">
+                        <strong>تاریخ اعتبار:</strong>
+                        <span class="print-meta-value">
+                            {{ $formatDate($invoice->valid_until) }}
+                        </span>
+                    </div>
+                @endif
+
+                <div class="print-meta-row">
+                    <strong>وضعیت:</strong>
+                    <span class="print-meta-value">
+                        <span class="print-status {{ $isVoided || $isExpired ? 'is-invalid' : '' }}">
+                            {{ $statusText }}
+                        </span>
+                    </span>
+                </div>
+
+                <div class="print-meta-row">
+                    <strong>نوع پرداخت:</strong>
+                    <span class="print-meta-value">
+                        {{ $invoice->payment_type ?: '—' }}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <section class="print-info-grid kohan-bold">
+            <div class="print-card">
+                <div class="print-card-title">
+                    <span class="print-card-icon">♙</span>
+                    مشخصات مشتری
+                </div>
+
+                <div class="print-card-body">
+                    <div class="print-info-row">
+                        <span class="print-info-label">نام / نام شرکت:</span>
+                        <span class="print-info-value">{{ $customerName }}</span>
+                    </div>
+
+                    @if(!empty($invoice->customer?->phone))
+                        <div class="print-info-row">
+                            <span class="print-info-label">شماره تماس:</span>
+                            <span class="print-info-value">
+                                {{ $formatDigits($invoice->customer->phone) }}
+                            </span>
+                        </div>
+                    @endif
+
+                    @if(!empty($invoice->customer?->address))
+                        <div class="print-info-row">
+                            <span class="print-info-label">آدرس:</span>
+                            <span class="print-info-value">
+                                {{ $invoice->customer->address }}
+                            </span>
+                        </div>
+                    @endif
+                </div>
+            </div>
+
+            <div class="print-card">
+                <div class="print-card-title">
+                    <span class="print-card-icon">▤</span>
+                    اطلاعات سند
+                </div>
+
+                <div class="print-card-body">
+                    <div class="print-info-row">
+                        <span class="print-info-label">شماره سند:</span>
+                        <span class="print-info-value">
+                            {{ $formatDigits($invoice->document_number) }}
+                        </span>
+                    </div>
+
+                    <div class="print-info-row">
+                        <span class="print-info-label">تاریخ صدور:</span>
+                        <span class="print-info-value">
+                            {{ $formatDate($invoice->issue_date) }}
+                        </span>
+                    </div>
+
+                    @if($invoice->type === 'proforma')
+                        <div class="print-info-row">
+                            <span class="print-info-label">معتبر تا:</span>
+                            <span class="print-info-value">
+                                {{ $formatDate($invoice->valid_until) }}
+                            </span>
+                        </div>
+                    @endif
+
+                    <div class="print-info-row">
+                        <span class="print-info-label">وضعیت:</span>
+                        <span class="print-info-value">{{ $statusText }}</span>
+                    </div>
+
+                    <div class="print-info-row">
+                        <span class="print-info-label">نوع صدور:</span>
+                        <span class="print-info-value">
+                            {{ $invoice->is_formal ? 'رسمی' : 'غیررسمی' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="print-items kohan-bold">
+            <table>
+                <colgroup>
+                    <col style="width: 4%">
+                    <col style="width: 22%">
+                    <col style="width: 7%">
+                    <col style="width: 7%">
+                    <col style="width: 10%">
+                    <col style="width: 12%">
+                    <col style="width: 7%">
+                    <col style="width: 9%">
+                    <col style="width: 10%">
+                    <col style="width: 12%">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>ردیف</th>
+                        <th>نام کالا / شرح و ابعاد</th>
+                        <th>تعداد</th>
+                        <th>واحد</th>
+                        <th>قیمت واحد (ریال)</th>
+                        <th>قیمت کل (ریال)</th>
+                        <th>مالیات (%)</th>
+                        <th>مالیات (ریال)</th>
+                        <th>مبلغ نهایی (ریال)</th>
+                        <th>جزئیات</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    @forelse($items as $item)
+                        @php
+                            $quantity = (float) ($item->quantity ?? 0);
+                            $unitPrice = (float) ($item->unit_price ?? 0);
+                            $lineSubtotal = (float) (
+                                $item->total_amount ?? ($quantity * $unitPrice)
+                            );
+                            $lineTax = (float) ($item->vat_amount ?? 0);
+                            $lineGrandTotal = (float) (
+                                $item->grand_total ?? ($lineSubtotal + $lineTax)
+                            );
+                        @endphp
+
+                        <tr>
+                            <td>{{ $formatDigits($loop->iteration) }}</td>
+
+                            <td class="print-product-name">
+                                {{ $item->description ?: '—' }}
+
+                                @if($item->width !== null || $item->thickness !== null)
+                                    <span class="print-product-dimensions">
+                                        @if($item->width !== null)
+                                            عرض: {{ $formatMeasurement($item->width) }}
+                                        @endif
+
+                                        @if($item->width !== null && $item->thickness !== null)
+                                            |
+                                        @endif
+
+                                        @if($item->thickness !== null)
+                                            ضخامت: {{ $formatMeasurement($item->thickness) }}
+                                        @endif
+                                    </span>
+                                @endif
+                            </td>
+
+                            <td>{{ $formatNumber($quantity) }}</td>
+                            <td>{{ $item->unit ?: '—' }}</td>
+                            <td>{{ $formatNumber($unitPrice) }}</td>
+                            <td>{{ $formatNumber($lineSubtotal) }}</td>
+                            <td>{{ $formatTaxRate($item->vat_percent ?? 0) }}٪</td>
+                            <td>{{ $formatNumber($lineTax) }}</td>
+                            <td>{{ $formatNumber($lineGrandTotal) }}</td>
+                            <td>ریال</td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="10" class="print-empty-row">
+                                هیچ قلمی برای این سند ثبت نشده است.
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </section>
+
+        <section class="print-bottom-grid kohan-bold">
+            <div class="print-card">
+                <div class="print-card-title">
+                    <span class="print-card-icon">▤</span>
+                    توضیحات
+                </div>
+
+                <div class="print-card-body">
+                    <ul class="print-notes-list">
+                        @foreach($printNotes as $printNote)
+                            <li class="print-note-text">{{ $printNote }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+
+            <div class="print-card">
+                <div class="print-card-title" style="background:#674040;color:#fff;">
+                    جمع کل
+                </div>
+
+                <div class="print-totals-body">
+                    <div class="print-total-row">
+                        <span>جمع جزئیات کالاها</span>
+                        <strong>{{ $formatNumber($totalAmount) }} ریال</strong>
+                    </div>
+
+                    <div class="print-total-row">
+                        <span>مالیات بر ارزش افزوده</span>
+                        <strong>{{ $formatNumber($totalVatAmount) }} ریال</strong>
+                    </div>
+
+                    <div class="print-total-row print-grand-total">
+                        <span>مبلغ کل</span>
+                        <strong>{{ $formatNumber($grandTotal) }} ریال</strong>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="print-footer kohan-bold">
+            <div class="print-footer-brand">
+                <div>کهن پلیمر البرز</div>
+                <div class="print-subtitle">عرضه کننده محصولات پلیمری</div>
+            </div>
+
+            <div class="print-verification-badge">
+                <span class="print-shield">
+                    {{ $isValid ? '✓' : '×' }}
+                </span>
+
+                <div>
+                    <strong>
+                        @if($isVoided)
+                            این سند باطل شده است
+                        @elseif($isExpired)
+                            اعتبار این سند به پایان رسیده است
+                        @else
+                            وضعیت سند: معتبر
+                        @endif
+                    </strong>
+
+                    <small>وضعیت اعتبار در زمان مشاهده بررسی شده است.</small>
+                </div>
+            </div>
+
+            <div class="print-footer-qr">
+                @if(!empty($qrCodeDataUri))
+                    <img
+                        src="{{ $qrCodeDataUri }}"
+                        alt="QR بررسی اصالت"
+                    >
+                @endif
+
+                <strong>بررسی آنلاین اصالت سند</strong>
+            </div>
+        </footer>
+
+        <div class="print-bottom-bar kohan-bold">
+            کهن پلیمر البرز
+            &nbsp; | &nbsp;
+            کیفیت امروز، اعتماد فردا
+        </div>
     </div>
 </div>
 @endsection

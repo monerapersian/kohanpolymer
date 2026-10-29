@@ -180,7 +180,23 @@ class InvoiceController extends Controller
             ->where('qr_token', $token)
             ->firstOrFail();
 
-        return view('invoices.verify', compact('invoice'));
+        $verificationUrl = route('invoices.verify', $invoice->qr_token);
+
+        $qrCode = new QrCode(
+            data: $verificationUrl,
+            size: 220,
+            margin: 10,
+        );
+
+        $writer = new PngWriter();
+        $result = $writer->write($qrCode);
+        $qrCodeDataUri = $result->getDataUri();
+
+        return view('invoices.verify', compact(
+            'invoice',
+            'verificationUrl',
+            'qrCodeDataUri'
+        ));
     }
 
     public function export(Invoice $invoice)

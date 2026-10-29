@@ -8,12 +8,32 @@ use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\InquiryController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Models\Product;
+use App\Models\BlogPost;
 
 // Public Website Routes
 Route::get('/', function () {
     $content = SiteContent::first();
 
-    return view('home', compact('content'));
+    $products = Product::query()
+        ->where('status', 'published')
+        ->orderByDesc('published_at')
+        ->orderByDesc('created_at')
+        ->take(3)
+        ->get();
+
+    $blogPosts = BlogPost::query()
+        ->where('status', 'published')
+        ->orderByDesc('published_at')
+        ->orderByDesc('created_at')
+        ->take(3)
+        ->get();
+
+    return view('home', compact(
+        'content',
+        'products',
+        'blogPosts'
+    ));
 });
 
 // Public Document Verification

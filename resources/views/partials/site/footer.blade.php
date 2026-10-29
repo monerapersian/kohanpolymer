@@ -1,113 +1,140 @@
+@php
+    $siteContent = $content ?? null;
 
-    <!-- ================= FOOTER ================= -->
-    <footer class="border-t">
-        <div class="container-custom pt-14 pb-7">
+    $footerPhones = is_array($siteContent?->phones)
+        ? array_filter($siteContent->phones)
+        : [];
 
-            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-10 pb-12">
+    if (empty($footerPhones) && !empty($siteContent?->phone)) {
+        $footerPhones = [$siteContent->phone];
+    }
 
-                <div class="lg:col-span-2">
-                    <a href="{{ url('/#home') }}" class="inline-flex items-center gap-4 mb-6">
-                        <div class="brand-symbol">
-                            <span class="brand-symbol-inner"></span>
-                        </div>
+    $footerActivityAreas = is_array($siteContent?->activity_areas)
+        ? array_filter($siteContent->activity_areas)
+        : [];
+@endphp
 
-                        <div>
-                            <div class="font-extrabold text-white text-lg">کهن پلیمر البرز</div>
-                            <div class="text-[10px] tracking-widest text-[#aaa] mt-1" dir="ltr">
-                                KOHAN POLYMER ALBORZ
-                            </div>
-                        </div>
-                    </a>
+<!-- Footer -->
+<footer class="site-footer">
+    <div class="container-main">
 
-                    <p class="text-sm text-[#b5b5b5] leading-8 max-w-md">
-                        همراه شما در مسیر انتخاب محصولات پلیمری صنعتی؛
-                        با تمرکز بر نیاز واقعی، مشخصات محصول و ایجاد
-                        زمینه همکاری حرفه‌ای.
-                    </p>
-                </div>
+        <div class="footer-grid">
 
-                <div>
-                    <h3 class="text-white font-bold mb-6">دسترسی سریع</h3>
+            <!-- Brand -->
+            <div>
+                <a href="{{ url('/') }}" class="brand">
+                    @if ($siteContent?->logo)
+                        <img
+                            src="{{ \Illuminate\Support\Facades\Storage::url($siteContent->logo) }}"
+                            alt="لوگوی کهن پلیمر البرز"
+                            class="brand-symbol object-contain bg-white"
+                            loading="lazy"
+                        >
+                    @else
+                        <span class="brand-symbol">ک</span>
+                    @endif
 
-                    <ul class="flex flex-col gap-4 text-sm">
-                        <li><a class="footer-link" href="{{ url('/#home') }}">صفحه اصلی</a></li>
-                        <li><a class="footer-link" href="{{ url('/#products') }}">محصولات</a></li>
-                        <li><a class="footer-link" href="{{ url('/#about') }}">درباره ما</a></li>
-                        <li><a class="footer-link" href="{{ url('/#advantages') }}">مزیت‌های ما</a></li>
-                    </ul>
-                </div>
+                    <span>
+                        <span class="brand-name block">کهن پلیمر البرز</span>
+                        <span class="brand-caption block">مهندسی در ساختار مواد</span>
+                    </span>
+                </a>
 
-                <div>
-                    <h3 class="text-white font-bold mb-6">ارتباط با ما</h3>
-
-                    <ul class="flex flex-col gap-4 text-sm">
-                        <li>
-                            <a class="footer-link" href="{{ url('/#contact') }}">
-                                درخواست همکاری
-                            </a>
-                        </li>
-
-                        @if(isset($content) && $content?->email)                            <li>
-                                <a class="footer-link" href="mailto:{{ $content->email }}" dir="ltr">
-                                    {{ $content->email }}
-                                </a>
-                            </li>
-                        @endif
-
-                        @if(isset($content) && $content?->phone)                            <li>
-                                <a class="footer-link" href="tel:{{ $content->phone }}" dir="ltr">
-                                    تلفن: {{ $content->phone }}
-                                </a>
-                            </li>
-                        @endif
-
-                        @if(isset($content) && $content?->instagram)
-                            <li>
-                                <a
-                                    class="footer-link"
-                                    href="https://instagram.com/{{ $content->instagram }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    dir="ltr"
-                                >
-                                    اینستاگرام
-                                </a>
-                            </li>
-                        @endif
-
-                        @if(isset($content) && $content?->whatsapp)
-                            <li>
-                                <a
-                                    class="footer-link"
-                                    href="https://wa.me/{{ $content->whatsapp }}"
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                >
-                                    واتساپ
-                                </a>
-                            </li>
-                        @endif
-                    </ul>
-
-                    <p class="footer-note text-[11px] mt-5 leading-6">
-                        کافیست یکی از موارد بالا کلیک شود.
-                    </p>
-                </div>
-
+                <p class="footer-description">
+                    {{ $siteContent?->about_text ?: 'همراهی در مسیر انتخاب مواد و راهکارهای پلیمری، با رویکردی حرفه‌ای، نگاهی دقیق و توجه به نیاز صنعت.' }}
+                </p>
             </div>
 
-            <div class="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <p class="footer-copy text-xs text-center sm:text-right">
-                    © تمامی حقوق این وب‌سایت برای کهن پلیمر البرز محفوظ است.
-                </p>
+            <!-- Quick Links -->
+            <div>
+                <h3 class="footer-heading">دسترسی سریع</h3>
 
-                <a
-                    href="{{ url('/#home') }}"
-                    class="flex items-center gap-2 text-xs text-[#b5b5b5] hover:text-white transition"
-                >
-                    بازگشت به بالا <span aria-hidden="true">↑</span>
-                </a>
+                <nav class="footer-links">
+                    <a href="{{ url('/') }}#home">صفحه اصلی</a>
+                    <a href="{{ url('/') }}#about">درباره ما</a>
+                    <a href="{{ url('/') }}#products">محصولات</a>
+                    <a href="{{ url('/') }}#articles">مقالات</a>
+                    <a href="{{ url('/') }}#contact">ارتباط با ما</a>
+                </nav>
+            </div>
+
+            <!-- Activity Areas -->
+            <div>
+                <h3 class="footer-heading">حوزه‌های فعالیت</h3>
+
+                <nav class="footer-links">
+                    @forelse ($footerActivityAreas as $area)
+                        <a href="{{ url('/') }}#products">
+                            {{ $area }}
+                        </a>
+                    @empty
+                        <a href="{{ url('/') }}#products">محصولات پلیمری</a>
+                        <a href="{{ url('/') }}#products">راهکارهای صنعتی</a>
+                    @endforelse
+                </nav>
+            </div>
+
+            <!-- Contact -->
+            <div>
+                <h3 class="footer-heading">ارتباط با ما</h3>
+
+                <div class="footer-contact">
+                    @forelse ($footerPhones as $phone)
+                        <p>
+                            تلفن:
+                            <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}">
+                                {{ $phone }}
+                            </a>
+                        </p>
+                    @empty
+                        <p>شماره تماس ثبت نشده است.</p>
+                    @endforelse
+
+                    @if ($siteContent?->email)
+                        <p>
+                            ایمیل:
+                            <a href="mailto:{{ $siteContent->email }}">
+                                {{ $siteContent->email }}
+                            </a>
+                        </p>
+                    @endif
+
+                    @if ($siteContent?->instagram)
+                        <p>
+                            اینستاگرام:
+                            <a
+                                href="https://instagram.com/{{ ltrim($siteContent->instagram, '@') }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                {{ ltrim($siteContent->instagram, '@') }}
+                            </a>
+                        </p>
+                    @endif
+
+                    @if ($siteContent?->whatsapp)
+                        <p>
+                            <a
+                                href="https://wa.me/{{ preg_replace('/\D+/', '', $siteContent->whatsapp) }}"
+                                target="_blank"
+                                rel="noopener noreferrer"
+                            >
+                                واتساپ
+                            </a>
+                        </p>
+                    @endif
+                </div>
             </div>
 
         </div>
-    </footer>
+
+        <div class="footer-bottom">
+            <p>© تمامی حقوق این وب‌سایت محفوظ است.</p>
+
+            <a href="{{ url('/') }}#home">
+                بازگشت به ابتدای صفحه ↑
+            </a>
+        </div>
+
+    </div>
+</footer>

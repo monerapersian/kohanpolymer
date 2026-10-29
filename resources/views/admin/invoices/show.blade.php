@@ -16,6 +16,38 @@
         ?? '—';
 
     $verificationUrl = route('invoices.verify', $invoice->qr_token);
+
+    $siteContent = \App\Models\SiteContent::first();
+
+    $logoUrl = $siteContent?->logo
+        ? \Illuminate\Support\Facades\Storage::disk('public')->url($siteContent->logo)
+        : null;
+
+    $totalAmount = $invoice->items->sum('total_amount');
+    $totalVatAmount = $invoice->items->sum('vat_amount');
+    $grandTotal = $invoice->items->sum('grand_total');
+
+    // Format monetary amounts without decimal places.
+    $formatNumber = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 0, true);
+
+    // Format VAT rates with one decimal place.
+    $formatTaxRate = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 1, true);
+
+    // Format measurements with up to two decimal places.
+    $formatMeasurement = static fn ($value) =>
+        \App\Support\NumberHelper::format($value, 2, true);
+
+    // Convert digits to Persian numerals.
+    $formatDigits = static fn ($value) =>
+        \App\Support\NumberHelper::toPersian($value);
+
+    // Format dates using the Jalali calendar and Persian numerals.
+    $formatDate = static fn ($value) =>
+        \App\Support\NumberHelper::toPersian(
+            \App\Support\DateHelper::toPersian($value, 'Y/m/d')
+        );
 @endphp
 
 <style>
@@ -25,12 +57,17 @@
 
     @media print {
         @page {
-            size: A4;
-            margin: 12mm;
+            size: A4 portrait;
+            margin: 7mm;
         }
 
+        html,
         body {
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
         }
 
         body * {
@@ -45,135 +82,465 @@
         #invoice-print-sheet {
             display: block !important;
             position: absolute;
-            inset: 0 auto auto 0;
+            top: 0;
+            right: 0;
             width: 100%;
-            color: #222;
+            margin: 0;
+            padding: 0;
+            color: #362727;
             background: #fff;
-            font-family: Tahoma, Arial, sans-serif;
-            font-size: 10pt;
             direction: rtl;
+            font-family: Tahoma, Arial, sans-serif;
+            font-size: 8pt;
+            line-height: 1.7;
+        }
+
+        #invoice-print-sheet * {
+            box-sizing: border-box;
         }
 
         #invoice-print-sheet .print-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            gap: 16px;
-            padding-bottom: 14px;
-            border-bottom: 3px solid #681b21;
+            align-items: center;
+            gap: 12px;
+            padding: 5px 0 13px;
+            border-bottom: 2px solid #674040;
+        }
+
+        #invoice-print-sheet .print-company-info {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            color: #362727;
+            font-size: 7.5pt;
+        }
+
+        #invoice-print-sheet .print-company-line {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        #invoice-print-sheet .print-company-icon {
+            display: inline-flex;
+            flex: 0 0 14px;
+            align-items: center;
+            justify-content: center;
+            color: #674040;
+            font-weight: bold;
         }
 
         #invoice-print-sheet .print-brand {
-            color: #681b21;
-            font-size: 21pt;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+        }
+
+        #invoice-print-sheet .print-logo {
+            display: block;
+            width: auto;
+            max-width: 100px;
+            max-height: 75px;
+            object-fit: contain;
+        }
+
+        #invoice-print-sheet .print-brand-name {
+            color: #362727;
+            font-size: 19pt;
             font-weight: bold;
+            line-height: 1.5;
         }
 
         #invoice-print-sheet .print-subtitle {
-            margin-top: 4px;
-            color: #666;
-            font-size: 9pt;
+            margin-top: 2px;
+            color: #674040;
+            font-size: 8pt;
         }
 
-        #invoice-print-sheet .print-section-title {
-            margin: 18px 0 10px;
-            padding-right: 8px;
-            border-right: 3px solid #681b21;
-            font-size: 11pt;
-            font-weight: bold;
-        }
-
-        #invoice-print-sheet .print-details {
+        #invoice-print-sheet .print-overview {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
+            grid-template-columns: 1fr 1.1fr 1fr;
+            align-items: center;
+            gap: 12px;
+            margin: 14px 0 16px;
         }
 
-        #invoice-print-sheet .print-detail {
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
+        #invoice-print-sheet .print-qr-card {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+            padding: 9px;
+            border: 1px solid #d8dfe4;
+            border-radius: 8px;
+            background: #F4F0EE;
+        }
+
+        #invoice-print-sheet .print-qr-card img {
+            flex: 0 0 70px;
+            width: 70px;
+            height: 70px;
+            padding: 3px;
+            background: #fff;
+            object-fit: contain;
+        }
+
+        #invoice-print-sheet .print-qr-copy {
+            min-width: 0;
+            font-size: 7pt;
             overflow-wrap: anywhere;
         }
 
-        #invoice-print-sheet .print-label {
+        #invoice-print-sheet .print-qr-copy strong {
             display: block;
-            margin-bottom: 3px;
-            color: #666;
+            margin-bottom: 4px;
             font-size: 8pt;
+        }
+
+        #invoice-print-sheet .print-main-title {
+            text-align: center;
+        }
+
+        #invoice-print-sheet .print-document-heading {
+            margin: 0 0 8px;
+            color: #362727;
+            font-size: 20pt;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+
+        #invoice-print-sheet .print-document-number {
+            padding: 7px 9px;
+            border-radius: 24px;
+            background: #674040;
+            color: #fff;
+            font-size: 10pt;
+            font-weight: bold;
+            overflow-wrap: anywhere;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet .print-document-meta {
+            display: grid;
+            gap: 7px;
+            padding-right: 12px;
+            border-right: 1px solid #baadad;
+        }
+
+        #invoice-print-sheet .print-meta-row {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #invoice-print-sheet .print-meta-row strong {
+            white-space: nowrap;
+        }
+
+        #invoice-print-sheet .print-meta-value {
+            text-align: left;
+            overflow-wrap: anywhere;
+        }
+
+        #invoice-print-sheet .print-status {
+            display: inline-block;
+            padding: 2px 12px;
+            border-radius: 20px;
+            background: #d8f5e2;
+            color: #16803d;
+            font-weight: bold;
+            text-align: center;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet .print-status.is-invalid {
+            background: #f9e0e0;
+            color: #a51d2d;
+        }
+
+        #invoice-print-sheet .print-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        #invoice-print-sheet .print-card {
+            min-width: 0;
+            overflow: hidden;
+            border: 1px solid #d8dfe4;
+            border-radius: 8px;
+            background: #fff;
+            break-inside: avoid;
+        }
+
+        #invoice-print-sheet .print-card-title {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            min-height: 34px;
+            padding: 7px 11px;
+            background: #F4F0EE;
+            color: #362727;
+            font-size: 9pt;
+            font-weight: bold;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet .print-card-title .print-card-icon {
+            color: #674040;
+            font-size: 12pt;
+        }
+
+        #invoice-print-sheet .print-card-body {
+            padding: 8px 11px;
+        }
+
+        #invoice-print-sheet .print-info-row {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 6px;
+            padding: 5px 0;
+            align-items: start;
+        }
+
+        #invoice-print-sheet .print-info-row + .print-info-row {
+            border-top: 1px solid #f0ebeb;
+        }
+
+        #invoice-print-sheet .print-info-label {
+            font-weight: bold;
+        }
+
+        #invoice-print-sheet .print-info-value {
+            overflow-wrap: anywhere;
+        }
+
+        #invoice-print-sheet .print-items {
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #d8dfe4;
+            border-radius: 8px;
         }
 
         #invoice-print-sheet table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 8pt;
+            table-layout: fixed;
+            font-size: 6.5pt;
         }
 
         #invoice-print-sheet th,
         #invoice-print-sheet td {
-            padding: 7px 5px;
-            border: 1px solid #ccc;
-            text-align: right;
-            vertical-align: top;
+            padding: 7px 4px;
+            border-left: 1px solid #e1e5e8;
+            border-bottom: 1px solid #e1e5e8;
+            text-align: center;
+            vertical-align: middle;
+            overflow-wrap: anywhere;
         }
 
         #invoice-print-sheet th {
-            background: #681b21 !important;
+            background: #674040 !important;
             color: #fff !important;
-            print-color-adjust: exact;
+            font-weight: bold;
             -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
-        #invoice-print-sheet tr {
+        #invoice-print-sheet tbody tr:nth-child(even) {
+            background: #F4F0EE !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet tbody tr {
             break-inside: avoid;
         }
 
-        #invoice-print-sheet .print-totals {
-            width: 55%;
-            margin: 14px 0 0 auto;
+        #invoice-print-sheet .print-product-name {
+            text-align: right;
+        }
+
+        #invoice-print-sheet .print-product-dimensions {
+            display: block;
+            margin-top: 2px;
+            color: #8d6666;
+            font-size: 6pt;
+        }
+
+        #invoice-print-sheet .print-bottom-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 1fr;
+            gap: 12px;
+            align-items: stretch;
+        }
+
+        #invoice-print-sheet .print-notes-list {
+            margin: 0;
+            padding: 0 15px 0 0;
+        }
+
+        #invoice-print-sheet .print-notes-list li {
+            margin: 0 0 5px;
+            padding-right: 2px;
+            overflow-wrap: anywhere;
+        }
+
+        #invoice-print-sheet .print-notes-list li:last-child {
+            margin-bottom: 0;
+        }
+
+        #invoice-print-sheet .print-totals-body {
+            padding: 8px 11px;
         }
 
         #invoice-print-sheet .print-total-row {
             display: flex;
             justify-content: space-between;
-            gap: 12px;
-            padding: 6px 0;
-            border-bottom: 1px solid #eee;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 0;
+            border-bottom: 1px solid #e8e0e0;
+        }
+
+        #invoice-print-sheet .print-total-row strong {
+            white-space: nowrap;
         }
 
         #invoice-print-sheet .print-grand-total {
-            color: #681b21;
-            font-size: 12pt;
+            margin-top: 5px;
+            padding: 10px;
+            border: 0;
+            border-radius: 5px;
+            background: #f8e9ec !important;
+            color: #674040;
+            font-size: 10pt;
             font-weight: bold;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
         #invoice-print-sheet .print-footer {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr 0.8fr;
+            align-items: center;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 8px 0 12px;
+        }
+
+        #invoice-print-sheet .print-verification-badge {
             display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            gap: 20px;
-            margin-top: 25px;
-            padding-top: 12px;
-            border-top: 1px solid #ccc;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 54px;
+            padding: 8px;
+            border-radius: 8px;
+            background: #674040 !important;
+            color: #fff !important;
+            text-align: center;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet .print-verification-badge strong {
+            display: block;
             font-size: 8pt;
         }
 
-        #invoice-print-sheet .print-qr {
-            width: 95px;
-            height: 95px;
+        #invoice-print-sheet .print-verification-badge small {
+            display: block;
+            margin-top: 3px;
+            font-size: 6pt;
+        }
+
+        #invoice-print-sheet .print-shield {
+            font-size: 23pt;
+            line-height: 1;
+        }
+
+        #invoice-print-sheet .print-footer-qr {
+            text-align: center;
+            font-size: 7pt;
+        }
+
+        #invoice-print-sheet .print-footer-qr img {
+            display: block;
+            width: 65px;
+            height: 65px;
+            margin: 0 auto 4px;
             object-fit: contain;
         }
 
-        #invoice-print-sheet .print-signature {
-            min-width: 150px;
-            padding-top: 35px;
+        #invoice-print-sheet .print-footer-qr a {
+            color: #674040;
+            overflow-wrap: anywhere;
+            text-decoration: none;
+        }
+
+        #invoice-print-sheet .print-footer-brand {
+            color: #362727;
+            font-weight: bold;
             text-align: center;
         }
 
-        #invoice-print-sheet .print-note {
-            margin-top: 12px;
+        #invoice-print-sheet .print-bottom-bar {
+            margin-top: 3px;
+            padding: 12px 8px;
+            background: #674040 !important;
+            color: #fff !important;
+            text-align: center;
+            font-size: 8pt;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        #invoice-print-sheet .print-note-text {
             white-space: pre-line;
             overflow-wrap: anywhere;
+        }
+
+        #invoice-print-sheet .print-plain-url {
+            display: block;
+            margin-top: 4px;
+            direction: ltr;
+            text-align: right;
+            overflow-wrap: anywhere;
+            font-size: 6pt;
+        }
+
+        #invoice-print-sheet .print-page-break {
+            break-inside: avoid;
+        }
+
+        @font-face {
+            font-family: 'kohan';
+            src: url('../font/Kohan-Medium.woff2');
+        }
+
+        @font-face {
+            font-family: 'kohanBold';
+            src: url('../font/Kohan-Bold.woff2');
+        }
+
+        body {
+            font-family: 'kohan';
+        }
+
+        h1, h2, h3, h4{
+            font-family: 'kohanBold';
+        }
+
+        .kohan-bold{
+            font-family: kohanBold;
         }
     }
 </style>
@@ -182,16 +549,16 @@
 
     <div class="flex flex-wrap items-center justify-between gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-[#222222]">
+            <h1 class="text-2xl font-bold text-[#fff]">
                 جزئیات {{ $documentType }}
             </h1>
             <p class="mt-2 text-sm text-gray-500">
-                شماره سند: {{ $invoice->document_number }}
+                شماره سند: {{ $formatDigits($invoice->document_number) }}
             </p>
         </div>
 
         <a href="{{ route('admin.invoices.index') }}"
-           class="rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
+           class="rounded-xl border border-[#baadad] px-4 py-2 text-sm font-semibold text-[#674040] transition hover:bg-[#F4F0EE]">
             بازگشت به فهرست
         </a>
     </div>
@@ -215,26 +582,26 @@
     <div class="flex flex-wrap gap-3">
         <button type="button"
                 onclick="window.print()"
-                class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#681b21] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#51151a]">
+                class="inline-flex cursor-pointer items-center gap-2 rounded-xl bg-[#674040] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#362727]">
             <span>چاپ سند</span>
         </button>
 
         <a href="{{ route('admin.invoices.export', $invoice) }}"
-           class="inline-flex items-center gap-2 rounded-xl border border-[#681b21] px-5 py-3 text-sm font-semibold text-[#681b21] transition hover:bg-[#681b21] hover:text-white">
+           class="inline-flex items-center gap-2 rounded-xl border border-[#8d6666] px-5 py-3 text-sm font-semibold text-[#674040] transition hover:bg-[#674040] hover:text-white">
             خروجی اکسل
         </a>
 
         <a href="{{ $verificationUrl }}"
            target="_blank"
            rel="noopener noreferrer"
-           class="inline-flex items-center gap-2 rounded-xl border border-gray-300 px-5 py-3 text-sm font-semibold text-gray-700 transition hover:bg-gray-100">
+           class="inline-flex items-center gap-2 rounded-xl border border-[#baadad] px-5 py-3 text-sm font-semibold text-[#674040] transition hover:bg-[#F4F0EE]">
             مشاهده صفحه تأیید سند
         </a>
     </div>
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
+    <div class="rounded-2xl border border-[#baadad] bg-white p-5 shadow-sm sm:p-6">
         <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-lg font-bold text-[#222222]">اطلاعات سند</h2>
+            <h2 class="text-lg font-bold text-[#362727]">اطلاعات سند</h2>
 
             @if($isVoided)
                 <span class="rounded-full bg-red-100 px-3 py-1.5 text-sm font-semibold text-red-700">
@@ -245,7 +612,7 @@
                     منقضی
                 </span>
             @else
-                <span class="rounded-full bg-green-100 px-3 py-1.5 text-sm font-semibold text-green-700">
+                <span class="rounded-full bg-[#F4F0EE] px-3 py-1.5 text-sm font-semibold text-[#674040]">
                     معتبر
                 </span>
             @endif
@@ -254,53 +621,48 @@
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             <div>
                 <p class="text-sm text-gray-500">نوع سند</p>
-                <p class="mt-1 font-semibold text-gray-800">{{ $documentType }}</p>
+                <p class="mt-1 font-semibold text-[#362727]">{{ $documentType }}</p>
             </div>
 
             <div>
                 <p class="text-sm text-gray-500">شماره سند</p>
-                <p class="mt-1 font-semibold text-gray-800">{{ $invoice->document_number }}</p>
+                <p class="mt-1 font-semibold text-[#362727]">
+                    {{ $formatDigits($invoice->document_number) }}
+                </p>
             </div>
 
             <div>
                 <p class="text-sm text-gray-500">مشتری</p>
-                <p class="mt-1 font-semibold text-gray-800">{{ $customerName }}</p>
+                <p class="mt-1 font-semibold text-[#362727]">{{ $customerName }}</p>
             </div>
 
             <div>
                 <p class="text-sm text-gray-500">تاریخ صدور</p>
-                <p class="mt-1 font-semibold text-gray-800">
-                    {{ $invoice->issue_date?->format('Y/m/d') ?? '—' }}
+                <p class="mt-1 font-semibold text-[#362727]">
+                    {{ $invoice->issue_date ? $formatDate($invoice->issue_date) : '—' }}
                 </p>
             </div>
 
             @if($invoice->type === 'proforma')
                 <div>
                     <p class="text-sm text-gray-500">معتبر تا تاریخ</p>
-                    <p class="mt-1 font-semibold text-gray-800">
-                        {{ $invoice->valid_until?->format('Y/m/d') ?? '—' }}
+                    <p class="mt-1 font-semibold text-[#362727]">
+                        {{ $invoice->valid_until ? $formatDate($invoice->valid_until) : '—' }}
                     </p>
                 </div>
             @endif
 
             <div>
                 <p class="text-sm text-gray-500">نوع پرداخت</p>
-                <p class="mt-1 font-semibold text-gray-800">{{ $invoice->payment_type ?: '—' }}</p>
-            </div>
-
-            <div>
-                <p class="text-sm text-gray-500">نوع ثبت</p>
-                <p class="mt-1 font-semibold text-gray-800">
-                    {{ $invoice->is_formal ? 'رسمی' : 'غیررسمی' }}
-                </p>
+                <p class="mt-1 font-semibold text-[#362727]">{{ $invoice->payment_type ?: '—' }}</p>
             </div>
 
             @if($invoice->convertedFrom)
                 <div>
                     <p class="text-sm text-gray-500">پیش‌فاکتور مبنا</p>
                     <a href="{{ route('admin.invoices.show', $invoice->convertedFrom) }}"
-                       class="mt-1 inline-block font-semibold text-[#681b21] hover:underline">
-                        {{ $invoice->convertedFrom->document_number }}
+                       class="mt-1 inline-block font-semibold text-[#674040] hover:underline">
+                        {{ $formatDigits($invoice->convertedFrom->document_number) }}
                     </a>
                 </div>
             @endif
@@ -310,8 +672,8 @@
                     <p class="text-sm text-gray-500">فاکتور صادرشده از این پیش‌فاکتور</p>
                     @foreach($invoice->convertedTo as $convertedInvoice)
                         <a href="{{ route('admin.invoices.show', $convertedInvoice) }}"
-                           class="mt-1 block font-semibold text-[#681b21] hover:underline">
-                            {{ $convertedInvoice->document_number }}
+                           class="mt-1 block font-semibold text-[#674040] hover:underline">
+                            {{ $formatDigits($convertedInvoice->document_number) }}
                         </a>
                     @endforeach
                 </div>
@@ -319,21 +681,21 @@
         </div>
 
         @if($invoice->description)
-            <div class="mt-6 border-t border-gray-100 pt-5">
+            <div class="mt-6 border-t border-[#F4F0EE] pt-5">
                 <p class="text-sm text-gray-500">توضیحات سند</p>
-                <p class="mt-2 whitespace-pre-line leading-7 text-gray-700">{{ $invoice->description }}</p>
+                <p class="mt-2 whitespace-pre-line leading-7 text-[#362727]">{{ $invoice->description }}</p>
             </div>
         @endif
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div class="border-b border-gray-100 p-5">
-            <h2 class="text-lg font-bold text-[#222222]">اقلام سند</h2>
+    <div class="overflow-hidden rounded-2xl border border-[#baadad] bg-white shadow-sm">
+        <div class="border-b border-[#F4F0EE] p-5">
+            <h2 class="text-lg font-bold text-[#362727]">اقلام سند</h2>
         </div>
 
         <div class="overflow-x-auto">
             <table class="w-full min-w-[1050px] text-right text-sm">
-                <thead class="bg-gray-50 text-gray-600">
+                <thead class="bg-[#F4F0EE] text-[#674040]">
                     <tr>
                         <th class="px-4 py-3 font-semibold">ردیف</th>
                         <th class="px-4 py-3 font-semibold">شرح کالا</th>
@@ -349,21 +711,31 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-[#F4F0EE]">
                     @forelse($invoice->items as $item)
-                        <tr class="text-gray-700">
-                            <td class="px-4 py-4">{{ $loop->iteration }}</td>
+                        <tr class="text-[#362727]">
+                            <td class="px-4 py-4">{{ $formatDigits($loop->iteration) }}</td>
                             <td class="px-4 py-4 font-medium">{{ $item->description }}</td>
-                            <td class="px-4 py-4">{{ number_format((float) $item->quantity, 3) }}</td>
+                            <td class="px-4 py-4">{{ $formatNumber($item->quantity) }}</td>
                             <td class="px-4 py-4">{{ $item->unit ?: '—' }}</td>
-                            <td class="px-4 py-4">{{ $item->width ?? '—' }}</td>
-                            <td class="px-4 py-4">{{ $item->thickness ?? '—' }}</td>
-                            <td class="whitespace-nowrap px-4 py-4">{{ number_format((float) $item->unit_price) }}</td>
-                            <td class="whitespace-nowrap px-4 py-4">{{ number_format((float) $item->total_amount) }}</td>
-                            <td class="px-4 py-4">{{ number_format((float) $item->vat_percent, 2) }}</td>
-                            <td class="whitespace-nowrap px-4 py-4">{{ number_format((float) $item->vat_amount) }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 font-semibold">
-                                {{ number_format((float) $item->grand_total) }}
+                            <td class="px-4 py-4">
+                                {{ $item->width !== null ? $formatMeasurement($item->width) : '—' }}
+                            </td>
+                            <td class="px-4 py-4">
+                                {{ $item->thickness !== null ? $formatMeasurement($item->thickness) : '—' }}
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-4">
+                                {{ $formatNumber($item->unit_price) }} ریال
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-4">
+                                {{ $formatNumber($item->total_amount) }} ریال
+                            </td>
+                            <td class="px-4 py-4">{{ $formatTaxRate($item->vat_percent) }}٪</td>
+                            <td class="whitespace-nowrap px-4 py-4">
+                                {{ $formatNumber($item->vat_amount) }} ریال
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-4 font-semibold text-[#674040]">
+                                {{ $formatNumber($item->grand_total) }} ریال
                             </td>
                         </tr>
                     @empty
@@ -376,20 +748,20 @@
                 </tbody>
 
                 @if($invoice->items->isNotEmpty())
-                    <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+                    <tfoot class="border-t-2 border-[#baadad] bg-[#F4F0EE]">
                         <tr>
-                            <td colspan="7" class="px-4 py-4 text-left font-bold text-gray-800">
-                                جمع کل سند (ریال)
+                            <td colspan="7" class="px-4 py-4 text-left font-bold text-[#362727]">
+                                جمع کل سند
                             </td>
-                            <td class="px-4 py-4 font-bold text-gray-800">
-                                {{ number_format($invoice->items->sum('total_amount')) }}
+                            <td class="whitespace-nowrap px-4 py-4 font-bold text-[#362727]">
+                                {{ $formatNumber($totalAmount) }} ریال
                             </td>
                             <td></td>
-                            <td class="px-4 py-4 font-bold text-gray-800">
-                                {{ number_format($invoice->items->sum('vat_amount')) }}
+                            <td class="whitespace-nowrap px-4 py-4 font-bold text-[#362727]">
+                                {{ $formatNumber($totalVatAmount) }} ریال
                             </td>
-                            <td class="px-4 py-4 font-bold text-[#681b21]">
-                                {{ number_format($invoice->items->sum('grand_total')) }}
+                            <td class="whitespace-nowrap px-4 py-4 font-bold text-[#674040]">
+                                {{ $formatNumber($grandTotal) }} ریال
                             </td>
                         </tr>
                     </tfoot>
@@ -399,10 +771,10 @@
     </div>
 
     @if($invoice->notes->isNotEmpty())
-        <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-            <h2 class="mb-4 text-lg font-bold text-[#222222]">توضیحات تکمیلی</h2>
+        <div class="rounded-2xl border border-[#baadad] bg-white p-5 shadow-sm sm:p-6">
+            <h2 class="mb-4 text-lg font-bold text-[#362727]">توضیحات تکمیلی</h2>
 
-            <ol class="list-inside list-decimal space-y-3 text-sm leading-7 text-gray-700">
+            <ol class="list-inside list-decimal space-y-3 text-sm leading-7 text-[#362727]">
                 @foreach($invoice->notes as $note)
                     <li>{{ $note->description }}</li>
                 @endforeach
@@ -410,22 +782,22 @@
         </div>
     @endif
 
-    <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 class="mb-4 text-lg font-bold text-[#222222]">تأیید اصالت سند با QR</h2>
+    <div class="rounded-2xl border border-[#baadad] bg-white p-5 shadow-sm sm:p-6">
+        <h2 class="mb-4 text-lg font-bold text-[#362727]">تأیید اصالت سند با QR</h2>
 
         <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
             @if(!empty($qrCodeDataUri))
                 <img src="{{ $qrCodeDataUri }}"
                      alt="QR تأیید سند"
-                     class="h-40 w-40 rounded-xl border border-gray-200 bg-white p-2">
+                     class="h-40 w-40 rounded-xl border border-[#baadad] bg-white p-2">
             @else
-                <div class="flex h-40 w-40 items-center justify-center rounded-xl border border-gray-200 bg-gray-50 text-center text-sm text-gray-500">
+                <div class="flex h-40 w-40 items-center justify-center rounded-xl border border-[#baadad] bg-[#F4F0EE] text-center text-sm text-gray-500">
                     کد QR تولید نشده است
                 </div>
             @endif
 
             <div class="min-w-0 space-y-2">
-                <p class="font-semibold text-gray-800">
+                <p class="font-semibold text-[#362727]">
                     وضعیت فعلی: {{ $statusText }}
                 </p>
 
@@ -436,7 +808,7 @@
                 <a href="{{ $verificationUrl }}"
                    target="_blank"
                    rel="noopener noreferrer"
-                   class="block break-all text-sm text-[#681b21] hover:underline">
+                   class="block break-all text-sm text-[#674040] hover:underline">
                     {{ $verificationUrl }}
                 </a>
             </div>
@@ -453,7 +825,7 @@
                   onsubmit="return confirm('پیش‌فاکتور به فاکتور تبدیل شود؟');">
                 @csrf
                 <button type="submit"
-                        class="cursor-pointer rounded-xl bg-[#003260] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#002448]">
+                        class="cursor-pointer rounded-xl bg-[#674040] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#362727]">
                     تبدیل به فاکتور
                 </button>
             </form>
@@ -474,144 +846,335 @@
 </div>
 
 <div id="invoice-print-sheet" class="invoice-print-sheet" dir="rtl">
+    @php
+        $printPhone = $siteContent?->phone;
+        $printEmail = $siteContent?->email;
+        $printWebsite = 'www.kohanpolymeralborz.ir';
+
+        $printNotes = collect();
+
+        if ($invoice->description) {
+            $printNotes->push($invoice->description);
+        }
+
+        foreach ($invoice->notes as $note) {
+            $printNotes->push($note->description);
+        }
+
+        if ($printNotes->isEmpty()) {
+            $printNotes = collect([
+                'این سند بر اساس اطلاعات ثبت‌شده در سامانه کهن پلیمر البرز صادر شده است.',
+                'برای بررسی اصالت سند، کد QR را اسکن کنید.',
+            ]);
+        }
+    @endphp
+
     <header class="print-header">
-        <div>
-            <div class="print-brand">کهن پلیمر البرز</div>
-            <div class="print-subtitle">فاکتور فروش و پیش‌فاکتور</div>
+        <div class="print-brand">
+            @if($logoUrl)
+                <img src="{{ $logoUrl }}"
+                     alt="لوگوی کهن پلیمر البرز"
+                     class="print-logo">
+            @endif
+
+            <div>
+                <div class="print-brand-name kohan-bold">کهن پلیمر البرز</div>
+                <div class="print-subtitle">KOHAN POLYMER ALBORZ</div>
+            </div>
         </div>
 
-        <div style="text-align:left;">
-            <div style="font-size:17pt;font-weight:bold;">{{ $documentType }}</div>
-            <div>شماره سند: {{ $invoice->document_number }}</div>
-            <div>وضعیت: {{ $statusText }}</div>
+        <div class="print-company-info" style="direction: ltr;">
+            @if($printPhone)
+                <div class="print-company-line kohan-bold">
+                    <span class="print-company-icon">☎</span>
+                    <span>{{ $formatDigits($printPhone) }}</span>
+                </div>
+            @endif
+
+            @if($printEmail)
+                <div class="print-company-line kohan-bold">
+                    <span class="print-company-icon">✉</span>
+                    <span>{{ $printEmail }}</span>
+                </div>
+            @endif
+
+            <div class="print-company-line kohan-bold">
+                <span class="print-company-icon">◎</span>
+                <span>{{ $printWebsite }}</span>
+            </div>
         </div>
     </header>
 
-    <h2 class="print-section-title">مشخصات سند و مشتری</h2>
+    <section class="print-overview">
+        <div class="print-qr-card">
+            @if(!empty($qrCodeDataUri))
+                <img src="{{ $qrCodeDataUri }}" alt="QR اعتبارسنجی فاکتور">
+            @endif
 
-    <div class="print-details">
-        <div class="print-detail">
-            <span class="print-label">نام مشتری</span>
-            <strong>{{ $customerName }}</strong>
-        </div>
-
-        <div class="print-detail">
-            <span class="print-label">تاریخ صدور</span>
-            <strong>{{ $invoice->issue_date?->format('Y/m/d') ?? '—' }}</strong>
-        </div>
-
-        <div class="print-detail">
-            <span class="print-label">نوع پرداخت</span>
-            <strong>{{ $invoice->payment_type ?: '—' }}</strong>
-        </div>
-
-        @if($invoice->type === 'proforma')
-            <div class="print-detail">
-                <span class="print-label">معتبر تا تاریخ</span>
-                <strong>{{ $invoice->valid_until?->format('Y/m/d') ?? '—' }}</strong>
+            <div class="print-qr-copy kohan-bold">
+                <strong>کد اعتبارسنجی سند</strong>
+                <div>برای بررسی اصالت سند، کد QR را اسکن کنید.</div>
             </div>
-        @endif
-
-        <div class="print-detail">
-            <span class="print-label">نوع ثبت</span>
-            <strong>{{ $invoice->is_formal ? 'رسمی' : 'غیررسمی' }}</strong>
         </div>
 
-        @if($invoice->convertedFrom)
-            <div class="print-detail">
-                <span class="print-label">پیش‌فاکتور مبنا</span>
-                <strong>{{ $invoice->convertedFrom->document_number }}</strong>
+        <div class="print-main-title">
+            <h1 class="print-document-heading kohan-bold">{{ $documentType }} فروش</h1>
+
+            <div class="print-document-number kohan-bold">
+                شماره {{ $invoice->type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور' }}:
+                {{ $formatDigits($invoice->document_number) }}
             </div>
-        @endif
-    </div>
-
-    <h2 class="print-section-title">اقلام سند</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ردیف</th>
-                <th>شرح کالا</th>
-                <th>تعداد</th>
-                <th>واحد</th>
-                <th>عرض</th>
-                <th>ضخامت</th>
-                <th>قیمت واحد</th>
-                <th>مبلغ کل</th>
-                <th>مالیات</th>
-                <th>مبلغ مالیات</th>
-                <th>مبلغ نهایی</th>
-            </tr>
-        </thead>
-
-        <tbody>
-            @forelse($invoice->items as $item)
-                <tr>
-                    <td>{{ $loop->iteration }}</td>
-                    <td>{{ $item->description }}</td>
-                    <td>{{ number_format((float) $item->quantity, 3) }}</td>
-                    <td>{{ $item->unit ?: '—' }}</td>
-                    <td>{{ $item->width ?? '—' }}</td>
-                    <td>{{ $item->thickness ?? '—' }}</td>
-                    <td>{{ number_format((float) $item->unit_price) }}</td>
-                    <td>{{ number_format((float) $item->total_amount) }}</td>
-                    <td>{{ number_format((float) $item->vat_percent, 2) }}٪</td>
-                    <td>{{ number_format((float) $item->vat_amount) }}</td>
-                    <td>{{ number_format((float) $item->grand_total) }}</td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="11">هیچ قلمی برای این سند ثبت نشده است.</td>
-                </tr>
-            @endforelse
-        </tbody>
-
-        @if($invoice->items->isNotEmpty())
-            <tfoot>
-                <tr>
-                    <td colspan="7" style="font-weight:bold;">جمع کل</td>
-                    <td style="font-weight:bold;">
-                        {{ number_format($invoice->items->sum('total_amount')) }}
-                    </td>
-                    <td></td>
-                    <td style="font-weight:bold;">
-                        {{ number_format($invoice->items->sum('vat_amount')) }}
-                    </td>
-                    <td style="font-weight:bold;color:#681b21;">
-                        {{ number_format($invoice->items->sum('grand_total')) }}
-                    </td>
-                </tr>
-            </tfoot>
-        @endif
-    </table>
-
-    @if($invoice->description)
-        <h2 class="print-section-title">توضیحات سند</h2>
-        <div class="print-note">{{ $invoice->description }}</div>
-    @endif
-
-    @if($invoice->notes->isNotEmpty())
-        <h2 class="print-section-title">توضیحات تکمیلی</h2>
-
-        @foreach($invoice->notes as $note)
-            <div class="print-note">{{ $note->description }}</div>
-        @endforeach
-    @endif
-
-    <footer class="print-footer">
-        <div>
-            <strong>کهن پلیمر البرز</strong>
-            <div style="margin-top:6px;">بررسی اصالت سند با اسکن کد QR</div>
-            <div>نشانی تأیید: {{ $verificationUrl }}</div>
         </div>
 
-        <div class="print-signature">
-            مهر و امضا
+        <div class="print-document-meta">
+            <div class="print-meta-row kohan-bold">
+                <strong>تاریخ صدور:</strong>
+                <span class="print-meta-value">
+                    {{ $invoice->issue_date ? $formatDate($invoice->issue_date) : '—' }}
+                </span>
+            </div>
+
+            @if($invoice->type === 'proforma')
+                <div class="print-meta-row kohan-bold">
+                    <strong>تاریخ اعتبار:</strong>
+                    <span class="print-meta-value">
+                        {{ $invoice->valid_until ? $formatDate($invoice->valid_until) : '—' }}
+                    </span>
+                </div>
+            @endif
+
+            <div class="print-meta-row kohan-bold">
+                <strong>وضعیت:</strong>
+                <span class="print-meta-value">
+                    <span class="print-status {{ $isVoided || $isExpired ? 'is-invalid' : '' }}">
+                        {{ $statusText }}
+                    </span>
+                </span>
+            </div>
+
+            <div class="print-meta-row kohan-bold">
+                <strong>نوع پرداخت:</strong>
+                <span class="print-meta-value">{{ $invoice->payment_type ?: '—' }}</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="print-info-grid">
+        <div class="print-card kohan-bold">
+            <div class="print-card-title">
+                <span class="print-card-icon">♙</span>
+                مشخصات مشتری
+            </div>
+
+            <div class="print-card-body">
+                <div class="print-info-row">
+                    <span class="print-info-label">نام / نام شرکت:</span>
+                    <span class="print-info-value">{{ $customerName }}</span>
+                </div>
+
+                @if(!empty($invoice->customer?->phone))
+                    <div class="print-info-row">
+                        <span class="print-info-label">شماره تماس:</span>
+                        <span class="print-info-value">
+                            {{ $formatDigits($invoice->customer->phone) }}
+                        </span>
+                    </div>
+                @endif
+
+                @if(!empty($invoice->customer?->address))
+                    <div class="print-info-row">
+                        <span class="print-info-label">آدرس:</span>
+                        <span class="print-info-value">{{ $invoice->customer->address }}</span>
+                    </div>
+                @endif
+            </div>
         </div>
 
-        @if(!empty($qrCodeDataUri))
-            <img src="{{ $qrCodeDataUri }}" alt="QR" class="print-qr">
-        @endif
+        <div class="print-card kohan-bold">
+            <div class="print-card-title">
+                <span class="print-card-icon">▤</span>
+                اطلاعات سند
+            </div>
+
+            <div class="print-card-body kohan-bold">
+                <div class="print-info-row">
+                    <span class="print-info-label">شماره سند:</span>
+                    <span class="print-info-value">
+                        {{ $formatDigits($invoice->document_number) }}
+                    </span>
+                </div>
+
+                <div class="print-info-row">
+                    <span class="print-info-label">تاریخ صدور:</span>
+                    <span class="print-info-value">
+                        {{ $invoice->issue_date ? $formatDate($invoice->issue_date) : '—' }}
+                    </span>
+                </div>
+
+                @if($invoice->type === 'proforma')
+                    <div class="print-info-row">
+                        <span class="print-info-label">معتبر تا:</span>
+                        <span class="print-info-value">
+                            {{ $invoice->valid_until ? $formatDate($invoice->valid_until) : '—' }}
+                        </span>
+                    </div>
+                @endif
+
+                <div class="print-info-row">
+                    <span class="print-info-label">وضعیت:</span>
+                    <span class="print-info-value">{{ $statusText }}</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="print-items kohan-bold">
+        <table>
+            <colgroup>
+                <col style="width: 4%">
+                <col style="width: 22%">
+                <col style="width: 7%">
+                <col style="width: 7%">
+                <col style="width: 10%">
+                <col style="width: 12%">
+                <col style="width: 7%">
+                <col style="width: 9%">
+                <col style="width: 10%">
+                <col style="width: 12%">
+            </colgroup>
+
+            <thead>
+                <tr>
+                    <th>ردیف</th>
+                    <th>نام کالا / شرح و ابعاد</th>
+                    <th>تعداد</th>
+                    <th>واحد</th>
+                    <th>قیمت واحد (ریال)</th>
+                    <th>قیمت کل (ریال)</th>
+                    <th>مالیات (%)</th>
+                    <th>مالیات (ریال)</th>
+                    <th>مبلغ نهایی (ریال)</th>
+                    <th>جزئیات</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @forelse($invoice->items as $item)
+                    <tr>
+                        <td>{{ $formatDigits($loop->iteration) }}</td>
+
+                        <td class="print-product-name">
+                            {{ $item->description }}
+
+                            @if($item->width !== null || $item->thickness !== null)
+                                <span class="print-product-dimensions">
+                                    @if($item->width !== null)
+                                        عرض: {{ $formatMeasurement($item->width) }}
+                                    @endif
+
+                                    @if($item->width !== null && $item->thickness !== null)
+                                        |
+                                    @endif
+
+                                    @if($item->thickness !== null)
+                                        ضخامت: {{ $formatMeasurement($item->thickness) }}
+                                    @endif
+                                </span>
+                            @endif
+                        </td>
+
+                        <td>{{ $formatNumber($item->quantity) }}</td>
+                        <td>{{ $item->unit ?: '—' }}</td>
+                        <td>{{ $formatNumber($item->unit_price) }}</td>
+                        <td>{{ $formatNumber($item->total_amount) }}</td>
+                        <td>{{ $formatTaxRate($item->vat_percent) }}٪</td>
+                        <td>{{ $formatNumber($item->vat_amount) }}</td>
+                        <td>{{ $formatNumber($item->grand_total) }}</td>
+                        <td>ریال</td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="10">هیچ قلمی برای این سند ثبت نشده است.</td>
+                    </tr>
+                @endforelse
+            </tbody>
+        </table>
+    </section>
+
+    <section class="print-bottom-grid print-page-break">
+        <div class="print-card">
+            <div class="print-card-title kohan-bold">
+                <span class="print-card-icon">▤</span>
+                توضیحات
+            </div>
+
+            <div class="print-card-body kohan-bold">
+                <ul class="print-notes-list">
+                    @foreach($printNotes as $printNote)
+                        <li>{{ $printNote }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+
+        <div class="print-card kohan-bold">
+            <div class="print-card-title" style="background:#674040;color:#fff;">
+                جمع کل
+            </div>
+
+            <div class="print-totals-body">
+                <div class="print-total-row">
+                    <span>جمع جزئیات کالاها</span>
+                    <strong>{{ $formatNumber($totalAmount) }} ریال</strong>
+                </div>
+
+                <div class="print-total-row">
+                    <span>مالیات بر ارزش افزوده</span>
+                    <strong>{{ $formatNumber($totalVatAmount) }} ریال</strong>
+                </div>
+
+                <div class="print-total-row print-grand-total">
+                    <span>مبلغ کل</span>
+                    <strong>{{ $formatNumber($grandTotal) }} ریال</strong>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="print-footer print-page-break kohan-bold">
+        <div class="print-footer-brand">
+            <div>کهن پلیمر البرز</div>
+            <div class="print-subtitle">عرضه کننده محصولات پلیمری</div>
+        </div>
+
+        <div class="print-verification-badge">
+            <span class="print-shield">✓</span>
+            <div>
+                <strong>
+                    @if($isVoided)
+                        این سند باطل شده است
+                    @elseif($isExpired)
+                        اعتبار این سند به پایان رسیده است
+                    @else
+                        وضعیت سند: معتبر
+                    @endif
+                </strong>
+            </div>
+        </div>
+
+        <div class="print-footer-qr kohan-bold">
+            @if(!empty($qrCodeDataUri))
+                <img src="{{ $qrCodeDataUri }}" alt="QR بررسی اصالت">
+            @endif
+
+            <strong>اسکن برای بررسی اصالت</strong>
+        </div>
     </footer>
+
+    <div class="print-bottom-bar kohan-bold">
+        کهن پلیمر البرز
+        &nbsp; | &nbsp;
+        کیفیت امروز، اعتماد فردا
+    </div>
 </div>
 @endsection
