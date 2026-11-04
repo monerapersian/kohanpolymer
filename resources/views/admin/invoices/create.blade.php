@@ -3,18 +3,51 @@
 @section('content')
 <div class="space-y-6 pb-24" dir="rtl" id="invoice-form-page">
 
-    <div>
-        <a href="{{ route('admin.invoices.index') }}"
-           class="text-sm text-gray-400 transition hover:text-white">
-            ← بازگشت به فهرست اسناد
-        </a>
+    {{-- Page Header --}}
+    <section class="hero-animated-bg relative isolate overflow-hidden rounded-3xl p-6 sm:p-8 lg:p-10">
 
-        <h1 class="mt-4 text-2xl font-bold text-white">ثبت سند جدید</h1>
-        <p class="mt-2 text-sm text-gray-400">ثبت فاکتور یا پیش‌فاکتور مشتری</p>
-    </div>
+        <div class="hero-orb hero-orb-one"></div>
+        <div class="hero-orb hero-orb-two"></div>
+        <div class="hero-orb hero-orb-three"></div>
 
+        <div class="hero-wave"></div>
+
+        <div class="hero-ring hero-ring-one"></div>
+        <div class="hero-ring hero-ring-two"></div>
+
+        <div class="hero-grid"></div>
+        <div class="hero-shine"></div>
+
+        <div class="relative z-10 flex flex-col justify-between gap-6 sm:flex-row sm:items-start">
+
+            <div>
+                <span class="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-3 py-1.5 text-xs text-white/80 backdrop-blur-sm">
+                    مدیریت اسناد مالی
+                </span>
+
+                <h1 class="mt-4 text-2xl text-white kohan-bold sm:text-3xl">
+                    ثبت سند جدید
+                </h1>
+
+                <p class="mt-3 max-w-xl text-sm leading-7 text-white/65">
+                    از این بخش می‌توانید فاکتور یا پیش‌فاکتور جدیدی برای مشتریان ثبت کنید.
+                </p>
+            </div>
+
+            <a
+                href="{{ route('admin.invoices.index') }}"
+                class="inline-flex shrink-0 cursor-pointer items-center gap-2 self-start rounded-xl border border-white/20 bg-white/10 px-4 py-3 text-sm text-white backdrop-blur-sm transition hover:bg-white/20"
+            >
+                <span>←</span>
+                بازگشت به فهرست اسناد
+            </a>
+
+        </div>
+    </section>
+
+    {{-- Validation Errors --}}
     @if ($errors->any())
-        <div class="rounded-xl border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-300">
+        <div class="rounded-xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
             <ul class="list-inside list-disc space-y-1">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -23,136 +56,282 @@
         </div>
     @endif
 
-    <form method="POST" action="{{ route('admin.invoices.store') }}" id="invoice-form"
-          class="space-y-6">
+    <form
+        method="POST"
+        action="{{ route('admin.invoices.store') }}"
+        id="invoice-form"
+        class="space-y-6"
+    >
         @csrf
 
-        <section class="space-y-5 rounded-2xl border border-white/10 bg-[#222222] p-5 sm:p-6">
-            <h2 class="text-lg font-bold text-white">اطلاعات سند</h2>
+        {{-- Document Information --}}
+        <section class="space-y-5 rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-sm sm:p-6">
+
+            <div class="flex items-center gap-3">
+                <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#674040]">
+                    <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
+                        <path d="M7 3h7l5 5v13H5V3h2Z" stroke-linejoin="round"/>
+                        <path d="M14 3v6h5M8 13h8M8 17h8" stroke-linecap="round"/>
+                    </svg>
+                </span>
+
+                <h2 class="text-lg text-[#362727] kohan-bold">
+                    اطلاعات سند
+                </h2>
+            </div>
 
             <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+
+                {{-- Document Type --}}
                 <div>
-                    <label for="type" class="mb-2 block text-sm text-gray-300">نوع سند</label>
-                    <select id="type" name="type" required
-                            class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white">
-                        <option value="invoice" @selected(old('type', 'invoice') === 'invoice')>فاکتور</option>
-                        <option value="proforma" @selected(old('type') === 'proforma')>پیش‌فاکتور</option>
+                    <label for="type" class="mb-2 block text-sm text-[#5F514D]">
+                        نوع سند
+                    </label>
+
+                    <select
+                        id="type"
+                        name="type"
+                        required
+                        class="w-full cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
+                    >
+                        <option value="invoice" @selected(old('type', 'invoice') === 'invoice')>
+                            فاکتور
+                        </option>
+
+                        <option value="proforma" @selected(old('type') === 'proforma')>
+                            پیش‌فاکتور
+                        </option>
                     </select>
                 </div>
 
+                {{-- Customer --}}
                 <div class="relative">
-                    <label for="customer-search" class="mb-2 block text-sm text-gray-300">مشتری</label>
-                    <input type="text" id="customer-search" autocomplete="off"
-                           value="{{ old('customer_id') ? ($customers->firstWhere('id', old('customer_id'))?->name ?? '') : '' }}"
-                           placeholder="نام مشتری را جست‌وجو کنید..."
-                           class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white placeholder:text-gray-500"
-                           required>
+                    <label for="customer-search" class="mb-2 block text-sm text-[#5F514D]">
+                        مشتری
+                    </label>
 
-                    <input type="hidden" name="customer_id" id="customer_id"
-                           value="{{ old('customer_id') }}">
+                    <input
+                        type="text"
+                        id="customer-search"
+                        autocomplete="off"
+                        value="{{ old('customer_id') ? ($customers->firstWhere('id', old('customer_id'))?->name ?? '') : '' }}"
+                        placeholder="نام مشتری را جست‌وجو کنید..."
+                        class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B0A5A0] focus:border-[#8d6666] focus:bg-white"
+                        required
+                    >
 
-                    <div id="customer-results"
-                         class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-xl border border-white/10 bg-[#292929] shadow-xl">
-                    </div>
+                    <input
+                        type="hidden"
+                        name="customer_id"
+                        id="customer_id"
+                        value="{{ old('customer_id') }}"
+                    >
 
-                    <p id="customer-message" class="mt-2 hidden text-xs text-red-400">
+                    <div
+                        id="customer-results"
+                        class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-xl border border-[#E8E1DE] bg-white shadow-xl text-[#362727]"
+                    ></div>
+
+                    <p id="customer-message" class="mt-2 hidden text-xs text-rose-600">
                         مشتری مورد نظر یافت نشد.
                     </p>
                 </div>
 
+                {{-- Issue Date --}}
                 <div>
-                    <label for="issue_date" class="mb-2 block text-sm text-gray-300">تاریخ صدور</label>
-                    <input type="date" id="issue_date" name="issue_date"
-                           value="{{ old('issue_date', now()->format('Y-m-d')) }}" required
-                           class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white">
+                    <label for="issue_date" class="mb-2 block text-sm text-[#5F514D]">
+                        تاریخ صدور
+                    </label>
+
+                    <input
+                        type="date"
+                        id="issue_date"
+                        name="issue_date"
+                        value="{{ old('issue_date', now()->format('Y-m-d')) }}"
+                        required
+                        class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
+                    >
                 </div>
 
+                {{-- Valid Until --}}
                 <div id="valid-until-wrapper">
-                    <label for="valid_until" class="mb-2 block text-sm text-gray-300">معتبر تا تاریخ</label>
-                    <input type="date" id="valid_until" name="valid_until"
-                           value="{{ old('valid_until') }}"
-                           class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white">
-                    <p class="mt-1 text-xs text-gray-500">فقط برای پیش‌فاکتور قابل استفاده است.</p>
+                    <label for="valid_until" class="mb-2 block text-sm text-[#5F514D]">
+                        معتبر تا تاریخ
+                    </label>
+
+                    <input
+                        type="date"
+                        id="valid_until"
+                        name="valid_until"
+                        value="{{ old('valid_until') }}"
+                        class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
+                    >
+
+                    <p class="mt-1 text-xs text-[#A99D98]">
+                        فقط برای پیش‌فاکتور قابل استفاده است.
+                    </p>
                 </div>
 
+                {{-- Payment Type --}}
                 <div>
-                    <label for="payment_type" class="mb-2 block text-sm text-gray-300">نوع پرداخت</label>
-                    <input type="text" id="payment_type" name="payment_type"
-                           value="{{ old('payment_type') }}" maxlength="100"
-                           placeholder="مثلاً نقدی، اعتباری یا توافقی"
-                           class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white placeholder:text-gray-500">
+                    <label for="payment_type" class="mb-2 block text-sm text-[#5F514D]">
+                        نوع پرداخت
+                    </label>
+
+                    <input
+                        type="text"
+                        id="payment_type"
+                        name="payment_type"
+                        value="{{ old('payment_type') }}"
+                        maxlength="100"
+                        placeholder="مثلاً نقدی، اعتباری یا توافقی"
+                        class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B0A5A0] focus:border-[#8d6666]"
+                    >
                 </div>
 
+                {{-- Description --}}
                 <div>
-                    <label for="description" class="mb-2 block text-sm text-gray-300">توضیحات سند</label>
-                    <textarea id="description" name="description" rows="2"
-                              class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white">{{ old('description') }}</textarea>
+                    <label for="description" class="mb-2 block text-sm text-[#5F514D]">
+                        توضیحات سند
+                    </label>
+
+                    <textarea
+                        id="description"
+                        name="description"
+                        rows="2"
+                        class="w-full resize-y rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
+                    >{{ old('description') }}</textarea>
                 </div>
+
             </div>
 
-            <label class="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 p-4">
-                <input type="checkbox" name="is_formal" value="0"
-                       @checked(old('is_formal') === '0')
-                       class="h-4 w-4 accent-[#681b21]">
+            {{-- Formal Document --}}
+            <label class="flex cursor-pointer items-start gap-3 rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition hover:border-[#d6c5c2]">
+
+                <input
+                    type="checkbox"
+                    name="is_formal"
+                    value="0"
+                    @checked(old('is_formal') === '0')
+                    class="mt-0.5 h-4 w-4 cursor-pointer accent-[#542b2e]"
+                >
+
                 <span>
-                    <span class="block text-sm font-semibold text-white">ثبت غیر رسمی</span>
-                    <span class="mt-1 block text-xs text-gray-400">
+                    <span class="block text-sm text-[#362727] kohan-bold">
+                        ثبت غیر رسمی
+                    </span>
+
+                    <span class="mt-1 block text-xs leading-6 text-[#827875]">
                         با انتخاب این گزینه، سربرگ رسمی و QR اعتبارسنجی برای سند فعال نمی‌شود.
                     </span>
                 </span>
+
             </label>
+
         </section>
 
-        <section class="space-y-5 rounded-2xl border border-white/10 bg-[#222222] p-5 sm:p-6">
+        {{-- Document Items --}}
+        <section class="space-y-5 rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-sm sm:p-6">
+
             <div class="flex flex-wrap items-center justify-between gap-3">
-                <h2 class="text-lg font-bold text-white">اقلام سند</h2>
-                <button type="button" id="add-item"
-                        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
-                    + افزودن ردیف
+                <div class="flex items-center gap-3">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#674040]">
+                        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
+                            <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+
+                    <h2 class="text-lg text-[#362727] kohan-bold">
+                        اقلام سند
+                    </h2>
+                </div>
+
+                <button
+                    type="button"
+                    id="add-item"
+                    class="cursor-pointer inline-flex items-center gap-2 rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-2 text-sm text-[#674040] transition hover:border-[#d6c5c2] hover:bg-[#F3E9E9] kohan-bold"
+                >
+                    <span class="text-lg">+</span>
+                    افزودن ردیف
                 </button>
             </div>
 
             <div id="items-container" class="space-y-5"></div>
 
-            <div class="rounded-xl border border-white/10 bg-black/10 p-4 sm:mr-auto sm:max-w-sm">
-                <div class="flex justify-between gap-4 py-2 text-sm text-gray-300">
+            {{-- Totals --}}
+            <div class="rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 sm:mr-auto sm:max-w-sm">
+
+                <div class="flex justify-between gap-4 py-2 text-sm text-[#827875]">
                     <span>جمع اقلام</span>
                     <span id="subtotal-display">۰ ریال</span>
                 </div>
-                <div class="flex justify-between gap-4 py-2 text-sm text-gray-300">
+
+                <div class="flex justify-between gap-4 py-2 text-sm text-[#827875]">
                     <span>مجموع مالیات</span>
                     <span id="vat-display">۰ ریال</span>
                 </div>
-                <div class="mt-2 flex justify-between gap-4 border-t border-white/10 pt-4 font-bold text-white">
+
+                <div class="mt-2 flex justify-between gap-4 border-t border-[#E8E1DE] pt-4 text-[#362727] kohan-bold">
                     <span>مبلغ نهایی</span>
-                    <span id="grand-total-display" class="text-lg">۰ ریال</span>
+                    <span id="grand-total-display" class="text-lg text-[#542b2e]">
+                        ۰ ریال
+                    </span>
                 </div>
+
             </div>
+
         </section>
 
-        <section class="space-y-4 rounded-2xl border border-white/10 bg-[#222222] p-5 sm:p-6">
-            <div class="flex items-center justify-between gap-3">
-                <h2 class="text-lg font-bold text-white">متن‌ها و توضیحات تکمیلی</h2>
-                <button type="button" id="add-note"
-                        class="rounded-xl border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10">
-                    + افزودن متن
+        {{-- Additional Notes --}}
+        <section class="space-y-4 rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-sm sm:p-6">
+
+            <div class="flex flex-wrap items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#674040]">
+                        <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
+                            <path d="M8 4h13v16H3V4h5ZM7 9h10M7 13h10M7 17h6" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </span>
+
+                    <h2 class="text-lg text-[#362727] kohan-bold">
+                        متن‌ها و توضیحات تکمیلی
+                    </h2>
+                </div>
+
+                <button
+                    type="button"
+                    id="add-note"
+                    class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-2 text-sm text-[#674040] transition hover:border-[#d6c5c2] hover:bg-[#F3E9E9] kohan-bold"
+                >
+                    <span class="text-lg">+</span>
+                    افزودن متن
                 </button>
             </div>
 
             <div id="notes-container" class="space-y-3"></div>
+
         </section>
 
+        {{-- Form Actions --}}
         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <a href="{{ route('admin.invoices.index') }}"
-               class="rounded-xl border border-white/10 px-6 py-3 text-center text-sm font-semibold text-gray-300 transition hover:bg-white/5">
+
+            <a
+                href="{{ route('admin.invoices.index') }}"
+                class="cursor-pointer rounded-xl border border-[#E8E1DE] px-6 py-3 text-center text-sm text-[#827875] transition hover:bg-[#FAF8F7] hover:text-[#542b2e] kohan-bold"
+            >
                 انصراف
             </a>
 
-            <button type="submit" id="submit-invoice"
-                    class="rounded-xl bg-[#681b21] px-8 py-3 text-sm font-bold text-white transition hover:bg-[#81272e]">
+            <button
+                type="submit"
+                id="submit-invoice"
+                class="cursor-pointer rounded-xl bg-[#542b2e] px-8 py-3 text-sm text-white transition hover:bg-[#674040] kohan-bold"
+            >
                 ثبت سند
             </button>
+
         </div>
+
     </form>
 </div>
 
@@ -228,7 +407,7 @@
             matches.forEach(customer => {
                 const option = document.createElement('button');
                 option.type = 'button';
-                option.className = 'block w-full px-4 py-3 text-right text-sm text-white hover:bg-white/10';
+                option.className = 'block w-full px-4 py-3 text-right text-sm hover:bg-white/10';
                 option.textContent = customer.phone
                     ? `${customer.name} — ${customer.phone}`
                     : customer.name;
@@ -264,67 +443,118 @@
             const index = itemsContainer.children.length;
             const row = document.createElement('div');
 
-            row.className = 'item-row rounded-xl border border-white/10 bg-black/10 p-4';
+            row.className = 'item-row rounded-2xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 sm:p-5';
+
             row.innerHTML = `
-                <div class="mb-4 flex items-center justify-between gap-3">
-                    <h3 class="font-semibold text-white">ردیف <span class="item-number">${index + 1}</span></h3>
-                    <button type="button" class="remove-item text-sm text-red-300 hover:text-red-200">حذف ردیف</button>
+                <div class="mb-5 flex items-center justify-between gap-3">
+                    <h3 class="text-sm text-[#362727] kohan-bold">
+                        ردیف <span class="item-number">${index + 1}</span>
+                    </h3>
+
+                    <button
+                        type="button"
+                        class="remove-item cursor-pointer rounded-lg px-3 py-2 text-xs text-rose-600 transition hover:bg-rose-50 hover:text-rose-700"
+                    >
+                        حذف ردیف
+                    </button>
                 </div>
 
                 <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+
                     <div class="sm:col-span-2 lg:col-span-4">
-                        <label class="mb-2 block text-xs text-gray-400">شرح کالا یا خدمت</label>
-                        <input name="items[${index}][description]" required maxlength="500"
-                               value="${escapeHtml(data.description || '')}"
-                               class="item-description w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">
+                            شرح کالا یا خدمت
+                        </label>
+
+                        <input
+                            name="items[${index}][description]"
+                            required
+                            maxlength="500"
+                            value="${escapeHtml(data.description || '')}"
+                            class="item-description w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#A99D98] focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">تعداد</label>
-                        <input type="number" name="items[${index}][quantity]" required min="0.001" step="0.001"
-                               value="${escapeHtml(data.quantity ?? 1)}"
-                               class="item-quantity w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">تعداد</label>
+                        <input
+                            type="number"
+                            name="items[${index}][quantity]"
+                            required
+                            min="0.001"
+                            step="0.001"
+                            value="${escapeHtml(data.quantity ?? 1)}"
+                            class="item-quantity w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">واحد</label>
-                        <input name="items[${index}][unit]" maxlength="50"
-                               value="${escapeHtml(data.unit || '')}" placeholder="عدد، کیلوگرم..."
-                               class="w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">واحد</label>
+                        <input
+                            name="items[${index}][unit]"
+                            maxlength="50"
+                            value="${escapeHtml(data.unit || '')}"
+                            placeholder="عدد، کیلوگرم..."
+                            class="w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#A99D98] focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">عرض</label>
-                        <input type="number" name="items[${index}][width]" min="0" step="0.001"
-                               value="${escapeHtml(data.width || '')}"
-                               class="w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">عرض</label>
+                        <input
+                            type="number"
+                            name="items[${index}][width]"
+                            min="0"
+                            step="0.001"
+                            value="${escapeHtml(data.width || '')}"
+                            class="w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">ضخامت</label>
-                        <input type="number" name="items[${index}][thickness]" min="0" step="0.001"
-                               value="${escapeHtml(data.thickness || '')}"
-                               class="w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">ضخامت</label>
+                        <input
+                            type="number"
+                            name="items[${index}][thickness]"
+                            min="0"
+                            step="0.001"
+                            value="${escapeHtml(data.thickness || '')}"
+                            class="w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">قیمت واحد (ریال)</label>
-                        <input type="number" name="items[${index}][unit_price]" required min="0" step="1"
-                               value="${escapeHtml(data.unit_price ?? 0)}"
-                               class="item-price w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">قیمت واحد (ریال)</label>
+                        <input
+                            type="number"
+                            name="items[${index}][unit_price]"
+                            required
+                            min="0"
+                            step="1"
+                            value="${escapeHtml(data.unit_price ?? 0)}"
+                            class="item-price w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
                     <div>
-                        <label class="mb-2 block text-xs text-gray-400">درصد مالیات</label>
-                        <input type="number" name="items[${index}][vat_percent]" required min="0" max="100" step="0.01"
-                               value="${escapeHtml(data.vat_percent ?? 0)}"
-                               class="item-vat w-full rounded-lg border border-white/10 bg-[#292929] px-3 py-3 text-sm text-white">
+                        <label class="mb-2 block text-xs text-[#827875]">درصد مالیات</label>
+                        <input
+                            type="number"
+                            name="items[${index}][vat_percent]"
+                            required
+                            min="0"
+                            max="100"
+                            step="0.01"
+                            value="${escapeHtml(data.vat_percent ?? 0)}"
+                            class="item-vat w-full rounded-xl border border-[#E8E1DE] bg-white px-3 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
                     </div>
 
-                    <div class="sm:col-span-2">
-                        <p class="text-xs text-gray-400">جمع ردیف با مالیات</p>
-                        <p class="item-total mt-2 font-bold text-white">۰ ریال</p>
+                    <div class="sm:col-span-2 flex flex-col justify-center rounded-xl border border-[#E8E1DE] bg-white px-4 py-3">
+                        <p class="text-xs text-[#827875]">جمع ردیف با مالیات</p>
+                        <p class="item-total mt-2 text-base text-[#542b2e] kohan-bold">۰ ریال</p>
                     </div>
+
                 </div>
             `;
 
@@ -399,12 +629,13 @@
             textarea.maxLength = 5000;
             textarea.placeholder = 'متن یا توضیحات تکمیلی...';
             textarea.value = value;
-            textarea.className = 'min-w-0 flex-1 rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white';
+
+            textarea.className = 'min-w-0 flex-1 rounded-xl border border-[#E8E1DE] bg-white px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#A99D98] focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10';
 
             const remove = document.createElement('button');
             remove.type = 'button';
             remove.textContent = 'حذف';
-            remove.className = 'rounded-lg px-3 py-2 text-sm text-red-300 hover:bg-white/5';
+            remove.className = 'cursor-pointer rounded-xl px-3 py-3 text-sm text-rose-600 transition hover:bg-rose-50 hover:text-rose-700';
 
             remove.addEventListener('click', () => {
                 row.remove();

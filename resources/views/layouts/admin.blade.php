@@ -2,15 +2,14 @@
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#F4F1EF">
 
     <title>@yield('title', 'پنل مدیریت | کهن پلیمر البرز')</title>
 
     <meta name="description" content="@yield('description', 'پنل مدیریت کهن پلیمر البرز')">
-    <meta name="theme-color" content="#ffffff">
 
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-
     <link rel="icon" type="image/png" href="{{ asset('img/kohan-logo.png') }}">
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -42,13 +41,12 @@
     @include('partials.admin.mobnav')
 
     <!-- Admin Main Content -->
-    <main class="min-h-screen pr-[308px] pl-6 py-6 max-md:pr-4 max-md:pl-4 max-md:py-4 max-md:pb-28">
+    <main class="min-h-screen pr-[308px] pl-6 py-7 max-md:pr-4 max-md:pl-4 max-md:py-5 max-md:pb-28">
 
-        <div class="mx-auto w-full max-w-[1600px] space-y-6 text-white" dir="rtl">
+        <div class="mx-auto w-full max-w-[1600px] space-y-7 text-[#362727]" dir="rtl">
 
             @yield('content')
 
-            <!-- Dashboard Footer -->
             @include('partials.admin.footer')
 
         </div>

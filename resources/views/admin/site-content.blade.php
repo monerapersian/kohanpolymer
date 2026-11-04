@@ -6,32 +6,65 @@
     <div class="space-y-6">
 
         {{-- Page Hero --}}
-        <section class="relative overflow-hidden rounded-3xl border border-white/[0.08] bg-[#222222]/80 p-6 shadow-2xl sm:p-8 lg:p-10">
-            <div class="pointer-events-none absolute -left-16 -top-20 h-56 w-56 rounded-full bg-[#681b21]/30 blur-3xl"></div>
-            <div class="pointer-events-none absolute -bottom-24 right-1/3 h-48 w-48 rounded-full bg-emerald-900/20 blur-3xl"></div>
+        <section class="hero-animated-bg relative isolate overflow-hidden rounded-3xl border border-white/10 p-6 shadow-[0_15px_45px_rgba(54,39,39,0.18)] sm:p-8 lg:p-10">
 
-            <div class="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <div class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-white/60">
-                        <span class="h-1.5 w-1.5 rounded-full bg-emerald-400"></span>
+            {{-- Animated Background --}}
+            <div class="hero-orb hero-orb-one"></div>
+            <div class="hero-orb hero-orb-two"></div>
+            <div class="hero-orb hero-orb-three"></div>
+
+            <div class="hero-wave"></div>
+
+            <div class="hero-ring hero-ring-one"></div>
+            <div class="hero-ring hero-ring-two"></div>
+
+            <div class="hero-grid"></div>
+            <!-- <div class="hero-shine"></div> -->
+
+            {{-- Content --}}
+            <div class="relative z-10 flex flex-col gap-7 sm:flex-row sm:items-center sm:justify-between">
+
+                {{-- Text --}}
+                <div class="min-w-0">
+
+                    <div class="mb-4 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/[0.07] px-3.5 py-2 text-xs text-white/75 backdrop-blur-md">
+                        <span class="relative flex h-2 w-2">
+                            <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#baadad] opacity-50"></span>
+                            <span class="relative inline-flex h-2 w-2 rounded-full bg-[#baadad]"></span>
+                        </span>
                         مدیریت وب‌سایت
                     </div>
 
-                    <h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                        محتوا سایت
+                    <h1 class="kohan-bold text-2xl tracking-tight text-white sm:text-3xl lg:text-4xl">
+                        مدیریت محتوای سایت
                     </h1>
 
-                    <p class="mt-3 max-w-2xl text-sm leading-7 text-white/55 sm:text-base">
+                    <p class="mt-4 max-w-2xl text-sm leading-8 text-white/65 sm:text-base">
                         محتوای اصلی وب‌سایت، اطلاعات معرفی مجموعه و راه‌های ارتباطی را از این بخش مدیریت کنید.
                     </p>
+
+                    <div class="mt-6 flex items-center gap-3 text-xs text-white/45">
+                        <span class="h-px w-8 bg-[#baadad]/60"></span>
+                        <span>مدیریت و به‌روزرسانی اطلاعات وب‌سایت</span>
+                    </div>
+
                 </div>
 
-                <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.05]">
-                    <svg class="h-8 w-8 text-white/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+                {{-- Decorative Icon --}}
+                <div class="relative flex h-24 w-24 shrink-0 items-center justify-center self-start sm:h-28 sm:w-28 sm:self-center">
+
+                    <div class="absolute inset-0 rounded-[30px] border border-white/15 bg-white/[0.06] shadow-[0_0_50px_rgba(186,173,173,0.12)] backdrop-blur-md"></div>
+
+                    <div class="absolute inset-2 rounded-[24px] border border-white/[0.08]"></div>
+
+                    <svg class="relative h-11 w-11 text-[#baadad] sm:h-14 sm:w-14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
+                        <path d="M14.5 5.5l4 4"/>
                     </svg>
+
                 </div>
+
             </div>
         </section>
 
@@ -59,15 +92,20 @@
 
         {{-- Content Tabs --}}
         <section
-            class="overflow-hidden rounded-3xl border border-white/[0.08] bg-[#222222]/75 shadow-xl"
+            class="relative overflow-hidden rounded-3xl border border-[#E8E1DE] bg-white shadow-[0_12px_40px_rgba(54,39,39,0.06)]"
             id="site-content-manager"
         >
-            <div class="border-b border-white/[0.08] p-3 sm:p-4">
-                <div class="grid grid-cols-3 gap-2" role="tablist" aria-label="بخش‌های مدیریت محتوا">
+            {{-- Tabs Navigation --}}
+            <div class="border-b border-[#EEE8E5] bg-[#FAF8F7] p-3 sm:p-4">
+                <div
+                    class="grid grid-cols-3 gap-2"
+                    role="tablist"
+                    aria-label="بخش‌های مدیریت محتوا"
+                >
                     <button
                         type="button"
                         id="tab-main"
-                        class="content-tab is-active rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 sm:px-5 kohan-bold cursor-pointer"
+                        class="content-tab is-active cursor-pointer rounded-xl border border-transparent px-3 py-3 text-sm transition-all duration-200 sm:px-5 kohan-bold"
                         role="tab"
                         aria-selected="true"
                         aria-controls="panel-main"
@@ -79,7 +117,7 @@
                     <button
                         type="button"
                         id="tab-products"
-                        class="content-tab rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 sm:px-5 kohan-bold cursor-pointer"
+                        class="content-tab cursor-pointer rounded-xl border border-transparent px-3 py-3 text-sm transition-all duration-200 sm:px-5 kohan-bold"
                         role="tab"
                         aria-selected="false"
                         aria-controls="panel-products"
@@ -91,7 +129,7 @@
                     <button
                         type="button"
                         id="tab-blog"
-                        class="content-tab rounded-xl px-3 py-3 text-sm font-bold transition-all duration-200 sm:px-5 kohan-bold cursor-pointer"
+                        class="content-tab cursor-pointer rounded-xl border border-transparent px-3 py-3 text-sm transition-all duration-200 sm:px-5 kohan-bold"
                         role="tab"
                         aria-selected="false"
                         aria-controls="panel-blog"
@@ -105,7 +143,7 @@
             {{-- Main Content Tab --}}
             <div
                 id="panel-main"
-                class="content-panel p-5 sm:p-7 lg:p-8"
+                class="content-panel bg-[#FCFBFA] p-5 sm:p-7 lg:p-8"
                 role="tabpanel"
                 aria-labelledby="tab-main"
                 data-panel="main"
@@ -114,38 +152,47 @@
                     action="{{ route('admin.site-content.update') }}"
                     method="POST"
                     enctype="multipart/form-data"
-                    class="space-y-8"
+                    class="space-y-6"
                 >
                     @csrf
                     @method('PUT')
 
                     {{-- Logo and Hero --}}
-                    <section>
-                        <div class="mb-5">
-                            <h2 class="text-lg font-extrabold text-white sm:text-xl">
-                                لوگو و بخش ابتدایی سایت
-                            </h2>
-                            <p class="mt-2 text-sm leading-6 text-white/45">
-                                لوگو و تصویر اصلی سایت را مدیریت کنید.
-                            </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <rect x="3" y="3" width="18" height="18" rx="3"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 15l3-3 2 2 3-4 3 5H5"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg text-[#362727] kohan-bold">
+                                    لوگو و بخش ابتدایی سایت
+                                </h2>
+                                <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                    لوگو، تصویر اصلی و شعار صفحه نخست را مدیریت کنید.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                             <div>
-                                <label for="logo" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="logo" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     لوگوی سایت
                                 </label>
 
                                 @if ($content?->logo)
-                                    <div class="mb-4 flex items-center gap-4 rounded-xl border border-white/10 bg-black/20 p-4">
+                                    <div class="mb-4 flex items-center gap-4 rounded-xl border border-[#EAE3E0] bg-[#FAF8F7] p-4">
                                         <img
                                             src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->logo) }}"
                                             alt="لوگوی فعلی سایت"
-                                            class="h-20 w-32 rounded-lg bg-white p-2 object-contain"
+                                            class="h-20 w-32 rounded-lg border border-[#EAE3E0] bg-white p-2 object-contain"
                                         >
-                                        <span class="text-xs leading-6 text-white/50">
-                                            لوگوی فعلی
-                                        </span>
+                                        <div>
+                                            <span class="text-sm text-[#554744] kohan-bold">لوگوی فعلی</span>
+                                            <p class="mt-1 text-xs text-[#A19692]">تصویر ذخیره‌شده سایت</p>
+                                        </div>
                                     </div>
                                 @endif
 
@@ -154,29 +201,27 @@
                                     id="logo"
                                     name="logo"
                                     accept=".jpg,.jpeg,.png,.webp"
-                                    class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10"
+                                    class="block w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] text-sm text-[#776966] file:ml-4 file:cursor-pointer file:border-0 file:bg-[#F0E8E6] file:px-4 file:py-3 file:text-[#542b2e] file:kohan-bold hover:file:bg-[#E9DAD9]"
                                 >
 
-                                <p class="mt-2 text-xs leading-6 text-white/40">
+                                <p class="mt-2 text-xs leading-6 text-[#A19692]">
                                     JPG، PNG یا WebP؛ حداکثر ۵ مگابایت. تصویر به WebP تبدیل می‌شود.
                                 </p>
                             </div>
 
                             <div>
-                                <label for="hero_image" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="hero_image" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     تصویر Hero
                                 </label>
 
                                 @if ($content?->hero_image)
-                                    <div class="mb-4 rounded-xl border border-white/10 bg-black/20 p-3">
+                                    <div class="mb-4 rounded-xl border border-[#EAE3E0] bg-[#FAF8F7] p-3">
                                         <img
                                             src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->hero_image) }}"
                                             alt="تصویر فعلی Hero"
                                             class="h-40 w-full rounded-lg object-cover"
                                         >
-                                        <p class="mt-2 text-xs text-white/50">
-                                            تصویر فعلی
-                                        </p>
+                                        <p class="mt-2 text-xs text-[#948784]">تصویر فعلی</p>
                                     </div>
                                 @endif
 
@@ -185,17 +230,17 @@
                                     id="hero_image"
                                     name="hero_image"
                                     accept=".jpg,.jpeg,.png,.webp"
-                                    class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10"
+                                    class="block w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] text-sm text-[#776966] file:ml-4 file:cursor-pointer file:border-0 file:bg-[#F0E8E6] file:px-4 file:py-3 file:text-[#542b2e] file:kohan-bold hover:file:bg-[#E9DAD9]"
                                 >
 
-                                <p class="mt-2 text-xs leading-6 text-white/40">
+                                <p class="mt-2 text-xs leading-6 text-[#A19692]">
                                     JPG، PNG یا WebP؛ حداکثر ۵ مگابایت.
                                 </p>
                             </div>
                         </div>
 
-                        <div class="mt-6">
-                            <label for="hero_slogan" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                        <div class="mt-6 border-t border-[#F0EBE9] pt-6">
+                            <label for="hero_slogan" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                 شعار Hero
                             </label>
 
@@ -205,26 +250,32 @@
                                 rows="4"
                                 maxlength="2000"
                                 placeholder="شعار اصلی صفحه نخست را وارد کنید..."
-                                class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                             >{{ old('hero_slogan', $content?->hero_slogan) }}</textarea>
                         </div>
                     </section>
 
                     {{-- Industry Section --}}
-                    <section class="border-t border-white/[0.08] pt-7">
-                        <div class="mb-5">
-                            <h2 class="text-lg font-extrabold text-white">نگاه ما به صنعت</h2>
-                            <p class="mt-2 text-sm leading-6 text-white/45">
-                                عنوان و متن این بخش از صفحه اصلی را وارد کنید.
-                            </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-5h6v5M9 9h.01M15 9h.01M9 12h.01M15 12h.01"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg text-[#362727] kohan-bold">نگاه ما به صنعت</h2>
+                                <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                    عنوان و متن این بخش از صفحه اصلی را وارد کنید.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="space-y-5">
                             <div>
-                                <label for="industry_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="industry_title" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     عنوان بخش
                                 </label>
-
                                 <input
                                     type="text"
                                     id="industry_title"
@@ -232,42 +283,47 @@
                                     maxlength="255"
                                     value="{{ old('industry_title', $content?->industry_title) }}"
                                     placeholder="نگاه ما به صنعت"
-                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >
                             </div>
 
                             <div>
-                                <label for="industry_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="industry_text" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     متن بخش
                                 </label>
-
                                 <textarea
                                     id="industry_text"
                                     name="industry_text"
                                     rows="5"
                                     maxlength="10000"
                                     placeholder="متن معرفی نگاه مجموعه به صنعت..."
-                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >{{ old('industry_text', $content?->industry_text) }}</textarea>
                             </div>
                         </div>
                     </section>
 
                     {{-- Difference Section --}}
-                    <section class="border-t border-white/[0.08] pt-7">
-                        <div class="mb-5">
-                            <h2 class="text-lg font-extrabold text-white">نگاه متفاوت</h2>
-                            <p class="mt-2 text-sm leading-6 text-white/45">
-                                عنوان و توضیحات بخش نگاه متفاوت را مدیریت کنید.
-                            </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v3m0 12v3M3 12h3m12 0h3M5.64 5.64l2.12 2.12m8.48 8.48 2.12 2.12m0-12.72-2.12 2.12m-8.48 8.48-2.12 2.12M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg text-[#362727] kohan-bold">نگاه متفاوت</h2>
+                                <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                    عنوان و توضیحات بخش نگاه متفاوت را مدیریت کنید.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="space-y-5">
                             <div>
-                                <label for="difference_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="difference_title" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     عنوان بخش
                                 </label>
-
                                 <input
                                     type="text"
                                     id="difference_title"
@@ -275,42 +331,47 @@
                                     maxlength="255"
                                     value="{{ old('difference_title', $content?->difference_title) }}"
                                     placeholder="نگاه متفاوت"
-                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >
                             </div>
 
                             <div>
-                                <label for="difference_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="difference_text" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     توضیحات بخش
                                 </label>
-
                                 <textarea
                                     id="difference_text"
                                     name="difference_text"
                                     rows="5"
                                     maxlength="10000"
                                     placeholder="توضیحات مربوط به تفاوت‌ها و مزیت‌های مجموعه..."
-                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >{{ old('difference_text', $content?->difference_text) }}</textarea>
                             </div>
                         </div>
                     </section>
 
                     {{-- About Section --}}
-                    <section class="border-t border-white/[0.08] pt-7">
-                        <div class="mb-5">
-                            <h2 class="text-lg font-extrabold text-white">درباره کهن پلیمر</h2>
-                            <p class="mt-2 text-sm leading-6 text-white/45">
-                                عنوان و متن معرفی مجموعه را مدیریت کنید.
-                            </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 16v-4m0-4h.01M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg text-[#362727] kohan-bold">درباره کهن پلیمر</h2>
+                                <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                    عنوان و متن معرفی مجموعه را مدیریت کنید.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="space-y-5">
                             <div>
-                                <label for="about_title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="about_title" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     عنوان بخش
                                 </label>
-
                                 <input
                                     type="text"
                                     id="about_title"
@@ -318,43 +379,49 @@
                                     maxlength="255"
                                     value="{{ old('about_title', $content?->about_title) }}"
                                     placeholder="درباره کهن پلیمر"
-                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >
                             </div>
 
                             <div>
-                                <label for="about_text" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                <label for="about_text" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     متن درباره مجموعه
                                 </label>
-
                                 <textarea
                                     id="about_text"
                                     name="about_text"
                                     rows="6"
                                     maxlength="10000"
                                     placeholder="متن معرفی کهن پلیمر البرز..."
-                                    class="w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-7 text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >{{ old('about_text', $content?->about_text) }}</textarea>
                             </div>
                         </div>
                     </section>
 
                     {{-- Activity Areas --}}
-                    <section class="border-t border-white/[0.08] pt-7">
-                        <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <div>
-                                <h2 class="text-lg font-extrabold text-white">حوزه‌های فعالیت</h2>
-                                <p class="mt-2 text-sm leading-6 text-white/45">
-                                    هر حوزه فعالیت را در یک فیلد جداگانه وارد کنید.
-                                </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                            <div class="flex items-start gap-3">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M4 12h16M4 17h16M8 4v16"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg text-[#362727] kohan-bold">حوزه‌های فعالیت</h2>
+                                    <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                        هر حوزه فعالیت را در یک فیلد جداگانه وارد کنید.
+                                    </p>
+                                </div>
                             </div>
 
                             <button
                                 type="button"
                                 data-add-field="activity_areas"
-                                class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold"
+                                class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DCCBC9] bg-[#F8F1F0] px-4 py-2.5 text-sm text-[#542b2e] transition hover:bg-[#F0E4E2] kohan-bold"
                             >
-                                <span>+</span>
+                                <span class="text-lg leading-none">+</span>
                                 افزودن حوزه
                             </button>
                         </div>
@@ -373,13 +440,12 @@
                                         maxlength="255"
                                         value="{{ $activityArea }}"
                                         placeholder="مثلاً: تولید قطعات پلیمری صنعتی"
-                                        class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                        class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                     >
-
                                     <button
                                         type="button"
                                         data-remove-field
-                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-500 transition hover:border-red-300 hover:bg-red-100"
                                         aria-label="حذف حوزه فعالیت"
                                     >
                                         &times;
@@ -392,13 +458,12 @@
                                         name="activity_areas[]"
                                         maxlength="255"
                                         placeholder="مثلاً: تولید قطعات پلیمری صنعتی"
-                                        class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                        class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                     >
-
                                     <button
                                         type="button"
                                         data-remove-field
-                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                        class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-500 transition hover:border-red-300 hover:bg-red-100"
                                         aria-label="حذف حوزه فعالیت"
                                     >
                                         &times;
@@ -409,27 +474,34 @@
                     </section>
 
                     {{-- Contact Information --}}
-                    <section class="border-t border-white/[0.08] pt-7">
-                        <div class="mb-5">
-                            <h2 class="text-lg font-extrabold text-white">راه‌های ارتباطی</h2>
-                            <p class="mt-2 text-sm leading-6 text-white/45">
-                                شماره تماس، ایمیل و شبکه‌های اجتماعی مجموعه را مدیریت کنید.
-                            </p>
+                    <section class="rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:p-6">
+                        <div class="mb-6 flex items-start gap-3">
+                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 5a2 2 0 0 1 2-2h2.3a2 2 0 0 1 1.9 1.4l1 3a2 2 0 0 1-.5 2l-1.5 1.5a16 16 0 0 0 5.9 5.9l1.5-1.5a2 2 0 0 1 2-.5l3 1a2 2 0 0 1 1.4 1.9V19a2 2 0 0 1-2 2h-1C10.7 21 3 13.3 3 4V5Z"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <h2 class="text-lg text-[#362727] kohan-bold">راه‌های ارتباطی</h2>
+                                <p class="mt-1 text-sm leading-6 text-[#948784]">
+                                    شماره تماس، ایمیل و شبکه‌های اجتماعی مجموعه را مدیریت کنید.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="space-y-6">
                             <div>
                                 <div class="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                    <label class="block text-sm font-bold text-white/80 kohan-bold">
+                                    <label class="block text-sm text-[#554744] kohan-bold">
                                         شماره‌های تماس
                                     </label>
 
                                     <button
                                         type="button"
                                         data-add-field="phones"
-                                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold"
+                                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-[#DCCBC9] bg-[#F8F1F0] px-4 py-2.5 text-sm text-[#542b2e] transition hover:bg-[#F0E4E2] kohan-bold"
                                     >
-                                        <span>+</span>
+                                        <span class="text-lg leading-none">+</span>
                                         افزودن شماره
                                     </button>
                                 </div>
@@ -453,13 +525,12 @@
                                                 inputmode="tel"
                                                 dir="ltr"
                                                 placeholder="02612345678"
-                                                class="min-w-0 flex-1 rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                                class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-left text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                             >
-
                                             <button
                                                 type="button"
                                                 data-remove-field
-                                                class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-400/20 text-red-300 transition hover:bg-red-500/10"
+                                                class="inline-flex h-11 w-11 shrink-0 cursor-pointer items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-500 transition hover:border-red-300 hover:bg-red-100"
                                                 aria-label="حذف شماره تلفن"
                                             >
                                                 &times;
@@ -469,11 +540,10 @@
                                 </div>
                             </div>
 
-                            <div>
-                                <label for="email" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                            <div class="border-t border-[#F0EBE9] pt-6">
+                                <label for="email" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     ایمیل
                                 </label>
-
                                 <input
                                     type="email"
                                     id="email"
@@ -482,21 +552,20 @@
                                     value="{{ old('email', $content?->email) }}"
                                     placeholder="info@example.com"
                                     dir="ltr"
-                                    class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3.5 text-left text-sm text-white outline-none transition placeholder:text-white/25 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                                    class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-left text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >
                             </div>
 
-                            <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+                            <div class="grid grid-cols-1 gap-5 border-t border-[#F0EBE9] pt-6 md:grid-cols-2">
                                 <div>
-                                    <label for="instagram" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    <label for="instagram" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                         آیدی اینستاگرام
                                     </label>
 
-                                    <div class="flex overflow-hidden rounded-xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
-                                        <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45">
+                                    <div class="flex overflow-hidden rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] transition focus-within:border-[#8d6666] focus-within:ring-2 focus-within:ring-[#8d6666]/10" dir="ltr">
+                                        <span class="flex shrink-0 items-center border-r border-[#E5DCDA] bg-[#F2ECEA] px-3 text-xs text-[#948784]">
                                             instagram.com/
                                         </span>
-
                                         <input
                                             type="text"
                                             id="instagram"
@@ -504,25 +573,24 @@
                                             maxlength="150"
                                             value="{{ old('instagram', $content?->instagram) }}"
                                             placeholder="kohanpolymer"
-                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25"
+                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-[#362727] outline-none placeholder:text-[#B4A9A5]"
                                         >
                                     </div>
 
-                                    <p class="mt-2 text-xs text-white/35">
+                                    <p class="mt-2 text-xs text-[#A19692]">
                                         فقط آیدی را وارد کنید.
                                     </p>
                                 </div>
 
                                 <div>
-                                    <label for="whatsapp" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                                    <label for="whatsapp" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                         شماره واتساپ
                                     </label>
 
-                                    <div class="flex overflow-hidden rounded-xl border border-white/10 bg-black/20 transition focus-within:border-[#681b21] focus-within:ring-2 focus-within:ring-[#681b21]/20" dir="ltr">
-                                        <span class="flex shrink-0 items-center border-r border-white/10 bg-white/[0.04] px-3 text-xs text-white/45">
+                                    <div class="flex overflow-hidden rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] transition focus-within:border-[#8d6666] focus-within:ring-2 focus-within:ring-[#8d6666]/10" dir="ltr">
+                                        <span class="flex shrink-0 items-center border-r border-[#E5DCDA] bg-[#F2ECEA] px-3 text-xs text-[#948784]">
                                             wa.me/
                                         </span>
-
                                         <input
                                             type="text"
                                             id="whatsapp"
@@ -531,11 +599,11 @@
                                             value="{{ old('whatsapp', $content?->whatsapp) }}"
                                             placeholder="989121234567"
                                             inputmode="tel"
-                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-white outline-none placeholder:text-white/25"
+                                            class="min-w-0 w-full bg-transparent px-3 py-3.5 text-sm text-[#362727] outline-none placeholder:text-[#B4A9A5]"
                                         >
                                     </div>
 
-                                    <p class="mt-2 text-xs text-white/35">
+                                    <p class="mt-2 text-xs text-[#A19692]">
                                         شماره را همراه کد کشور وارد کنید.
                                     </p>
                                 </div>
@@ -544,14 +612,14 @@
                     </section>
 
                     {{-- Save Actions --}}
-                    <div class="flex flex-col-reverse gap-3 border-t border-white/[0.08] pt-6 sm:flex-row sm:items-center sm:justify-between">
-                        <p class="text-xs leading-6 text-white/35">
+                    <div class="flex flex-col-reverse gap-4 rounded-2xl border border-[#EAE3E0] bg-white p-5 shadow-[0_4px_18px_rgba(54,39,39,0.035)] sm:flex-row sm:items-center sm:justify-between sm:p-6">
+                        <p class="text-xs leading-6 text-[#948784]">
                             تصاویر پس از بارگذاری به WebP تبدیل می‌شوند. در صورت انتخاب‌نکردن تصویر جدید، تصویر فعلی حفظ می‌شود.
                         </p>
 
                         <button
                             type="submit"
-                            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#681b21] px-6 py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#681b21]/20 transition hover:bg-[#7c242b] focus:outline-none focus:ring-2 focus:ring-[#a64b52] focus:ring-offset-2 focus:ring-offset-[#222222] kohan-bold"
+                            class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#542b2e] px-7 py-3.5 text-sm text-white shadow-lg shadow-[#542b2e]/15 transition hover:bg-[#674040] focus:outline-none focus:ring-2 focus:ring-[#8d6666] focus:ring-offset-2 kohan-bold"
                         >
                             <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
@@ -565,18 +633,25 @@
             {{-- Products Tab --}}
             <div
                 id="panel-products"
-                class="content-panel hidden p-5 sm:p-7 lg:p-8"
+                class="content-panel bg-[#FCFBFA] p-5 sm:p-7 lg:p-8"
                 role="tabpanel"
                 aria-labelledby="tab-products"
                 data-panel="products"
                 hidden
             >
-                <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {{-- Header --}}
+                <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 class="text-lg font-extrabold text-white sm:text-xl">
+                        <div class="flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-[#8d6666]"></span>
+                            <span class="text-xs text-[#A18E89] kohan-bold">مدیریت محتوای سایت</span>
+                        </div>
+
+                        <h2 class="mt-2 text-xl text-[#362727] sm:text-2xl kohan-bold">
                             مدیریت محصولات
                         </h2>
-                        <p class="mt-2 text-sm leading-6 text-white/45">
+
+                        <p class="mt-2 text-sm leading-6 text-[#948784]">
                             محصولات سایت را ثبت، ویرایش و مدیریت کنید.
                         </p>
                     </div>
@@ -584,7 +659,7 @@
                     <button
                         type="button"
                         id="add-product-button"
-                        class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#681b21] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#7c242b] focus:outline-none focus:ring-2 focus:ring-[#a64b52] kohan-bold cursor-pointer"
+                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#542b2e] px-5 py-3 text-sm text-white shadow-lg shadow-[#542b2e]/10 transition hover:-translate-y-0.5 hover:bg-[#674040] focus:outline-none focus:ring-2 focus:ring-[#8d6666] focus:ring-offset-2 kohan-bold"
                     >
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
@@ -593,126 +668,180 @@
                     </button>
                 </div>
 
+                {{-- Search and Filters --}}
                 <form
                     action="{{ route('admin.site-content.edit') }}"
                     method="GET"
-                    class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_auto]"
+                    class="mb-6 rounded-2xl border border-[#EAE3E0] bg-white p-4 shadow-[0_4px_18px_rgba(54,39,39,0.025)] sm:p-5"
                 >
                     <input type="hidden" name="tab" value="products">
-                    <input
-                        type="search"
-                        name="search"
-                        value="{{ request('search') }}"
-                        placeholder="جست‌وجوی نام محصول..."
-                        class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
-                    >
 
-                    <select
-                        name="sort"
-                        class="w-full rounded-xl border border-white/10 bg-[#222222] px-4 py-3 text-sm text-white outline-none focus:border-[#681b21] cursor-pointer"
-                    >
-                        <option value="newest" @selected(request('sort', 'newest') === 'newest')>
-                            جدیدترین
-                        </option>
-                        <option value="oldest" @selected(request('sort') === 'oldest')>
-                            قدیمی‌ترین
-                        </option>
-                    </select>
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_auto]">
+                        <div class="relative">
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A99994]"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                            >
+                                <circle cx="11" cy="11" r="7"/>
+                                <path stroke-linecap="round" d="m16 16 4 4"/>
+                            </svg>
 
-                    <button
-                        type="submit"
-                        class="rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold cursor-pointer"
-                    >
-                        اعمال فیلتر
-                    </button>
+                            <input
+                                type="search"
+                                name="search"
+                                value="{{ request('search') }}"
+                                placeholder="جست‌وجوی نام محصول..."
+                                class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] py-3 pr-11 pl-4 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
+                            >
+                        </div>
+
+                        <select
+                            name="sort"
+                            class="w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#554744] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
+                            <option value="newest" @selected(request('sort', 'newest') === 'newest')>
+                                جدیدترین
+                            </option>
+
+                            <option value="oldest" @selected(request('sort') === 'oldest')>
+                                قدیمی‌ترین
+                            </option>
+                        </select>
+
+                        <button
+                            type="submit"
+                            class="cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#F3EDEB] px-5 py-3 text-sm text-[#542b2e] transition hover:border-[#DCCBC9] hover:bg-[#EDE2E0] kohan-bold"
+                        >
+                            اعمال فیلتر
+                        </button>
+                    </div>
                 </form>
 
-                <div class="overflow-x-auto rounded-2xl border border-white/[0.08]">
-                    <table class="w-full min-w-[650px] text-right text-sm">
-                        <thead class="bg-white/[0.04] text-white/55 kohan-bold">
-                            <tr>
-                                <th class="px-4 py-4 font-bold">ردیف</th>
-                                <th class="px-4 py-4 font-bold">نام محصول</th>
-                                <th class="px-4 py-4 font-bold">تاریخ انتشار</th>
-                                <th class="px-4 py-4 font-bold">وضعیت</th>
-                                <th class="px-4 py-4 font-bold">عملیات</th>
-                            </tr>
-                        </thead>
+                {{-- Products Table --}}
+                <div class="overflow-hidden rounded-2xl border border-[#EAE3E0] bg-white shadow-[0_4px_18px_rgba(54,39,39,0.025)]">
+                    <div class="flex items-center justify-between border-b border-[#F0EBE9] px-5 py-4">
+                        <div>
+                            <h3 class="text-sm text-[#362727] kohan-bold">
+                                فهرست محصولات
+                            </h3>
+                            <p class="mt-1 text-xs text-[#A19692]">
+                                اطلاعات و وضعیت انتشار محصولات ثبت‌شده
+                            </p>
+                        </div>
 
-                        <tbody class="divide-y divide-white/[0.06]">
-                            @forelse ($products as $product)
-                                <tr class="transition hover:bg-white/[0.03]">
-                                    <td class="px-4 py-4 text-white/45">
-                                        {{ $products->firstItem() + $loop->index }}
-                                    </td>
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5"/>
+                            </svg>
+                        </div>
+                    </div>
 
-                                    <td class="px-4 py-4 font-bold text-white kohan-bold">
-                                        {{ $product->name }}
-                                    </td>
-
-                                    <td class="px-4 py-4 text-white/60">
-                                        {{ $product->published_at?->format('Y/m/d') ?? '—' }}
-                                    </td>
-
-                                    <td class="px-4 py-4">
-                                        @if ($product->status === 'published')
-                                            <span class="rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 kohan-bold">
-                                                منتشر شده
-                                            </span>
-                                        @else
-                                            <span class="rounded-full bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-300 kohan-bold">
-                                                پیش‌نویس
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-4 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                class="edit-product-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-white/75 transition hover:border-[#681b21]/60 hover:bg-[#681b21]/15 hover:text-white kohan-bold"
-                                                data-id="{{ $product->id }}"
-                                                data-name="{{ $product->name }}"
-                                                data-description="{{ $product->description }}"
-                                                data-status="{{ $product->status }}"
-                                            >
-                                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="m16 4 4 4M4 20l4-.8L19.2 8a2.26 2.26 0 0 0-3.2-3.2L4.8 16 4 20Z"/>
-                                                </svg>
-                                                ویرایش
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                class="delete-product-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-400 px-3 py-2 text-xs font-bold text-red-300 transition hover:border-red-400/40 hover:bg-red-500/60 hover:text-red-200 kohan-bold"
-                                                data-id="{{ $product->id }}"
-                                                data-name="{{ $product->name }}"
-                                            >
-                                                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3"/>
-                                                </svg>
-                                                حذف
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[650px] text-right text-sm">
+                            <thead class="bg-[#FAF8F7] text-[#8E7D78] kohan-bold">
                                 <tr>
-                                    <td colspan="5" class="px-4 py-12 text-center text-white/45">
-                                        @if (request()->filled('search'))
-                                            محصولی با این نام پیدا نشد.
-                                        @else
-                                            هنوز محصولی ثبت نشده است.
-                                        @endif
-                                    </td>
+                                    <th class="px-4 py-4">ردیف</th>
+                                    <th class="px-4 py-4">نام محصول</th>
+                                    <th class="px-4 py-4">تاریخ انتشار</th>
+                                    <th class="px-4 py-4">وضعیت</th>
+                                    <th class="px-4 py-4">عملیات</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody class="divide-y divide-[#F0EBE9]">
+                                @forelse ($products as $product)
+                                    <tr class="transition duration-200 hover:bg-[#FCFAF9]">
+                                        <td class="px-4 py-4 text-[#A19692]">
+                                            {{ $products->firstItem() + $loop->index }}
+                                        </td>
+
+                                        <td class="px-4 py-4 text-[#362727] kohan-bold">
+                                            {{ $product->name }}
+                                        </td>
+
+                                        <td class="px-4 py-4 text-[#8E7D78]">
+                                            {{ $product->published_at?->format('Y/m/d') ?? '—' }}
+                                        </td>
+
+                                        <td class="px-4 py-4">
+                                            @if ($product->status === 'published')
+                                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs text-emerald-700 kohan-bold">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                    منتشر شده
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs text-amber-700 kohan-bold">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                                    پیش‌نویس
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        <td class="px-4 py-4">
+                                            <div class="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    class="edit-product-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#E8DEDC] bg-white px-3 py-2 text-xs text-[#674040] transition hover:border-[#CBB5B2] hover:bg-[#F8F1F0] kohan-bold"
+                                                    data-id="{{ $product->id }}"
+                                                    data-name="{{ $product->name }}"
+                                                    data-description="{{ $product->description }}"
+                                                    data-status="{{ $product->status }}"
+                                                >
+                                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16 4 4 4M4 20l4-.8L19.2 8a2.26 2.26 0 0 0-3.2-3.2L4.8 16 4 20Z"/>
+                                                    </svg>
+                                                    ویرایش
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    class="delete-product-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs text-red-600 transition hover:border-red-300 hover:bg-red-50 kohan-bold"
+                                                    data-id="{{ $product->id }}"
+                                                    data-name="{{ $product->name }}"
+                                                >
+                                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3"/>
+                                                    </svg>
+                                                    حذف
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-16 text-center">
+                                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F5EFED] text-[#8d6666]">
+                                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 5h16v14H4zM8 9h8M8 13h5"/>
+                                                </svg>
+                                            </div>
+
+                                            <p class="mt-4 text-sm text-[#674040] kohan-bold">
+                                                @if (request()->filled('search'))
+                                                    محصولی با این نام پیدا نشد.
+                                                @else
+                                                    هنوز محصولی ثبت نشده است.
+                                                @endif
+                                            </p>
+
+                                            <p class="mt-1 text-xs text-[#A19692]">
+                                                محصولات ثبت‌شده در این قسمت نمایش داده می‌شوند.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                {{-- Pagination --}}
                 @if ($products->hasPages())
-                    <div class="mt-5">
+                    <div class="mt-5 rounded-xl border border-[#EAE3E0] bg-white px-4 py-3">
                         {{ $products->links() }}
                     </div>
                 @endif
@@ -721,18 +850,25 @@
             {{-- Blog Tab --}}
             <div
                 id="panel-blog"
-                class="content-panel hidden p-5 sm:p-7 lg:p-8"
+                class="content-panel hidden bg-[#FCFBFA] p-5 sm:p-7 lg:p-8"
                 role="tabpanel"
                 aria-labelledby="tab-blog"
                 data-panel="blog"
                 hidden
             >
-                <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                {{-- Header --}}
+                <div class="mb-7 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h2 class="text-lg font-extrabold text-white sm:text-xl kohan-bold">
+                        <div class="flex items-center gap-2">
+                            <span class="h-2 w-2 rounded-full bg-[#8d6666]"></span>
+                            <span class="text-xs text-[#A18E89] kohan-bold">مدیریت محتوای سایت</span>
+                        </div>
+
+                        <h2 class="mt-2 text-xl text-[#362727] sm:text-2xl kohan-bold">
                             مدیریت مقالات
                         </h2>
-                        <p class="mt-2 text-sm leading-6 text-white/45">
+
+                        <p class="mt-2 text-sm leading-6 text-[#948784]">
                             مقالات سایت را ثبت، ویرایش و مدیریت کنید.
                         </p>
                     </div>
@@ -740,7 +876,7 @@
                     <button
                         type="button"
                         id="add-blog-post-button"
-                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#681b21] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#7c242b] focus:outline-none focus:ring-2 focus:ring-[#a64b52] kohan-bold"
+                        class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#542b2e] px-5 py-3 text-sm text-white shadow-lg shadow-[#542b2e]/10 transition hover:-translate-y-0.5 hover:bg-[#674040] focus:outline-none focus:ring-2 focus:ring-[#8d6666] focus:ring-offset-2 kohan-bold"
                     >
                         <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14"/>
@@ -749,122 +885,182 @@
                     </button>
                 </div>
 
+                {{-- Search and Filters --}}
                 <form
                     action="{{ route('admin.site-content.edit') }}"
                     method="GET"
-                    class="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_auto]"
+                    class="mb-6 rounded-2xl border border-[#EAE3E0] bg-white p-4 shadow-[0_4px_18px_rgba(54,39,39,0.025)] sm:p-5"
                 >
                     <input type="hidden" name="tab" value="blog">
 
-                    <input
-                        type="search"
-                        name="blog_search"
-                        value="{{ request('blog_search') }}"
-                        placeholder="جست‌وجوی عنوان مقاله..."
-                        class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
-                    >
+                    <div class="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_180px_auto]">
+                        <div class="relative">
+                            <svg
+                                class="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A99994]"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                            >
+                                <circle cx="11" cy="11" r="7"/>
+                                <path stroke-linecap="round" d="m16 16 4 4"/>
+                            </svg>
 
-                    <select
-                        name="blog_sort"
-                        class="w-full cursor-pointer rounded-xl border border-white/10 bg-[#222222] px-4 py-3 text-sm text-white outline-none focus:border-[#681b21]"
-                    >
-                        <option value="newest" @selected(request('blog_sort', 'newest') === 'newest')>
-                            جدیدترین
-                        </option>
-                        <option value="oldest" @selected(request('blog_sort') === 'oldest')>
-                            قدیمی‌ترین
-                        </option>
-                    </select>
+                            <input
+                                type="search"
+                                name="blog_search"
+                                value="{{ request('blog_search') }}"
+                                placeholder="جست‌وجوی عنوان مقاله..."
+                                class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] py-3 pr-11 pl-4 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
+                            >
+                        </div>
 
-                    <button
-                        type="submit"
-                        class="cursor-pointer rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-bold text-white transition hover:bg-white/10 kohan-bold"
-                    >
-                        اعمال فیلتر
-                    </button>
+                        <select
+                            name="blog_sort"
+                            class="w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#554744] outline-none transition focus:border-[#8d6666] focus:ring-2 focus:ring-[#8d6666]/10"
+                        >
+                            <option value="newest" @selected(request('blog_sort', 'newest') === 'newest')>
+                                جدیدترین
+                            </option>
+
+                            <option value="oldest" @selected(request('blog_sort') === 'oldest')>
+                                قدیمی‌ترین
+                            </option>
+                        </select>
+
+                        <button
+                            type="submit"
+                            class="cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#F3EDEB] px-5 py-3 text-sm text-[#542b2e] transition hover:border-[#DCCBC9] hover:bg-[#EDE2E0] kohan-bold"
+                        >
+                            اعمال فیلتر
+                        </button>
+                    </div>
                 </form>
 
-                <div class="overflow-x-auto rounded-2xl border border-white/[0.08]">
-                    <table class="w-full min-w-[750px] text-right text-sm">
-                        <thead class="bg-white/[0.04] text-white/55 kohan-bold">
-                            <tr>
-                                <th class="px-4 py-4 font-bold">ردیف</th>
-                                <th class="px-4 py-4 font-bold">عنوان مقاله</th>
-                                <th class="px-4 py-4 font-bold">تاریخ انتشار</th>
-                                <th class="px-4 py-4 font-bold">وضعیت</th>
-                                <th class="px-4 py-4 font-bold">عملیات</th>
-                            </tr>
-                        </thead>
+                {{-- Blog Posts Table --}}
+                <div class="overflow-hidden rounded-2xl border border-[#EAE3E0] bg-white shadow-[0_4px_18px_rgba(54,39,39,0.025)]">
+                    <div class="flex items-center justify-between border-b border-[#F0EBE9] px-5 py-4">
+                        <div>
+                            <h3 class="text-sm text-[#362727] kohan-bold">
+                                فهرست مقالات
+                            </h3>
 
-                        <tbody class="divide-y divide-white/[0.06]">
-                            @forelse ($blogPosts as $blogPost)
-                                <tr class="transition hover:bg-white/[0.03]">
-                                    <td class="px-4 py-4 text-white/45">
-                                        {{ $blogPosts->firstItem() + $loop->index }}
-                                    </td>
+                            <p class="mt-1 text-xs text-[#A19692]">
+                                اطلاعات و وضعیت انتشار مقالات ثبت‌شده
+                            </p>
+                        </div>
 
-                                    <td class="px-4 py-4 font-bold text-white kohan-bold">
-                                        {{ $blogPost->title }}
-                                    </td>
+                        <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-[#F3E9E9] text-[#542b2e]">
+                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>
+                            </svg>
+                        </div>
+                    </div>
 
-                                    <td class="px-4 py-4 text-white/60">
-                                        {{ $blogPost->published_at?->format('Y/m/d') ?? '—' }}
-                                    </td>
-
-                                    <td class="px-4 py-4">
-                                        @if ($blogPost->status === 'published')
-                                            <span class="rounded-full bg-emerald-500/10 px-3 py-1.5 text-xs font-bold text-emerald-400 kohan-bold">
-                                                منتشر شده
-                                            </span>
-                                        @else
-                                            <span class="rounded-full bg-amber-500/10 px-3 py-1.5 text-xs font-bold text-amber-300 kohan-bold">
-                                                پیش‌نویس
-                                            </span>
-                                        @endif
-                                    </td>
-
-                                    <td class="px-4 py-4">
-                                        <div class="flex items-center gap-2">
-                                            <button
-                                                type="button"
-                                                class="edit-blog-post-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-white/75 transition hover:border-[#681b21]/60 hover:bg-[#681b21]/15 hover:text-white kohan-bold"
-                                                data-id="{{ $blogPost->id }}"
-                                                data-title="{{ $blogPost->title }}"
-                                                data-summary="{{ $blogPost->summary }}"
-                                                data-body="{{ $blogPost->body }}"
-                                                data-status="{{ $blogPost->status }}"
-                                            >
-                                                ویرایش
-                                            </button>
-
-                                            <button
-                                                type="button"
-                                                class="delete-blog-post-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-400 px-3 py-2 text-xs font-bold text-red-300 transition hover:bg-red-500/20 hover:text-red-200 kohan-bold"
-                                                data-id="{{ $blogPost->id }}"
-                                                data-title="{{ $blogPost->title }}"
-                                            >
-                                                حذف
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            @empty
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[750px] text-right text-sm">
+                            <thead class="bg-[#FAF8F7] text-[#8E7D78] kohan-bold">
                                 <tr>
-                                    <td colspan="5" class="px-4 py-12 text-center text-white/45">
-                                        @if (request()->filled('blog_search'))
-                                            مقاله‌ای با این عنوان پیدا نشد.
-                                        @else
-                                            هنوز مقاله‌ای ثبت نشده است.
-                                        @endif
-                                    </td>
+                                    <th class="px-4 py-4">ردیف</th>
+                                    <th class="px-4 py-4">عنوان مقاله</th>
+                                    <th class="px-4 py-4">تاریخ انتشار</th>
+                                    <th class="px-4 py-4">وضعیت</th>
+                                    <th class="px-4 py-4">عملیات</th>
                                 </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                            </thead>
+
+                            <tbody class="divide-y divide-[#F0EBE9]">
+                                @forelse ($blogPosts as $blogPost)
+                                    <tr class="transition duration-200 hover:bg-[#FCFAF9]">
+                                        <td class="px-4 py-4 text-[#A19692]">
+                                            {{ $blogPosts->firstItem() + $loop->index }}
+                                        </td>
+
+                                        <td class="px-4 py-4 text-[#362727] kohan-bold">
+                                            {{ $blogPost->title }}
+                                        </td>
+
+                                        <td class="px-4 py-4 text-[#8E7D78]">
+                                            {{ $blogPost->published_at?->format('Y/m/d') ?? '—' }}
+                                        </td>
+
+                                        <td class="px-4 py-4">
+                                            @if ($blogPost->status === 'published')
+                                                <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1.5 text-xs text-emerald-700 kohan-bold">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                    منتشر شده
+                                                </span>
+                                            @else
+                                                <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-xs text-amber-700 kohan-bold">
+                                                    <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span>
+                                                    پیش‌نویس
+                                                </span>
+                                            @endif
+                                        </td>
+
+                                        <td class="px-4 py-4">
+                                            <div class="flex items-center gap-2">
+                                                <button
+                                                    type="button"
+                                                    class="edit-blog-post-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-[#E8DEDC] bg-white px-3 py-2 text-xs text-[#674040] transition hover:border-[#CBB5B2] hover:bg-[#F8F1F0] kohan-bold"
+                                                    data-id="{{ $blogPost->id }}"
+                                                    data-title="{{ $blogPost->title }}"
+                                                    data-summary="{{ $blogPost->summary }}"
+                                                    data-body="{{ $blogPost->body }}"
+                                                    data-status="{{ $blogPost->status }}"
+                                                >
+                                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="m16 4 4 4M4 20l4-.8L19.2 8a2.26 2.26 0 0 0-3.2-3.2L4.8 16 4 20Z"/>
+                                                    </svg>
+                                                    ویرایش
+                                                </button>
+
+                                                <button
+                                                    type="button"
+                                                    class="delete-blog-post-button inline-flex cursor-pointer items-center gap-2 rounded-lg border border-red-200 bg-white px-3 py-2 text-xs text-red-600 transition hover:border-red-300 hover:bg-red-50 kohan-bold"
+                                                    data-id="{{ $blogPost->id }}"
+                                                    data-title="{{ $blogPost->title }}"
+                                                >
+                                                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 13h12l1-13M9 7V4h6v3"/>
+                                                    </svg>
+                                                    حذف
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="5" class="px-4 py-16 text-center">
+                                            <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F5EFED] text-[#8d6666]">
+                                                <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>
+                                                </svg>
+                                            </div>
+
+                                            <p class="mt-4 text-sm text-[#674040] kohan-bold">
+                                                @if (request()->filled('blog_search'))
+                                                    مقاله‌ای با این عنوان پیدا نشد.
+                                                @else
+                                                    هنوز مقاله‌ای ثبت نشده است.
+                                                @endif
+                                            </p>
+
+                                            <p class="mt-1 text-xs text-[#A19692]">
+                                                مقالات ثبت‌شده در این قسمت نمایش داده می‌شوند.
+                                            </p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
+                {{-- Pagination --}}
                 @if ($blogPosts->hasPages())
-                    <div class="mt-5">
+                    <div class="mt-5 rounded-xl border border-[#EAE3E0] bg-white px-4 py-3">
                         {{ $blogPosts->links() }}
                     </div>
                 @endif
@@ -876,21 +1072,30 @@
     {{-- Product Modal --}}
     <div
         id="product-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+        class="fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto bg-[#24191A]/60 p-4 backdrop-blur-sm"
         aria-hidden="true"
     >
         <div
-            class="my-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-[#222222] shadow-2xl"
+            class="my-auto w-full max-w-2xl overflow-hidden rounded-2xl border border-[#EAE3E0] bg-white shadow-[0_25px_80px_rgba(36,25,26,0.25)]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="product-modal-title"
         >
-            <div class="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-7">
+            {{-- Modal Header --}}
+            <div class="flex items-center justify-between border-b border-[#F0EBE9] bg-[#FAF8F7] px-5 py-4 sm:px-7">
                 <div>
-                    <h2 id="product-modal-title" class="text-lg font-extrabold text-white kohan-bold">
+                    <div class="mb-2 flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-[#8d6666]"></span>
+                        <span class="text-xs text-[#A18E89] kohan-bold">
+                            مدیریت محصولات
+                        </span>
+                    </div>
+
+                    <h2 id="product-modal-title" class="text-lg text-[#362727] sm:text-xl kohan-bold">
                         افزودن محصول جدید
                     </h2>
-                    <p id="product-modal-subtitle" class="mt-1 text-xs text-white/45">
+
+                    <p id="product-modal-subtitle" class="mt-1 text-xs text-[#948784]">
                         اطلاعات محصول را وارد کنید.
                     </p>
                 </div>
@@ -898,7 +1103,7 @@
                 <button
                     type="button"
                     id="close-product-modal"
-                    class="flex h-10 w-10 items-center justify-center rounded-xl text-white/60 transition hover:bg-white/10 hover:text-white cursor-pointer"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#948784] transition hover:bg-[#F0E8E6] hover:text-[#542b2e]"
                     aria-label="بستن پنجره"
                 >
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -907,6 +1112,7 @@
                 </button>
             </div>
 
+            {{-- Modal Form --}}
             <form
                 id="product-form"
                 action="{{ route('admin.products.store') }}"
@@ -918,10 +1124,12 @@
                 <input type="hidden" name="_product_form" value="1">
                 <input type="hidden" id="product-method" name="_method" value="POST">
 
-                <div class="space-y-5 px-5 py-6 sm:px-7">
+                <div class="space-y-6 px-5 py-6 sm:px-7">
+
+                    {{-- Product Name --}}
                     <div>
-                        <label for="product-name" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                            نام محصول <span class="text-red-400">*</span>
+                        <label for="product-name" class="mb-2 block text-sm text-[#554744] kohan-bold">
+                            نام محصول <span class="text-red-500">*</span>
                         </label>
 
                         <input
@@ -932,34 +1140,38 @@
                             maxlength="255"
                             value="{{ old('_product_form') ? old('name') : '' }}"
                             placeholder="نام محصول را وارد کنید"
-                            class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >
                     </div>
 
+                    {{-- Product Image --}}
                     <div>
-                        <label for="product-image" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                        <label for="product-image" class="mb-2 block text-sm text-[#554744] kohan-bold">
                             تصویر محصول
                         </label>
 
-                        <input
-                            type="file"
-                            id="product-image"
-                            name="image"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10 kohan-bold"
-                        >
+                        <div class="rounded-xl border border-dashed border-[#DCCBC9] bg-[#FAF8F7] p-3 transition hover:border-[#B99B98]">
+                            <input
+                                type="file"
+                                id="product-image"
+                                name="image"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="block w-full cursor-pointer text-sm text-[#796B67] file:ml-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#F0E5E3] file:px-4 file:py-2.5 file:text-xs file:text-[#542b2e] hover:file:bg-[#E8D9D7] kohan-bold"
+                            >
+                        </div>
 
-                        <p class="mt-2 text-xs text-white/40">
+                        <p class="mt-2 text-xs leading-6 text-[#A19692]">
                             فرمت‌های مجاز: JPG، PNG و WebP؛ حداکثر حجم ۵ مگابایت.
                         </p>
 
-                        <p id="product-image-hint" class="mt-1 hidden text-xs text-white/45">
+                        <p id="product-image-hint" class="mt-1 hidden text-xs text-[#8d6666]">
                             اگر تصویر جدید انتخاب نکنید، تصویر فعلی حفظ می‌شود.
                         </p>
                     </div>
 
+                    {{-- Product Description --}}
                     <div>
-                        <label for="product-description" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                        <label for="product-description" class="mb-2 block text-sm text-[#554744] kohan-bold">
                             توضیحات محصول
                         </label>
 
@@ -968,16 +1180,17 @@
                             name="description"
                             rows="5"
                             placeholder="توضیحات محصول را وارد کنید..."
-                            class="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            class="w-full resize-y rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >{{ old('_product_form') ? old('description') : '' }}</textarea>
                     </div>
                 </div>
 
-                <div class="flex flex-col-reverse gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:justify-between sm:px-7">
+                {{-- Modal Footer --}}
+                <div class="flex flex-col-reverse gap-3 border-t border-[#F0EBE9] bg-[#FAF8F7] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
                     <button
                         type="button"
                         id="cancel-product-modal"
-                        class="cursor-pointer rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-white/70 transition hover:bg-white/[0.06] hover:text-white kohan-bold"
+                        class="cursor-pointer rounded-xl border border-[#E5DCDA] bg-white px-5 py-3 text-sm text-[#796B67] transition hover:border-[#D3C1BE] hover:bg-[#F5EFED] kohan-bold"
                     >
                         انصراف
                     </button>
@@ -987,7 +1200,7 @@
                             type="submit"
                             name="status"
                             value="draft"
-                            class="cursor-pointer rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/[0.06] kohan-bold"
+                            class="cursor-pointer rounded-xl border border-[#DCCBC9] bg-white px-5 py-3 text-sm text-[#674040] transition hover:border-[#BFA4A1] hover:bg-[#F8F1F0] kohan-bold"
                         >
                             ذخیره پیش‌نویس
                         </button>
@@ -996,7 +1209,7 @@
                             type="submit"
                             name="status"
                             value="published"
-                            class="cursor-pointer rounded-xl bg-[#681b21] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#7c242b] kohan-bold"
+                            class="cursor-pointer rounded-xl bg-[#542b2e] px-5 py-3 text-sm text-white shadow-md shadow-[#542b2e]/10 transition hover:-translate-y-0.5 hover:bg-[#674040] kohan-bold"
                         >
                             انتشار محصول
                         </button>
@@ -1009,21 +1222,30 @@
     {{-- Blog Post Modal --}}
     <div
         id="blog-post-modal"
-        class="fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto bg-black/70 p-4 backdrop-blur-sm"
+        class="fixed inset-0 z-[100] hidden items-center justify-center overflow-y-auto bg-[#24191A]/60 p-4 backdrop-blur-sm"
         aria-hidden="true"
     >
         <div
-            class="my-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-white/10 bg-[#222222] shadow-2xl"
+            class="my-auto w-full max-w-3xl overflow-hidden rounded-2xl border border-[#EAE3E0] bg-white shadow-[0_25px_80px_rgba(36,25,26,0.25)]"
             role="dialog"
             aria-modal="true"
             aria-labelledby="blog-post-modal-title"
         >
-            <div class="flex items-center justify-between border-b border-white/10 px-5 py-4 sm:px-7">
+            {{-- Modal Header --}}
+            <div class="flex items-center justify-between border-b border-[#F0EBE9] bg-[#FAF8F7] px-5 py-4 sm:px-7">
                 <div>
-                    <h2 id="blog-post-modal-title" class="text-lg font-extrabold text-white kohan-bold">
+                    <div class="mb-2 flex items-center gap-2">
+                        <span class="h-2 w-2 rounded-full bg-[#8d6666]"></span>
+                        <span class="text-xs text-[#A18E89] kohan-bold">
+                            مدیریت مقالات
+                        </span>
+                    </div>
+
+                    <h2 id="blog-post-modal-title" class="text-lg text-[#362727] sm:text-xl kohan-bold">
                         افزودن مقاله جدید
                     </h2>
-                    <p id="blog-post-modal-subtitle" class="mt-1 text-xs text-white/45">
+
+                    <p id="blog-post-modal-subtitle" class="mt-1 text-xs text-[#948784]">
                         اطلاعات مقاله را وارد کنید.
                     </p>
                 </div>
@@ -1031,7 +1253,7 @@
                 <button
                     type="button"
                     id="close-blog-post-modal"
-                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-white/60 transition hover:bg-white/10 hover:text-white"
+                    class="flex h-10 w-10 cursor-pointer items-center justify-center rounded-xl text-[#948784] transition hover:bg-[#F0E8E6] hover:text-[#542b2e]"
                     aria-label="بستن پنجره"
                 >
                     <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -1040,6 +1262,7 @@
                 </button>
             </div>
 
+            {{-- Modal Form --}}
             <form
                 id="blog-post-form"
                 action="{{ route('admin.blog-posts.store') }}"
@@ -1051,10 +1274,12 @@
                 <input type="hidden" name="_blog_form" value="1">
                 <input type="hidden" id="blog-post-method" name="_method" value="POST">
 
-                <div class="max-h-[70vh] space-y-5 overflow-y-auto px-5 py-6 sm:px-7">
+                <div class="max-h-[70vh] space-y-6 overflow-y-auto px-5 py-6 sm:px-7">
+
+                    {{-- Blog Title --}}
                     <div>
-                        <label for="blog-post-title" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                            عنوان مقاله <span class="text-red-400">*</span>
+                        <label for="blog-post-title" class="mb-2 block text-sm text-[#554744] kohan-bold">
+                            عنوان مقاله <span class="text-red-500">*</span>
                         </label>
 
                         <input
@@ -1065,12 +1290,13 @@
                             maxlength="255"
                             value="{{ old('_blog_form') ? old('title') : '' }}"
                             placeholder="عنوان مقاله را وارد کنید"
-                            class="w-full rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >
                     </div>
 
+                    {{-- Blog Summary --}}
                     <div>
-                        <label for="blog-post-summary" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                        <label for="blog-post-summary" class="mb-2 block text-sm text-[#554744] kohan-bold">
                             خلاصه مقاله
                         </label>
 
@@ -1079,35 +1305,39 @@
                             name="summary"
                             rows="3"
                             placeholder="خلاصه کوتاهی از مقاله بنویسید..."
-                            class="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            class="w-full resize-y rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >{{ old('_blog_form') ? old('summary') : '' }}</textarea>
                     </div>
 
+                    {{-- Blog Image --}}
                     <div>
-                        <label for="blog-post-image" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
+                        <label for="blog-post-image" class="mb-2 block text-sm text-[#554744] kohan-bold">
                             تصویر مقاله
                         </label>
 
-                        <input
-                            type="file"
-                            id="blog-post-image"
-                            name="image"
-                            accept=".jpg,.jpeg,.png,.webp"
-                            class="block w-full cursor-pointer rounded-xl border border-white/10 bg-black/20 text-sm text-white/70 file:ml-4 file:border-0 file:bg-white/[0.06] file:px-4 file:py-3 file:font-bold file:text-white hover:file:bg-white/10 kohan-bold"
-                        >
+                        <div class="rounded-xl border border-dashed border-[#DCCBC9] bg-[#FAF8F7] p-3 transition hover:border-[#B99B98]">
+                            <input
+                                type="file"
+                                id="blog-post-image"
+                                name="image"
+                                accept=".jpg,.jpeg,.png,.webp"
+                                class="block w-full cursor-pointer text-sm text-[#796B67] file:ml-4 file:cursor-pointer file:rounded-lg file:border-0 file:bg-[#F0E5E3] file:px-4 file:py-2.5 file:text-xs file:text-[#542b2e] hover:file:bg-[#E8D9D7] kohan-bold"
+                            >
+                        </div>
 
-                        <p class="mt-2 text-xs text-white/40">
+                        <p class="mt-2 text-xs leading-6 text-[#A19692]">
                             فرمت‌های مجاز: JPG، PNG و WebP؛ حداکثر حجم ۵ مگابایت.
                         </p>
 
-                        <p id="blog-post-image-hint" class="mt-1 hidden text-xs text-white/45">
+                        <p id="blog-post-image-hint" class="mt-1 hidden text-xs text-[#8d6666]">
                             اگر تصویر جدید انتخاب نکنید، تصویر فعلی حفظ می‌شود.
                         </p>
                     </div>
 
+                    {{-- Blog Body --}}
                     <div>
-                        <label for="blog-post-body" class="mb-2 block text-sm font-bold text-white/80 kohan-bold">
-                            متن کامل مقاله <span class="text-red-400">*</span>
+                        <label for="blog-post-body" class="mb-2 block text-sm text-[#554744] kohan-bold">
+                            متن کامل مقاله <span class="text-red-500">*</span>
                         </label>
 
                         <textarea
@@ -1116,16 +1346,17 @@
                             rows="10"
                             required
                             placeholder="متن کامل مقاله را وارد کنید..."
-                            class="w-full resize-y rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-white outline-none transition placeholder:text-white/30 focus:border-[#681b21] focus:ring-2 focus:ring-[#681b21]/20"
+                            class="w-full resize-y rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >{{ old('_blog_form') ? old('body') : '' }}</textarea>
                     </div>
                 </div>
 
-                <div class="flex flex-col-reverse gap-3 border-t border-white/10 px-5 py-4 sm:flex-row sm:justify-between sm:px-7">
+                {{-- Modal Footer --}}
+                <div class="flex flex-col-reverse gap-3 border-t border-[#F0EBE9] bg-[#FAF8F7] px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-7">
                     <button
                         type="button"
                         id="cancel-blog-post-modal"
-                        class="cursor-pointer rounded-xl border border-white/10 px-5 py-3 text-sm font-bold text-white/70 transition hover:bg-white/[0.06] hover:text-white kohan-bold"
+                        class="cursor-pointer rounded-xl border border-[#E5DCDA] bg-white px-5 py-3 text-sm text-[#796B67] transition hover:border-[#D3C1BE] hover:bg-[#F5EFED] kohan-bold"
                     >
                         انصراف
                     </button>
@@ -1135,7 +1366,7 @@
                             type="submit"
                             name="status"
                             value="draft"
-                            class="cursor-pointer rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/[0.06] kohan-bold"
+                            class="cursor-pointer rounded-xl border border-[#DCCBC9] bg-white px-5 py-3 text-sm text-[#674040] transition hover:border-[#BFA4A1] hover:bg-[#F8F1F0] kohan-bold"
                         >
                             ذخیره پیش‌نویس
                         </button>
@@ -1144,7 +1375,7 @@
                             type="submit"
                             name="status"
                             value="published"
-                            class="cursor-pointer rounded-xl bg-[#681b21] px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#7c242b] kohan-bold"
+                            class="cursor-pointer rounded-xl bg-[#542b2e] px-5 py-3 text-sm text-white shadow-md shadow-[#542b2e]/10 transition hover:-translate-y-0.5 hover:bg-[#674040] kohan-bold"
                         >
                             انتشار مقاله
                         </button>
@@ -1153,7 +1384,6 @@
             </form>
         </div>
     </div>
-
     {{-- Delete Product Modal --}}
     <div
         id="delete-product-modal"
@@ -1287,7 +1517,7 @@
 @endsection
 
 @push('styles')
-    <style>
+    <!-- <style>
         #site-content-manager .content-tab {
             color: rgba(255, 255, 255, 0.5);
             background: transparent;
@@ -1305,7 +1535,7 @@
             border-color: rgba(166, 75, 82, 0.28);
             box-shadow: inset 0 0 0 1px rgba(104, 27, 33, 0.12);
         }
-    </style>
+    </style> -->
 @endpush
 
 @push('scripts')

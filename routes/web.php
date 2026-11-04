@@ -2,14 +2,16 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Models\SiteContent;
+use App\Models\Product;
+use App\Models\BlogPost;
+
 use App\Http\Controllers\Admin\SiteContentController;
+use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\InvoiceController;
+
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BlogPostController;
 use App\Http\Controllers\InquiryController;
-use App\Http\Controllers\Admin\CustomerController;
-use App\Http\Controllers\Admin\InvoiceController;
-use App\Models\Product;
-use App\Models\BlogPost;
 
 // Public Website Routes
 Route::get('/', function () {
@@ -42,9 +44,23 @@ Route::get('/document/verify/{token}', [InvoiceController::class, 'verify'])
 
 // Admin Panel Routes
 Route::middleware('auth')->group(function () {
+
+    // Dashboard
     Route::get('/admin', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+
+    // Admin Management Routes
+    Route::get('/admin/managers', function () {
+        return view('admin.managers.managers');
+    })->name('admin.managers.index');
+
+    // Admin Manager Profile Route
+    Route::get('/admin/managers/{manager}', function ($manager) {
+        return view('admin.managers.manager-profile', [
+            'managerId' => $manager,
+        ]);
+    })->name('admin.managers.show');
 
     // Site Content Routes
     Route::get('/admin/content', [SiteContentController::class, 'edit'])
@@ -120,6 +136,12 @@ Route::middleware('auth')->group(function () {
 
     Route::post('/admin/invoices/{invoice}/convert', [InvoiceController::class, 'convert'])
         ->name('admin.invoices.convert');
+
+    // Financial Reports
+    Route::get('/admin/reports/financial', function () {
+        return view('admin.reports.financial');
+    })->name('admin.reports.financial');
+
 });
 
 // Public Inquiry Submission

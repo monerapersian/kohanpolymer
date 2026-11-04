@@ -868,7 +868,6 @@
             class="print-button"
             onclick="window.print()"
         >
-            <span>▤</span>
             <span>چاپ یا ذخیره PDF</span>
         </button>
     </div>
@@ -929,7 +928,7 @@
 
             <div class="print-main-title">
                 <h1 class="print-document-heading">
-                    {{ $documentType }} فروش
+                    {{ $documentType }}
                 </h1>
 
                 <div class="print-document-number">
@@ -1181,7 +1180,7 @@
         <footer class="print-footer kohan-bold">
             <div class="print-footer-brand">
                 <div>کهن پلیمر البرز</div>
-                <div class="print-subtitle">عرضه کننده محصولات پلیمری</div>
+                <div class="print-subtitle">تامین کننده مواد اولیه و محصولات پلیمری</div>
             </div>
 
             <div class="print-verification-badge">

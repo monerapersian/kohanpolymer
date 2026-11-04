@@ -3,56 +3,98 @@
 @section('content')
 <div class="space-y-6" dir="rtl">
 
-    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h1 class="text-2xl font-bold text-white">فاکتورها و پیش‌فاکتورها</h1>
-            <p class="mt-2 text-sm text-gray-400">مدیریت اسناد فروش و پیش‌فاکتورهای مشتریان</p>
-        </div>
+    {{-- Page Header --}}
+    <div class="hero-animated-bg relative overflow-hidden rounded-3xl border border-white/10 p-6 shadow-2xl sm:p-8">
+        <div class="hero-orb hero-orb-one"></div>
+        <div class="hero-orb hero-orb-two"></div>
+        <div class="hero-orb hero-orb-three"></div>
+        <div class="hero-wave"></div>
+        <div class="hero-ring hero-ring-one"></div>
+        <div class="hero-ring hero-ring-two"></div>
+        <div class="hero-grid"></div>
+        <div class="hero-shine"></div>
 
-        <a href="{{ route('admin.invoices.create') }}"
-           class="inline-flex items-center justify-center gap-2 rounded-xl bg-[#681b21] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#81272e]">
-            <span class="text-lg">+</span>
-            ثبت سند جدید
-        </a>
+        <div class="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+                <span class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-white/70">
+                    <span class="h-1.5 w-1.5 rounded-full bg-[#baadad]"></span>
+                    مدیریت اسناد مالی
+                </span>
+
+                <h1 class="text-2xl text-white kohan-bold sm:text-3xl">
+                    فاکتورها و پیش‌فاکتورها
+                </h1>
+
+                <p class="mt-3 text-sm leading-7 text-white/60">
+                    مدیریت اسناد فروش و پیش‌فاکتورهای مشتریان
+                </p>
+            </div>
+
+            <a
+                href="{{ route('admin.invoices.create') }}"
+                class="inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-xl bg-[#8d6666] px-5 py-3 text-sm text-white transition duration-300 hover:bg-[#a07878] hover:shadow-lg hover:shadow-black/20 kohan-bold"
+            >
+                <svg viewBox="0 0 24 24" fill="none" class="h-5 w-5" stroke="currentColor" stroke-width="1.8">
+                    <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
+                </svg>
+                ثبت سند جدید
+            </a>
+        </div>
     </div>
 
-    <div class="rounded-2xl border border-white/10 bg-[#222222] p-4 sm:p-5">
-        <form method="GET" action="{{ route('admin.invoices.index') }}"
-              class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_200px_auto_auto]">
+    {{-- Search and Filters --}}
+    <div class="rounded-2xl border border-[#E8E1DE] bg-white p-4 shadow-sm sm:p-5">
+        <form
+            method="GET"
+            action="{{ route('admin.invoices.index') }}"
+            class="grid grid-cols-1 gap-3 md:grid-cols-[minmax(0,1fr)_200px_auto_auto]"
+        >
 
+            {{-- Search --}}
             <input
                 type="text"
                 name="search"
                 value="{{ request('search') }}"
                 placeholder="جست‌وجوی نام مشتری یا شماره سند..."
-                class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white placeholder:text-gray-500 focus:border-[#681b21] focus:outline-none"
+                class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition placeholder:text-[#B0A5A0] focus:border-[#8d6666] focus:bg-white"
             >
 
+            {{-- Document Type --}}
             <select
                 name="type"
-                class="w-full rounded-xl border border-white/10 bg-[#292929] px-4 py-3 text-sm text-white focus:outline-none"
+                class="w-full cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#5F514D] outline-none transition focus:border-[#8d6666]"
             >
                 <option value="">همه اسناد</option>
                 <option value="invoice" @selected(request('type') === 'invoice')>فاکتور</option>
                 <option value="proforma" @selected(request('type') === 'proforma')>پیش‌فاکتور</option>
             </select>
 
-            <button type="submit"
-                    class="rounded-xl bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15">
+            {{-- Search Button --}}
+            <button
+                type="submit"
+                class="cursor-pointer rounded-xl bg-[#542b2e] px-5 py-3 text-sm text-white transition hover:bg-[#674040] kohan-bold"
+            >
                 جست‌وجو
             </button>
 
-            <a href="{{ route('admin.invoices.index') }}"
-               class="rounded-xl border border-white/10 px-5 py-3 text-center text-sm text-gray-300 transition hover:bg-white/5">
+            {{-- Clear Filters --}}
+            <a
+                href="{{ route('admin.invoices.index') }}"
+                class="flex cursor-pointer items-center justify-center rounded-xl border border-[#E8E1DE] px-5 py-3 text-sm text-[#827875] transition hover:border-[#d6c5c2] hover:bg-[#FAF8F7] hover:text-[#542b2e]"
+            >
                 پاک کردن
             </a>
+
         </form>
     </div>
 
-    <div class="overflow-hidden rounded-2xl border border-white/10 bg-[#222222]">
+    {{-- Invoices Table --}}
+    <div class="overflow-hidden rounded-2xl border border-[#E8E1DE] bg-white shadow-sm">
         <div class="overflow-x-auto">
             <table class="w-full min-w-[850px] text-right text-sm">
-                <thead class="border-b border-white/10 bg-white/[0.03] text-gray-400">
+
+                {{-- Table Header --}}
+                <thead class="border-b border-[#EEE8E5] bg-[#FAF8F7] text-[#827875]">
                     <tr>
                         <th class="px-5 py-4 font-medium">ردیف</th>
                         <th class="px-5 py-4 font-medium">شماره سند</th>
@@ -64,70 +106,92 @@
                     </tr>
                 </thead>
 
-                <tbody class="divide-y divide-white/5 text-gray-200">
+                {{-- Table Body --}}
+                <tbody class="divide-y divide-[#F0EBE8] text-[#5F514D]">
                     @forelse ($invoices as $invoice)
-                        <tr class="transition hover:bg-white/[0.025]">
-                            <td class="px-5 py-4 text-gray-400">
+                        <tr class="transition hover:bg-[#FAF8F7]">
+
+                            {{-- Row Number --}}
+                            <td class="px-5 py-4 text-[#A99D98]">
                                 {{ $invoices->firstItem() + $loop->index }}
                             </td>
 
-                            <td class="px-5 py-4 font-semibold text-white kohan-bold" dir="ltr">
+                            {{-- Document Number --}}
+                            <td class="px-5 py-4 text-[#362727] kohan-bold" dir="ltr">
                                 {{ $invoice->document_number }}
                             </td>
 
+                            {{-- Customer --}}
                             <td class="px-5 py-4">
                                 {{ $invoice->customer->name }}
                             </td>
 
+                            {{-- Document Type --}}
                             <td class="px-5 py-4">
                                 {{ $invoice->type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور' }}
                             </td>
 
+                            {{-- Issue Date --}}
                             <td class="px-5 py-4">
                                 {{ $invoice->issue_date?->format('Y/m/d') }}
                             </td>
 
+                            {{-- Status --}}
                             <td class="px-5 py-4">
                                 @if ($invoice->status === 'voided')
-                                    <span class="rounded-lg bg-red-500/10 px-3 py-1.5 text-xs text-red-300">
+                                    <span class="inline-flex rounded-lg bg-rose-50 px-3 py-1.5 text-xs text-rose-700">
                                         باطل شده
                                     </span>
                                 @elseif ($invoice->isExpired())
-                                    <span class="rounded-lg bg-amber-500/10 px-3 py-1.5 text-xs text-amber-300">
+                                    <span class="inline-flex rounded-lg bg-amber-50 px-3 py-1.5 text-xs text-amber-700">
                                         منقضی
                                     </span>
                                 @else
-                                    <span class="rounded-lg bg-emerald-500/10 px-3 py-1.5 text-xs text-emerald-300">
+                                    <span class="inline-flex rounded-lg bg-emerald-50 px-3 py-1.5 text-xs text-emerald-700">
                                         معتبر
                                     </span>
                                 @endif
                             </td>
 
+                            {{-- Actions --}}
                             <td class="px-5 py-4">
-                                <a href="{{ route('admin.invoices.show', $invoice) }}"
-                                   class="text-sm font-semibold text-gray-300 transition hover:text-white">
+                                <a
+                                    href="{{ route('admin.invoices.show', $invoice) }}"
+                                    class="cursor-pointer text-sm text-[#674040] transition hover:text-[#542b2e] kohan-bold"
+                                >
                                     مشاهده جزئیات
                                 </a>
                             </td>
+
                         </tr>
                     @empty
+                        {{-- Empty State --}}
                         <tr>
                             <td colspan="7" class="px-5 py-16 text-center">
-                                <div class="text-3xl text-gray-600">—</div>
-                                <p class="mt-3 font-semibold text-gray-300">هنوز سندی ثبت نشده است</p>
-                                <p class="mt-2 text-xs text-gray-500">برای شروع، سند جدید ثبت کنید.</p>
+                                <div class="text-3xl text-[#C4B9B4]">—</div>
+
+                                <p class="mt-3 text-[#5F514D] kohan-bold">
+                                    هنوز سندی ثبت نشده است
+                                </p>
+
+                                <p class="mt-2 text-xs text-[#A99D98]">
+                                    برای شروع، سند جدید ثبت کنید.
+                                </p>
                             </td>
                         </tr>
                     @endforelse
                 </tbody>
+
             </table>
         </div>
 
+        {{-- Pagination --}}
         @if ($invoices->hasPages())
-            <div class="border-t border-white/10 px-5 py-4">
+            <div class="border-t border-[#EEE8E5] px-5 py-4">
                 {{ $invoices->links() }}
             </div>
         @endif
+
     </div>
 
 </div>

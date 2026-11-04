@@ -28,6 +28,7 @@
     <!-- Hero -->
     <section class="hero" id="home">
         <div class="hero-grid"></div>
+        <div class="hero-glow"></div>
 
         <div class="container-main">
             <div class="hero-content">
@@ -152,7 +153,7 @@
                     <span class="eyebrow">حوزه محصولات</span>
                     <h2 class="section-title">
                         مواد و راهکارها،
-متناسب با نیاز صنعت.
+                متناسب با نیاز صنعت.
                     </h2>
                 </div>
 
