@@ -21,7 +21,7 @@ Route::get('/', function () {
         ->where('status', 'published')
         ->orderByDesc('published_at')
         ->orderByDesc('created_at')
-        ->take(3)
+        ->take(4)
         ->get();
 
     $blogPosts = BlogPost::query()
