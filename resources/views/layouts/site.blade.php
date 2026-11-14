@@ -1126,6 +1126,37 @@
             });
         })();
     </script>
+    <script>
+        // Scroll reveal
+        document.addEventListener('DOMContentLoaded', function () {
+            const revealElements = document.querySelectorAll('.reveal');
+
+            if (!revealElements.length) return;
+
+            if (!('IntersectionObserver' in window)) {
+                revealElements.forEach(function (element) {
+                    element.classList.add('is-visible');
+                });
+
+                return;
+            }
+
+            const revealObserver = new IntersectionObserver(function (entries, observer) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1
+            });
+
+            revealElements.forEach(function (element) {
+                revealObserver.observe(element);
+            });
+        });
+    </script>
 </body>
 
 </html>
