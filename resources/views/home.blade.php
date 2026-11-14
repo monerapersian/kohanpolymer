@@ -256,7 +256,7 @@
             <!-- Products Grid -->
             <div class="home-products-grid">
 
-                @forelse ($publishedProducts->take(4) as $product)
+                @forelse ($products as $product)
 
                     <article class="home-product-card reveal">
 
@@ -269,7 +269,7 @@
                             >
 
                             <span class="home-product-number">
-                                {{ sprintf('%02d', $loop->iteration) }}
+                                <strong>{{ sprintf('%02d', $products->count()) }}</strong>
                             </span>
 
                             <div class="home-product-image-shade"></div>
@@ -492,9 +492,24 @@
                     </p>
                 </div>
 
-                <a href="/articles" class="articles-all-link">
+                <a href="{{ route('blog.index') }}" class="articles-all-link">
                     مشاهده همه مقالات
-                    <span>←</span>
+
+                    <span>
+                        <svg
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="1.8"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            width="18"
+                            height="18"
+                        >
+                            <path d="M19 12H5"/>
+                            <path d="m12 19-7-7 7-7"/>
+                        </svg>
+                    </span>
                 </a>
             </div>
 
@@ -646,7 +661,7 @@
                     </div>
 
                     <form
-                        action="{{ url('/inquiries') }}"
+                        action="{{ route('inquiries.store') }}"
                         method="POST"
                         class="contact-form"
                     >
@@ -664,8 +679,8 @@
                                 <input
                                     type="text"
                                     id="contact-name"
-                                    name="name"
-                                    value="{{ old('name') }}"
+                                    name="fullName"
+                                    value="{{ old('fullName') }}"
                                     placeholder="نام و نام خانوادگی خود را وارد کنید"
                                     required
                                     maxlength="150"
@@ -708,7 +723,7 @@
                                     <span>*</span>
                                 </label>
 
-                                <select
+                                 <select
                                     id="contact-subject"
                                     name="subject"
                                     required
@@ -717,19 +732,19 @@
                                         موضوع درخواست خود را انتخاب کنید
                                     </option>
 
-                                    <option value="استعلام محصولات" @selected(old('subject') === 'استعلام محصولات')>
+                                    <option value="product" @selected(old('subject') === 'product')>
                                         استعلام محصولات
                                     </option>
 
-                                    <option value="مشاوره فنی" @selected(old('subject') === 'مشاوره فنی')>
+                                    <option value="technical" @selected(old('subject') === 'technical')>
                                         مشاوره فنی
                                     </option>
 
-                                    <option value="درخواست همکاری" @selected(old('subject') === 'درخواست همکاری')>
+                                    <option value="cooperation" @selected(old('subject') === 'cooperation')>
                                         درخواست همکاری
                                     </option>
 
-                                    <option value="سایر" @selected(old('subject') === 'سایر')>
+                                    <option value="other" @selected(old('subject') === 'other')>
                                         سایر
                                     </option>
                                 </select>
@@ -782,109 +797,6 @@
         </div>
     </section>
 
-    <script>
-        (() => {
-            const header = document.getElementById('siteHeader');
-            const menuToggle = document.getElementById('menuToggle');
-            const mobileNav = document.getElementById('mobileNav');
 
-            if (header) {
-                const updateHeader = () => {
-                    header.classList.toggle('scrolled', window.scrollY > 30);
-                };
-
-                updateHeader();
-                window.addEventListener('scroll', updateHeader, { passive: true });
-            }
-
-            if (menuToggle && mobileNav) {
-                const mobileLinks = mobileNav.querySelectorAll('a');
-                let menuCloseTimer;
-
-                const openMenu = () => {
-                    clearTimeout(menuCloseTimer);
-
-                    mobileNav.inert = false;
-                    mobileNav.classList.add('open');
-                    menuToggle.classList.add('active');
-
-                    menuToggle.setAttribute('aria-expanded', 'true');
-                    menuToggle.setAttribute('aria-label', 'بستن منو');
-                };
-
-                const closeMenu = () => {
-                    mobileNav.classList.remove('open');
-                    menuToggle.classList.remove('active');
-
-                    menuToggle.setAttribute('aria-expanded', 'false');
-                    menuToggle.setAttribute('aria-label', 'باز کردن منو');
-
-                    menuCloseTimer = setTimeout(() => {
-                        if (!mobileNav.classList.contains('open')) {
-                            mobileNav.inert = true;
-                        }
-                    }, 260);
-                };
-
-                menuToggle.addEventListener('click', () => {
-                    const isOpen = menuToggle.getAttribute('aria-expanded') === 'true';
-
-                    if (isOpen) {
-                        closeMenu();
-                    } else {
-                        openMenu();
-                    }
-                });
-
-                mobileLinks.forEach(link => {
-                    link.addEventListener('click', closeMenu);
-                });
-
-                document.addEventListener('click', event => {
-                    if (
-                        menuToggle.getAttribute('aria-expanded') === 'true' &&
-                        !mobileNav.contains(event.target) &&
-                        !menuToggle.contains(event.target)
-                    ) {
-                        closeMenu();
-                    }
-                });
-
-                document.addEventListener('keydown', event => {
-                    if (
-                        event.key === 'Escape' &&
-                        menuToggle.getAttribute('aria-expanded') === 'true'
-                    ) {
-                        closeMenu();
-                        menuToggle.focus();
-                    }
-                });
-            }
-
-            const revealElements = document.querySelectorAll('.reveal');
-
-            if ('IntersectionObserver' in window) {
-                const revealObserver = new IntersectionObserver((entries, observer) => {
-                    entries.forEach(entry => {
-                        if (entry.isIntersecting) {
-                            entry.target.classList.add('is-visible');
-                            observer.unobserve(entry.target);
-                        }
-                    });
-                }, {
-                    threshold: 0.12,
-                    rootMargin: '0px 0px -35px 0px'
-                });
-
-                revealElements.forEach(element => {
-                    revealObserver.observe(element);
-                });
-            } else {
-                revealElements.forEach(element => {
-                    element.classList.add('is-visible');
-                });
-            }
-        })();
-    </script>
 
 @endsection

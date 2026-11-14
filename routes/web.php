@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\InvoiceController;
 
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\BlogPostController;
+use App\Http\Controllers\PublicBlogPostController;
 use App\Http\Controllers\InquiryController;
 
 // Public Website Routes
@@ -19,6 +20,7 @@ Route::get('/', function () {
 
     $products = Product::query()
         ->where('status', 'published')
+        ->where('is_featured', true)
         ->orderByDesc('published_at')
         ->orderByDesc('created_at')
         ->take(4)
@@ -37,6 +39,24 @@ Route::get('/', function () {
         'blogPosts'
     ));
 });
+
+// Public Products Page
+Route::get('/products', [ProductController::class, 'publicIndex'])
+    ->name('products.index');
+
+// Public Product Details Page
+Route::get('/products/{product}', [ProductController::class, 'show'])
+    ->whereNumber('product')
+    ->name('products.show');
+
+// Public Blog Page
+Route::get('/blog', [PublicBlogPostController::class, 'index'])
+    ->name('blog.index');
+
+// Public Blog Post Details Page
+Route::get('/blog/{blogPost}', [PublicBlogPostController::class, 'show'])
+    ->whereNumber('blogPost')
+    ->name('blog.show');
 
 // Public Document Verification
 Route::get('/document/verify/{token}', [InvoiceController::class, 'verify'])

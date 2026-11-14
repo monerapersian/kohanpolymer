@@ -132,7 +132,7 @@ a, button {
 }
 
 /* Header */
-
+/*
 .site-header {
     position: fixed;
     z-index: 100;
@@ -340,7 +340,7 @@ a, button {
 
 .mobile-menu a:hover {
     background: rgba(255,255,255,.08);
-}
+}*/
 
 /* Hero */
 

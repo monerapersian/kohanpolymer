@@ -292,6 +292,7 @@
         }
 
         .mobile-menu.open {
+            display: block;
             opacity: 1;
             transform: translateY(0) scale(1);
             pointer-events: auto;
@@ -1086,57 +1087,44 @@
     @stack('scripts')
     <!-- ================= JAVASCRIPT ================= -->
     <script>
-        // Mobile navigation
-        const menuToggle = document.getElementById('menuToggle');
-        const mobileNav = document.getElementById('mobileNav');
+        (() => {
+            // Mobile navigation
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileNav = document.getElementById('mobileNav');
 
-        menuToggle.addEventListener('click', function () {
-            const isOpen = !mobileNav.classList.contains('hidden');
+            if (!menuToggle || !mobileNav) return;
 
-            mobileNav.classList.toggle('hidden');
-            menuToggle.setAttribute('aria-expanded', String(!isOpen));
-            menuToggle.setAttribute('aria-label', isOpen ? 'باز کردن منو' : 'بستن منو');
-        });
+            menuToggle.addEventListener('click', function () {
+                const isOpen = mobileNav.classList.contains('open');
 
-        document.querySelectorAll('.mobile-link').forEach(function (link) {
-            link.addEventListener('click', function () {
-                mobileNav.classList.add('hidden');
-                menuToggle.setAttribute('aria-expanded', 'false');
-                menuToggle.setAttribute('aria-label', 'باز کردن منو');
+                mobileNav.classList.toggle('open', !isOpen);
+                menuToggle.classList.toggle('active', !isOpen);
+
+                if (isOpen) {
+                    mobileNav.setAttribute('inert', '');
+                } else {
+                    mobileNav.removeAttribute('inert');
+                }
+
+                menuToggle.setAttribute('aria-expanded', String(!isOpen));
+                menuToggle.setAttribute(
+                    'aria-label',
+                    isOpen ? 'باز کردن منو' : 'بستن منو'
+                );
             });
-        });
 
-        // Reveal sections while scrolling
-        const revealElements = document.querySelectorAll('.reveal');
+            mobileNav.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    mobileNav.classList.remove('open');
+                    menuToggle.classList.remove('active');
 
-        if ('IntersectionObserver' in window) {
-            const observer = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target);
-                    }
+                    mobileNav.setAttribute('inert', '');
+
+                    menuToggle.setAttribute('aria-expanded', 'false');
+                    menuToggle.setAttribute('aria-label', 'باز کردن منو');
                 });
-            }, {
-                threshold: 0.12,
-                rootMargin: '0px 0px -30px 0px'
             });
-
-            revealElements.forEach(function (element) {
-                observer.observe(element);
-            });
-        } else {
-            revealElements.forEach(function (element) {
-                element.classList.add('is-visible');
-            });
-        }
-
-        // Respect reduced motion preferences
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            revealElements.forEach(function (element) {
-                element.classList.add('is-visible');
-            });
-        }
+        })();
     </script>
 </body>
 

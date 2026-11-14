@@ -25,9 +25,9 @@
 
         <nav class="desktop-nav" aria-label="منوی اصلی">
             <a href="{{ url('/') }}#home">صفحه اصلی</a>
+            <a href="{{ route('products.index') }}">محصولات</a>
+            <a href="{{ route('blog.index') }}">دانش و مقالات</a>
             <a href="{{ url('/') }}#about">درباره ما</a>
-            <a href="{{ url('/') }}#products">محصولات</a>
-            <a href="{{ url('/') }}#articles">دانش و مقالات</a>
             <a href="{{ url('/') }}#contact">تماس با ما</a>
         </nav>
 
@@ -49,9 +49,10 @@
 
     <nav class="mobile-menu" id="mobileNav" aria-label="منوی موبایل" inert>
         <a href="{{ url('/') }}#home">صفحه اصلی</a>
-        <a href="{{ url('/') }}#about">درباره ما</a>
         <a href="{{ url('/') }}#products">محصولات</a>
-        <a href="{{ url('/') }}#articles">دانش و مقالات</a>
+        <a href="{{ route('blog.index') }}">دانش و مقالات</a>
+        <a href="{{ url('/') }}#about">درباره ما</a>
         <a href="{{ url('/') }}#contact">تماس با ما</a>
     </nav>
 </header>
+

@@ -64,12 +64,14 @@ class InquiryController extends Controller
             'full_name' => trim($validated['fullName']),
             'phone' => trim($validated['phone']),
             'subject' => $validated['subject'],
-            'message' => $validated['message'] ?? null,
+            'message' => isset($validated['message'])
+                ? trim($validated['message'])
+                : null,
         ]);
 
-        return response()->json([
-            'message' => 'درخواست شما با موفقیت ثبت شد.',
-        ], 201);
+        return redirect()
+            ->to(url()->previous() . '#contact')
+            ->with('success', 'درخواست شما با موفقیت ثبت شد. کارشناسان ما در اولین فرصت با شما تماس خواهند گرفت.');
     }
 
     /**

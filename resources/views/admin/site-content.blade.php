@@ -70,19 +70,41 @@
 
         {{-- Success Message --}}
         @if (session('success'))
-            <div role="status" class="flex items-start gap-3 rounded-2xl border border-emerald-400/20 bg-emerald-500/[0.08] px-5 py-4 text-sm text-emerald-200">
-                <svg class="mt-0.5 h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
-                </svg>
-                <span>{{ session('success') }}</span>
+            <div
+                role="status"
+                class="flex items-start gap-3 rounded-2xl border border-[#A7CDB5] bg-[#EDF7F0] px-5 py-4 text-sm text-[#245B38] shadow-sm"
+            >
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#D5EBDD]">
+                    <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="m5 12 4 4L19 6"/>
+                    </svg>
+                </div>
+
+                <div class="pt-1 font-medium leading-7">
+                    {{ session('success') }}
+                </div>
             </div>
         @endif
 
         {{-- Validation Errors --}}
         @if ($errors->any())
-            <div class="rounded-2xl border border-red-400/20 bg-red-500/[0.08] px-5 py-4 text-sm text-red-200">
-                <p class="mb-2 font-bold">لطفاً خطاهای زیر را بررسی کنید:</p>
-                <ul class="list-inside list-disc space-y-1">
+            <div
+                role="alert"
+                class="rounded-2xl border border-[#E8B8B8] bg-[#FFF1F0] px-5 py-4 text-sm text-[#9B3030] shadow-sm"
+            >
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#F9DADA]">
+                        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.3 3.9 2.8 17a2 2 0 0 0 1.7 3h15a2 2 0 0 0 1.7-3l-7.5-13.1a2 2 0 0 0-3.4 0Z"/>
+                        </svg>
+                    </div>
+
+                    <p class="font-bold">
+                        لطفاً موارد زیر را بررسی کنید:
+                    </p>
+                </div>
+
+                <ul class="list-inside list-disc space-y-2 pr-1 leading-7">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -764,7 +786,7 @@
                                         </td>
 
                                         <td class="px-4 py-4 text-[#8E7D78]">
-                                            {{ $product->published_at?->format('Y/m/d') ?? '—' }}
+                                            {{ $product->published_at ? \App\Support\NumberHelper::toPersian(\App\Support\DateHelper::toPersian($product->published_at)) : '—' }}
                                         </td>
 
                                         <td class="px-4 py-4">
@@ -1124,7 +1146,7 @@
                 <input type="hidden" name="_product_form" value="1">
                 <input type="hidden" id="product-method" name="_method" value="POST">
 
-                <div class="space-y-6 px-5 py-6 sm:px-7">
+                <div class="max-h-[70vh] space-y-7 overflow-y-auto px-5 py-6 sm:px-7">
 
                     {{-- Product Name --}}
                     <div>
@@ -1183,6 +1205,212 @@
                             class="w-full resize-y rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                         >{{ old('_product_form') ? old('description') : '' }}</textarea>
                     </div>
+
+                    {{-- Product Properties --}}
+                    <section class="border-t border-[#F0EBE9] pt-6">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm text-[#554744] kohan-bold">خواص محصول</h3>
+                                <p class="mt-1 text-xs text-[#A19692]">ویژگی‌های محصول را وارد کنید.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="add-property"
+                                class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#DCCBC9] bg-white px-3 py-2 text-xs text-[#674040] transition hover:bg-[#F8F1F0] kohan-bold"
+                            >
+                                <span class="text-base leading-none">+</span>
+                                افزودن خاصیت
+                            </button>
+                        </div>
+
+                        <div id="properties-container" class="space-y-3">
+                            @if(old('_product_form') && is_array(old('properties')))
+                                @foreach(old('properties') as $property)
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            name="properties[]"
+                                            value="{{ $property }}"
+                                            placeholder="خاصیت محصول"
+                                            class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                                        >
+                                        <button type="button" class="remove-product-row flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600" aria-label="حذف خاصیت">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </section>
+
+                    {{-- Product Sizes --}}
+                    <section class="border-t border-[#F0EBE9] pt-6">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm text-[#554744] kohan-bold">سایز محصول</h3>
+                                <p class="mt-1 text-xs text-[#A19692]">ضخامت و عرض هر سایز را مشخص کنید.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="add-size"
+                                class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#DCCBC9] bg-white px-3 py-2 text-xs text-[#674040] transition hover:bg-[#F8F1F0] kohan-bold"
+                            >
+                                <span class="text-base leading-none">+</span>
+                                افزودن سایز
+                            </button>
+                        </div>
+
+                        <div id="sizes-container" class="space-y-3">
+                            @if(old('_product_form') && is_array(old('sizes')))
+                                @foreach(old('sizes') as $size)
+                                    <div class="grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_1fr_auto]">
+                                        <div>
+                                            <label class="mb-2 block text-xs text-[#796B67]">ضخامت (میلی‌متر)</label>
+                                            <input
+                                                type="number"
+                                                step="any"
+                                                min="0"
+                                                name="sizes[][thickness]"
+                                                value="{{ $size['thickness'] ?? '' }}"
+                                                placeholder="مثلاً 0.5"
+                                                class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                                            >
+                                        </div>
+
+                                        <div>
+                                            <label class="mb-2 block text-xs text-[#796B67]">عرض (سانتی‌متر)</label>
+                                            <input
+                                                type="number"
+                                                step="any"
+                                                min="0"
+                                                name="sizes[][width]"
+                                                value="{{ $size['width'] ?? '' }}"
+                                                placeholder="مثلاً 120"
+                                                class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                                            >
+                                        </div>
+
+                                        <button type="button" class="remove-product-row flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600" aria-label="حذف سایز">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </section>
+
+                    {{-- Product EP --}}
+                    <section class="border-t border-[#F0EBE9] pt-6">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm text-[#554744] kohan-bold">EP</h3>
+                                <p class="mt-1 text-xs text-[#A19692]">مقادیر EP محصول را وارد کنید.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="add-ep"
+                                class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#DCCBC9] bg-white px-3 py-2 text-xs text-[#674040] transition hover:bg-[#F8F1F0] kohan-bold"
+                            >
+                                <span class="text-base leading-none">+</span>
+                                افزودن EP
+                            </button>
+                        </div>
+
+                        <div id="ep-container" class="space-y-3">
+                            @if(old('_product_form') && is_array(old('eps')))
+                                @foreach(old('eps') as $ep)
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            name="eps[]"
+                                            value="{{ $ep }}"
+                                            placeholder="مقدار EP"
+                                            class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                                        >
+                                        <button type="button" class="remove-product-row flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600" aria-label="حذف EP">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </section>
+
+                    {{-- Product Goods Descriptions --}}
+                    <section class="border-t border-[#F0EBE9] pt-6">
+                        <div class="mb-4 flex items-center justify-between gap-3">
+                            <div>
+                                <h3 class="text-sm text-[#554744] kohan-bold">شرح کالا</h3>
+                                <p class="mt-1 text-xs text-[#A19692]">شرح‌های مربوط به کالا را وارد کنید.</p>
+                            </div>
+
+                            <button
+                                type="button"
+                                id="add-goods-description"
+                                class="inline-flex shrink-0 cursor-pointer items-center gap-1.5 rounded-lg border border-[#DCCBC9] bg-white px-3 py-2 text-xs text-[#674040] transition hover:bg-[#F8F1F0] kohan-bold"
+                            >
+                                <span class="text-base leading-none">+</span>
+                                افزودن شرح کالا
+                            </button>
+                        </div>
+
+                        <div id="goods-descriptions-container" class="space-y-3">
+                            @if(old('_product_form') && is_array(old('goods_descriptions')))
+                                @foreach(old('goods_descriptions') as $goodsDescription)
+                                    <div class="flex items-center gap-2">
+                                        <input
+                                            type="text"
+                                            name="goods_descriptions[]"
+                                            value="{{ $goodsDescription }}"
+                                            placeholder="شرح کالا"
+                                            class="min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                                        >
+                                        <button type="button" class="remove-product-row flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600" aria-label="حذف شرح کالا">
+                                            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                @endforeach
+                            @endif
+                        </div>
+                    </section>
+
+                    {{-- Featured Product --}}
+                    <section class="border-t border-[#F0EBE9] pt-6">
+                        <label class="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] p-4 transition hover:border-[#D3C1BE]">
+                            <div>
+                                <span class="block text-sm text-[#554744] kohan-bold">
+                                    محصول ویژه
+                                </span>
+                                <span class="mt-1 block text-xs leading-6 text-[#A19692]">
+                                    با فعال‌کردن این گزینه، محصول در اسلایدر محصولات ویژه نمایش داده می‌شود.
+                                </span>
+                            </div>
+
+                            <span class="relative inline-flex shrink-0 items-center">
+                                <input
+                                    type="checkbox"
+                                    name="is_featured"
+                                    value="1"
+                                    class="peer sr-only"
+                                    {{ old('_product_form') && old('is_featured') ? 'checked' : '' }}
+                                >
+                                <span class="h-6 w-11 rounded-full bg-[#D9CECB] transition peer-checked:bg-[#674040]"></span>
+                                <span class="absolute right-1 h-4 w-4 rounded-full bg-white shadow-sm transition peer-checked:translate-x-[-20px]"></span>
+                            </span>
+                        </label>
+                    </section>
+
                 </div>
 
                 {{-- Modal Footer --}}
@@ -1709,7 +1937,8 @@
         })();
     </script>
 
-    <script>
+    <!-- Product-modal -->
+    <!-- <script>
         (() => {
             const modal = document.getElementById('product-modal');
             const openButton = document.getElementById('add-product-button');
@@ -1723,6 +1952,19 @@
             const title = document.getElementById('product-modal-title');
             const subtitle = document.getElementById('product-modal-subtitle');
             const imageHint = document.getElementById('product-image-hint');
+            const imageInput = document.getElementById('product-image');
+
+            const propertiesContainer = document.getElementById('properties-container');
+            const sizesContainer = document.getElementById('sizes-container');
+            const epContainer = document.getElementById('ep-container');
+            const goodsDescriptionsContainer = document.getElementById('goods-descriptions-container');
+
+            const addPropertyButton = document.getElementById('add-property');
+            const addSizeButton = document.getElementById('add-size');
+            const addEpButton = document.getElementById('add-ep');
+            const addGoodsDescriptionButton = document.getElementById('add-goods-description');
+
+            const featuredInput = form?.querySelector('input[name="is_featured"]');
 
             if (
                 !modal ||
@@ -1733,7 +1975,11 @@
                 !methodInput ||
                 !nameInput ||
                 !descriptionInput ||
-                !title
+                !title ||
+                !propertiesContainer ||
+                !sizesContainer ||
+                !epContainer ||
+                !goodsDescriptionsContainer
             ) {
                 return;
             }
@@ -1741,36 +1987,122 @@
             const storeUrl = @json(route('admin.products.store'));
             const updateUrlTemplate = @json(route('admin.products.update', ['product' => '__PRODUCT_ID__']));
 
-            const openModal = () => {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-                modal.setAttribute('aria-hidden', 'false');
-                document.body.classList.add('overflow-hidden');
+            const removeButtonHtml = `
+                <button
+                    type="button"
+                    class="remove-product-row flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600"
+                    aria-label="حذف مورد"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                    </svg>
+                </button>
+            `;
 
-                window.requestAnimationFrame(() => {
-                    nameInput.focus();
+            // Create a text row
+            const createTextRow = (container, name, placeholder, value = '') => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = name;
+                input.value = value ?? '';
+                input.placeholder = placeholder;
+                input.className = 'min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white';
+
+                row.appendChild(input);
+                row.insertAdjacentHTML('beforeend', removeButtonHtml);
+                container.appendChild(row);
+
+                return row;
+            };
+
+            let sizeIndex = 0;
+
+            // Create a size row
+            const createSizeRow = (container, thickness = '', width = '') => {
+                const index = sizeIndex++;
+
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_1fr_auto]';
+
+                row.innerHTML = `
+                    <div>
+                        <label class="mb-2 block text-xs text-[#796B67]">
+                            ضخامت (میلی‌متر)
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            name="sizes[${index}][thickness]"
+                            value="${thickness ?? ''}"
+                            placeholder="مثلاً 0.5"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs text-[#796B67]">
+                            عرض (سانتی‌متر)
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            name="sizes[${index}][width]"
+                            value="${width ?? ''}"
+                            placeholder="مثلاً 120"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                        >
+                    </div>
+
+                    ${removeButtonHtml}
+                `;
+
+                container.appendChild(row);
+
+                return row;
+            };
+
+            // Clear all dynamic rows
+            const clearDynamicRows = () => {
+                propertiesContainer.innerHTML = '';
+                sizesContainer.innerHTML = '';
+                epContainer.innerHTML = '';
+                goodsDescriptionsContainer.innerHTML = '';
+
+                sizeIndex = 0;
+            };
+
+            // Load text rows
+            const loadTextRows = (container, name, placeholder, values) => {
+                if (!Array.isArray(values)) {
+                    return;
+                }
+
+                values.forEach((value) => {
+                    createTextRow(container, name, placeholder, value);
                 });
             };
 
-            const closeModal = () => {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-                modal.setAttribute('aria-hidden', 'true');
-                document.body.classList.remove('overflow-hidden');
-
-                openButton.focus();
-            };
-
+            // Reset modal for creating a product
             const resetToCreateMode = () => {
                 form.action = storeUrl;
                 methodInput.value = 'POST';
+
                 nameInput.value = '';
                 descriptionInput.value = '';
 
-                const imageInput = document.getElementById('product-image');
-
                 if (imageInput) {
                     imageInput.value = '';
+                }
+
+                clearDynamicRows();
+
+                if (featuredInput) {
+                    featuredInput.checked = false;
                 }
 
                 title.textContent = 'افزودن محصول جدید';
@@ -1785,11 +2117,92 @@
                 });
             };
 
+            // Open modal
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.setAttribute('aria-hidden', 'false');
+
+                document.body.classList.add('overflow-hidden');
+
+                window.requestAnimationFrame(() => {
+                    nameInput.focus();
+                });
+            };
+
+            // Close modal
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modal.setAttribute('aria-hidden', 'true');
+
+                document.body.classList.remove('overflow-hidden');
+
+                openButton.focus();
+            };
+
+            // Add property row
+            addPropertyButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    propertiesContainer,
+                    'properties[]',
+                    'خاصیت محصول'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add size row
+            addSizeButton?.addEventListener('click', () => {
+                const row = createSizeRow(sizesContainer);
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add EP row
+            addEpButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    epContainer,
+                    'eps[]',
+                    'مقدار EP'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add goods description row
+            addGoodsDescriptionButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    goodsDescriptionsContainer,
+                    'goods_descriptions[]',
+                    'شرح کالا'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Remove the entire dynamic row
+            form.addEventListener('click', (event) => {
+                const removeButton = event.target.closest('.remove-product-row');
+
+                if (!removeButton || !form.contains(removeButton)) {
+                    return;
+                }
+
+                const row = removeButton.parentElement;
+
+                if (row) {
+                    row.remove();
+                }
+            });
+
+            // Open create modal
             openButton.addEventListener('click', () => {
                 resetToCreateMode();
                 openModal();
             });
 
+            // Edit product modal
             document.querySelectorAll('.edit-product-button').forEach((button) => {
                 button.addEventListener('click', () => {
                     const productId = button.dataset.id;
@@ -1798,17 +2211,90 @@
                         return;
                     }
 
+                    clearDynamicRows();
+
                     form.action = updateUrlTemplate.replace(
                         '__PRODUCT_ID__',
                         encodeURIComponent(productId)
                     );
 
                     methodInput.value = 'PUT';
+
                     nameInput.value = button.dataset.name || '';
                     descriptionInput.value = button.dataset.description || '';
 
+                    // Load properties
+                    try {
+                        const properties = JSON.parse(button.dataset.properties || '[]');
+
+                        loadTextRows(
+                            propertiesContainer,
+                            'properties[]',
+                            'خاصیت محصول',
+                            properties
+                        );
+                    } catch (error) {
+                        console.error('Unable to load product properties:', error);
+                    }
+
+                    // Load sizes
+                    try {
+                        const sizes = JSON.parse(button.dataset.sizes || '[]');
+
+                        if (Array.isArray(sizes)) {
+                            sizes.forEach((size) => {
+                                createSizeRow(
+                                    sizesContainer,
+                                    size.thickness ?? '',
+                                    size.width ?? ''
+                                );
+                            });
+                        }
+                    } catch (error) {
+                        console.error('Unable to load product sizes:', error);
+                    }
+
+                    // Load EP values
+                    try {
+                        const eps = JSON.parse(button.dataset.eps || '[]');
+
+                        loadTextRows(
+                            epContainer,
+                            'eps[]',
+                            'مقدار EP',
+                            eps
+                        );
+                    } catch (error) {
+                        console.error('Unable to load product EP values:', error);
+                    }
+
+                    // Load goods descriptions
+                    try {
+                        const descriptions = JSON.parse(
+                            button.dataset.goodsDescriptions || '[]'
+                        );
+
+                        loadTextRows(
+                            goodsDescriptionsContainer,
+                            'goods_descriptions[]',
+                            'شرح کالا',
+                            descriptions
+                        );
+                    } catch (error) {
+                        console.error('Unable to load product descriptions:', error);
+                    }
+
+                    // Load featured status
+                    if (featuredInput) {
+                        featuredInput.checked = button.dataset.featured === '1';
+                    }
+
                     title.textContent = 'ویرایش محصول';
                     subtitle.textContent = 'اطلاعات محصول را ویرایش کنید.';
+
+                    if (imageInput) {
+                        imageInput.value = '';
+                    }
 
                     if (imageHint) {
                         imageHint.classList.remove('hidden');
@@ -1822,15 +2308,18 @@
                 });
             });
 
+            // Close modal buttons
             closeButton.addEventListener('click', closeModal);
             cancelButton.addEventListener('click', closeModal);
 
+            // Close modal when clicking outside
             modal.addEventListener('click', (event) => {
                 if (event.target === modal) {
                     closeModal();
                 }
             });
 
+            // Close modal with Escape key
             document.addEventListener('keydown', (event) => {
                 if (
                     event.key === 'Escape' &&
@@ -1840,6 +2329,432 @@
                 }
             });
 
+            // Reopen modal after validation errors
+            const shouldReopenModal = @json(
+                $errors->any() && old('_product_form')
+            );
+
+            if (shouldReopenModal) {
+                openModal();
+            }
+        })();
+    </script> -->
+    <!-- Product-modal -->
+    @php
+        $productModalData = $products->getCollection()->mapWithKeys(function ($product) {
+            $details = $product->details->groupBy('type');
+
+            return [
+                $product->id => [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'description' => $product->description,
+                    'is_featured' => (bool) $product->is_featured,
+
+                    'properties' => $details->get('property', collect())
+                        ->pluck('value')
+                        ->values(),
+
+                    'sizes' => $details->get('size', collect())
+                        ->map(fn ($detail) => [
+                            'thickness' => $detail->thickness,
+                            'width' => $detail->width,
+                        ])
+                        ->values(),
+
+                    'eps' => $details->get('ep', collect())
+                        ->pluck('value')
+                        ->values(),
+
+                    'goods_descriptions' => $details->get('goods_description', collect())
+                        ->pluck('value')
+                        ->values(),
+                ],
+            ];
+        });
+    @endphp
+
+    <script>
+        (() => {
+            const modal = document.getElementById('product-modal');
+            const openButton = document.getElementById('add-product-button');
+            const closeButton = document.getElementById('close-product-modal');
+            const cancelButton = document.getElementById('cancel-product-modal');
+
+            const form = document.getElementById('product-form');
+            const methodInput = document.getElementById('product-method');
+            const nameInput = document.getElementById('product-name');
+            const descriptionInput = document.getElementById('product-description');
+            const title = document.getElementById('product-modal-title');
+            const subtitle = document.getElementById('product-modal-subtitle');
+            const imageHint = document.getElementById('product-image-hint');
+            const imageInput = document.getElementById('product-image');
+
+            const propertiesContainer = document.getElementById('properties-container');
+            const sizesContainer = document.getElementById('sizes-container');
+            const epContainer = document.getElementById('ep-container');
+            const goodsDescriptionsContainer = document.getElementById('goods-descriptions-container');
+
+            const addPropertyButton = document.getElementById('add-property');
+            const addSizeButton = document.getElementById('add-size');
+            const addEpButton = document.getElementById('add-ep');
+            const addGoodsDescriptionButton = document.getElementById('add-goods-description');
+
+            const featuredInput = form?.querySelector('input[name="is_featured"]');
+
+            if (
+                !modal ||
+                !openButton ||
+                !closeButton ||
+                !cancelButton ||
+                !form ||
+                !methodInput ||
+                !nameInput ||
+                !descriptionInput ||
+                !title ||
+                !propertiesContainer ||
+                !sizesContainer ||
+                !epContainer ||
+                !goodsDescriptionsContainer
+            ) {
+                return;
+            }
+
+            const storeUrl = @json(route('admin.products.store'));
+
+            const updateUrlTemplate = @json(
+                route('admin.products.update', ['product' => '__PRODUCT_ID__'])
+            );
+
+            // Product data loaded from the database
+            const productsData = @json($productModalData);
+
+            const removeButtonHtml = `
+                <button
+                    type="button"
+                    class="remove-product-row flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg text-[#A18E89] transition hover:bg-red-50 hover:text-red-600"
+                    aria-label="حذف مورد"
+                >
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 7h16M10 11v6m4-6v6M5 7l1 14h12l1-14M9 7V4h6v3"/>
+                    </svg>
+                </button>
+            `;
+
+            // Create a text row
+            const createTextRow = (container, name, placeholder, value = '') => {
+                const row = document.createElement('div');
+                row.className = 'flex items-center gap-2';
+
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.name = name;
+                input.value = value ?? '';
+                input.placeholder = placeholder;
+                input.className = 'min-w-0 flex-1 rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white';
+
+                row.appendChild(input);
+                row.insertAdjacentHTML('beforeend', removeButtonHtml);
+                container.appendChild(row);
+
+                return row;
+            };
+
+            let sizeIndex = 0;
+
+            // Create a size row
+            const createSizeRow = (container, thickness = '', width = '') => {
+                const index = sizeIndex++;
+
+                const row = document.createElement('div');
+                row.className = 'grid grid-cols-1 items-end gap-3 sm:grid-cols-[1fr_1fr_auto]';
+
+                row.innerHTML = `
+                    <div>
+                        <label class="mb-2 block text-xs text-[#796B67]">
+                            ضخامت (میلی‌متر)
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            name="sizes[${index}][thickness]"
+                            value="${thickness ?? ''}"
+                            placeholder="مثلاً 0.5"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                        >
+                    </div>
+
+                    <div>
+                        <label class="mb-2 block text-xs text-[#796B67]">
+                            عرض (سانتی‌متر)
+                        </label>
+                        <input
+                            type="number"
+                            step="any"
+                            min="0"
+                            name="sizes[${index}][width]"
+                            value="${width ?? ''}"
+                            placeholder="مثلاً 120"
+                            class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666] focus:bg-white"
+                        >
+                    </div>
+
+                    ${removeButtonHtml}
+                `;
+
+                container.appendChild(row);
+
+                return row;
+            };
+
+            // Clear all dynamic rows
+            const clearDynamicRows = () => {
+                propertiesContainer.innerHTML = '';
+                sizesContainer.innerHTML = '';
+                epContainer.innerHTML = '';
+                goodsDescriptionsContainer.innerHTML = '';
+
+                sizeIndex = 0;
+            };
+
+            // Load text rows
+            const loadTextRows = (container, name, placeholder, values) => {
+                if (!Array.isArray(values)) {
+                    return;
+                }
+
+                values.forEach((value) => {
+                    createTextRow(container, name, placeholder, value);
+                });
+            };
+
+            // Reset modal for creating a product
+            const resetToCreateMode = () => {
+                form.action = storeUrl;
+                methodInput.value = 'POST';
+
+                nameInput.value = '';
+                descriptionInput.value = '';
+
+                if (imageInput) {
+                    imageInput.value = '';
+                }
+
+                clearDynamicRows();
+
+                if (featuredInput) {
+                    featuredInput.checked = false;
+                }
+
+                title.textContent = 'افزودن محصول جدید';
+                subtitle.textContent = 'اطلاعات محصول را وارد کنید.';
+
+                if (imageHint) {
+                    imageHint.classList.add('hidden');
+                }
+
+                form.querySelectorAll('button[type="submit"]').forEach((button) => {
+                    button.classList.remove('hidden');
+                });
+            };
+
+            // Open modal
+            const openModal = () => {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+                modal.setAttribute('aria-hidden', 'false');
+
+                document.body.classList.add('overflow-hidden');
+
+                window.requestAnimationFrame(() => {
+                    nameInput.focus();
+                });
+            };
+
+            // Close modal
+            const closeModal = () => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                modal.setAttribute('aria-hidden', 'true');
+
+                document.body.classList.remove('overflow-hidden');
+
+                openButton.focus();
+            };
+
+            // Add property row
+            addPropertyButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    propertiesContainer,
+                    'properties[]',
+                    'خاصیت محصول'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add size row
+            addSizeButton?.addEventListener('click', () => {
+                const row = createSizeRow(sizesContainer);
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add EP row
+            addEpButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    epContainer,
+                    'eps[]',
+                    'مقدار EP'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Add goods description row
+            addGoodsDescriptionButton?.addEventListener('click', () => {
+                const row = createTextRow(
+                    goodsDescriptionsContainer,
+                    'goods_descriptions[]',
+                    'شرح کالا'
+                );
+
+                row.querySelector('input')?.focus();
+            });
+
+            // Remove dynamic rows
+            form.addEventListener('click', (event) => {
+                const removeButton = event.target.closest('.remove-product-row');
+
+                if (!removeButton || !form.contains(removeButton)) {
+                    return;
+                }
+
+                const row = removeButton.parentElement;
+
+                if (row) {
+                    row.remove();
+                }
+            });
+
+            // Open create modal
+            openButton.addEventListener('click', () => {
+                resetToCreateMode();
+                openModal();
+            });
+
+            // Edit product modal
+            document.querySelectorAll('.edit-product-button').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const productId = button.dataset.id;
+
+                    if (!productId) {
+                        console.error('Product ID is missing from the edit button.');
+                        return;
+                    }
+
+                    const product = productsData[String(productId)];
+
+                    if (!product) {
+                        console.error('Product data was not found:', productId);
+                        return;
+                    }
+
+                    clearDynamicRows();
+
+                    form.action = updateUrlTemplate.replace(
+                        '__PRODUCT_ID__',
+                        encodeURIComponent(productId)
+                    );
+
+                    methodInput.value = 'PUT';
+
+                    // Load basic information
+                    nameInput.value = product.name ?? '';
+                    descriptionInput.value = product.description ?? '';
+
+                    // Load properties
+                    loadTextRows(
+                        propertiesContainer,
+                        'properties[]',
+                        'خاصیت محصول',
+                        product.properties ?? []
+                    );
+
+                    // Load sizes
+                    if (Array.isArray(product.sizes)) {
+                        product.sizes.forEach((size) => {
+                            createSizeRow(
+                                sizesContainer,
+                                size.thickness ?? '',
+                                size.width ?? ''
+                            );
+                        });
+                    }
+
+                    // Load EP values
+                    loadTextRows(
+                        epContainer,
+                        'eps[]',
+                        'مقدار EP',
+                        product.eps ?? []
+                    );
+
+                    // Load goods descriptions
+                    loadTextRows(
+                        goodsDescriptionsContainer,
+                        'goods_descriptions[]',
+                        'شرح کالا',
+                        product.goods_descriptions ?? []
+                    );
+
+                    // Load featured status
+                    if (featuredInput) {
+                        featuredInput.checked = Boolean(product.is_featured);
+                    }
+
+                    title.textContent = 'ویرایش محصول';
+                    subtitle.textContent = 'اطلاعات محصول را ویرایش کنید.';
+
+                    if (imageInput) {
+                        imageInput.value = '';
+                    }
+
+                    if (imageHint) {
+                        imageHint.classList.remove('hidden');
+                    }
+
+                    form.querySelectorAll('button[type="submit"]').forEach((submitButton) => {
+                        submitButton.classList.remove('hidden');
+                    });
+
+                    openModal();
+                });
+            });
+
+            // Close modal buttons
+            closeButton.addEventListener('click', closeModal);
+            cancelButton.addEventListener('click', closeModal);
+
+            // Close modal when clicking outside
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            // Close modal with Escape key
+            document.addEventListener('keydown', (event) => {
+                if (
+                    event.key === 'Escape' &&
+                    !modal.classList.contains('hidden')
+                ) {
+                    closeModal();
+                }
+            });
+
+            // Reopen modal after validation errors
             const shouldReopenModal = @json(
                 $errors->any() && old('_product_form')
             );
