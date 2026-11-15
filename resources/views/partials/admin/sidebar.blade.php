@@ -114,7 +114,8 @@
                             ],
                             [
                                 'label' => 'گزارش فعالیت‌ها',
-                                'route' => null,
+                                'route' => 'admin.activity-logs.index',
+                                'active' => 'admin.activity-logs.*',
                                 'icon' => 'activity',
                             ],
                         ],
@@ -234,7 +235,7 @@
                         وارد شده به‌عنوان
                     </span>
                     <strong class="kohan-bold truncate text-sm text-[#362727]">
-                        مدیر سیستم
+                        {{ auth()->user()->name ?? 'مدیر سیستم' }}
                     </strong>
                 </div>
 
@@ -245,9 +246,12 @@
             <div class="grid grid-cols-2 gap-2">
 
                 <a
-                    href="#"
-                    aria-disabled="true"
-                    class="flex min-h-[44px] min-w-0 cursor-not-allowed items-center justify-center gap-2 rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-2 text-xs text-[#77716F] opacity-60 kohan-bold"
+                    href="{{ route('admin.settings.edit') }}"
+                    @if (request()->routeIs('admin.settings.*')) aria-current="page" @endif
+                    class="flex min-h-[44px] min-w-0 items-center justify-center gap-2 rounded-xl border px-2 text-xs transition-colors kohan-bold
+                        {{ request()->routeIs('admin.settings.*')
+                            ? 'border-[#542b2e]/10 bg-[#F3E9E9] text-[#542b2e]'
+                            : 'border-[#E8E1DE] bg-[#FAF8F7] text-[#77716F] hover:border-[#542b2e]/20 hover:bg-[#F3E9E9] hover:text-[#542b2e]' }}"
                 >
                     <svg class="h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <circle cx="12" cy="12" r="3"/>

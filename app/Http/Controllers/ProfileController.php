@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ProfileUpdateRequest;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -26,13 +27,29 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        $user->fill($request->validated());
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        $request->user()->save();
+        $changedFields = array_keys($user->getDirty());
+
+        $user->save();
+
+        if (! empty($changedFields)) {
+            app(ActivityLogger::class)->log(
+                action: 'profile_updated',
+                description: 'اطلاعات پروفایل کاربر ویرایش شد.',
+                subject: $user,
+                properties: [
+                    'changed_fields' => $changedFields,
+                ],
+                actor: $user
+            );
+        }
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
@@ -47,6 +64,16 @@ class ProfileController extends Controller
         ]);
 
         $user = $request->user();
+
+        app(ActivityLogger::class)->log(
+            action: 'account_deleted',
+            description: 'حساب کاربری حذف شد.',
+            subject: $user,
+            properties: [
+                'deleted_user_id' => $user->id,
+            ],
+            actor: $user
+        );
 
         Auth::logout();
 

@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
+use App\Services\ActivityLogger;
+use App\Support\ImageConverter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use App\Support\ImageConverter;
 
 class BlogPostController extends Controller
 {
@@ -50,7 +51,18 @@ class BlogPostController extends Controller
         $validated['published_at'] =
             $validated['status'] === 'published' ? now() : null;
 
-        BlogPost::create($validated);
+        $blogPost = BlogPost::create($validated);
+
+        app(ActivityLogger::class)->log(
+            action: 'blog_post_created',
+            description: 'مقاله جدید «' . $blogPost->title . '» ایجاد شد.',
+            subject: $blogPost,
+            properties: [
+                'title' => $blogPost->title,
+                'status' => $blogPost->status,
+                'has_image' => (bool) $blogPost->image,
+            ]
+        );
 
         return redirect()
             ->route('admin.site-content.edit', ['tab' => 'blog'])
@@ -72,6 +84,13 @@ class BlogPostController extends Controller
             'body' => ['required', 'string'],
             'status' => ['required', Rule::in(['draft', 'published'])],
         ]);
+
+        $oldValues = [
+            'title' => $blogPost->title,
+            'summary' => $blogPost->summary,
+            'status' => $blogPost->status,
+            'has_image' => (bool) $blogPost->image,
+        ];
 
         if ($request->hasFile('image')) {
             $newImagePath = ImageConverter::convertToWebp(
@@ -95,6 +114,46 @@ class BlogPostController extends Controller
 
         $blogPost->update($validated);
 
+        $changes = [];
+
+        foreach (['title', 'summary', 'status'] as $field) {
+            $oldValue = $oldValues[$field];
+            $newValue = $blogPost->{$field};
+
+            if ($oldValue !== $newValue) {
+                $changes[$field] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+        }
+
+        $newHasImage = (bool) $blogPost->image;
+
+        if ($oldValues['has_image'] !== $newHasImage || $request->hasFile('image')) {
+            $changes['image'] = [
+                'old' => $oldValues['has_image'],
+                'new' => $newHasImage,
+            ];
+        }
+
+        $description = 'مقاله «' . $blogPost->title . '» ویرایش شد.';
+
+        if (isset($changes['status'])) {
+            $description .= $blogPost->status === 'published'
+                ? ' مقاله منتشر شد.'
+                : ' مقاله به پیش‌نویس تغییر یافت.';
+        }
+
+        app(ActivityLogger::class)->log(
+            action: 'blog_post_updated',
+            description: $description,
+            subject: $blogPost,
+            properties: [
+                'changes' => $changes,
+            ]
+        );
+
         return redirect()
             ->route('admin.site-content.edit', ['tab' => 'blog'])
             ->with('active_tab', 'blog')
@@ -103,11 +162,28 @@ class BlogPostController extends Controller
 
     public function destroy(BlogPost $blogPost)
     {
-        if ($blogPost->image) {
-            Storage::disk('public')->delete($blogPost->image);
-        }
+        $deletedTitle = $blogPost->title;
+        $deletedStatus = $blogPost->status;
+        $hadImage = (bool) $blogPost->image;
+
+        $imagePath = $blogPost->image;
 
         $blogPost->delete();
+
+        app(ActivityLogger::class)->log(
+            action: 'blog_post_deleted',
+            description: 'مقاله «' . $deletedTitle . '» حذف شد.',
+            subject: $blogPost,
+            properties: [
+                'title' => $deletedTitle,
+                'status' => $deletedStatus,
+                'had_image' => $hadImage,
+            ]
+        );
+
+        if ($imagePath) {
+            Storage::disk('public')->delete($imagePath);
+        }
 
         return redirect()
             ->route('admin.site-content.edit', ['tab' => 'blog'])

@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\SiteContent;
+use App\Services\ActivityLogger;
+use App\Support\ImageConverter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
-use App\Support\ImageConverter;
 
 class ProductController extends Controller
 {
@@ -44,7 +45,6 @@ class ProductController extends Controller
      */
     public function publicIndex(Request $request)
     {
-        // Load website content for the public header and footer.
         $content = SiteContent::first();
         $siteContent = $content;
 
@@ -67,7 +67,7 @@ class ProductController extends Controller
 
         $sort = $request->input('sort', 'newest');
 
-        if (! in_array($sort, ['newest', 'oldest'], true)) {
+        if (!in_array($sort, ['newest', 'oldest'], true)) {
             $sort = 'newest';
         }
 
@@ -147,6 +147,17 @@ class ProductController extends Controller
 
             $this->syncProductDetails($product, $validated);
 
+            app(ActivityLogger::class)->log(
+                action: 'product_created',
+                description: 'محصول جدید «' . $product->name . '» ایجاد شد.',
+                subject: $product,
+                properties: [
+                    'name' => $product->name,
+                    'status' => $product->status,
+                    'is_featured' => (bool) $product->is_featured,
+                ]
+            );
+
             return $product;
         });
 
@@ -181,6 +192,12 @@ class ProductController extends Controller
             'goods_descriptions.*' => ['nullable', 'string', 'max:255'],
         ]);
 
+        $oldValues = [
+            'name' => $product->name,
+            'status' => $product->status,
+            'is_featured' => (bool) $product->is_featured,
+        ];
+
         $oldImage = $product->image;
         $imagePath = $oldImage;
 
@@ -194,7 +211,8 @@ class ProductController extends Controller
         DB::transaction(function () use (
             $product,
             $validated,
-            $imagePath
+            $imagePath,
+            $oldValues
         ) {
             $publishedAt = null;
 
@@ -212,6 +230,44 @@ class ProductController extends Controller
             ]);
 
             $this->syncProductDetails($product, $validated);
+
+            $newValues = [
+                'name' => $product->name,
+                'status' => $product->status,
+                'is_featured' => (bool) $product->is_featured,
+            ];
+
+            $changes = [];
+
+            foreach ($newValues as $field => $newValue) {
+                if ($oldValues[$field] !== $newValue) {
+                    $changes[$field] = [
+                        'old' => $oldValues[$field],
+                        'new' => $newValue,
+                    ];
+                }
+            }
+
+            $description = 'محصول «' . $product->name . '» ویرایش شد.';
+
+            if (isset($changes['status'])) {
+                $description .= ' وضعیت انتشار تغییر کرد.';
+            }
+
+            if (isset($changes['is_featured'])) {
+                $description .= $newValues['is_featured']
+                    ? ' محصول به محصولات ویژه اضافه شد.'
+                    : ' محصول از محصولات ویژه خارج شد.';
+            }
+
+            app(ActivityLogger::class)->log(
+                action: 'product_updated',
+                description: $description,
+                subject: $product,
+                properties: [
+                    'changes' => $changes,
+                ]
+            );
         });
 
         if ($request->hasFile('image') && $oldImage) {
@@ -230,9 +286,22 @@ class ProductController extends Controller
     {
         $imagePath = $product->image;
 
-        DB::transaction(function () use ($product) {
+        $deletedProduct = [
+            'name' => $product->name,
+            'status' => $product->status,
+            'is_featured' => (bool) $product->is_featured,
+        ];
+
+        DB::transaction(function () use ($product, $deletedProduct) {
             $product->details()->delete();
             $product->delete();
+
+            app(ActivityLogger::class)->log(
+                action: 'product_deleted',
+                description: 'محصول «' . $deletedProduct['name'] . '» حذف شد.',
+                subject: $product,
+                properties: $deletedProduct
+            );
         });
 
         if ($imagePath) {
@@ -245,9 +314,8 @@ class ProductController extends Controller
     }
 
     /**
-     * Show.
+     * Display a published product.
      */
-
     public function show(Product $product)
     {
         abort_unless($product->status === 'published', 404);

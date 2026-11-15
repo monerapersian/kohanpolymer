@@ -6,6 +6,7 @@ use App\Exports\InvoiceExport;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\Invoice;
+use App\Services\ActivityLogger;
 use App\Services\DocumentNumberService;
 use Endroid\QrCode\QrCode;
 use Endroid\QrCode\Writer\PngWriter;
@@ -125,6 +126,23 @@ class InvoiceController extends Controller
                 ]);
             }
 
+            app(ActivityLogger::class)->log(
+                action: $type === 'invoice'
+                    ? 'invoice_created'
+                    : 'proforma_created',
+                description: ($type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور')
+                    . ' شماره «' . $invoice->document_number . '» ثبت شد.',
+                subject: $invoice,
+                properties: [
+                    'document_number' => $invoice->document_number,
+                    'type' => $invoice->type,
+                    'customer_id' => $invoice->customer_id,
+                    'is_formal' => (bool) $invoice->is_formal,
+                    'status' => $invoice->status,
+                    'items_count' => count($validated['items']),
+                ]
+            );
+
             return $invoice;
         }, 5);
 
@@ -229,6 +247,27 @@ class InvoiceController extends Controller
             $lockedInvoice->update([
                 'status' => 'voided',
             ]);
+
+            $documentType = $lockedInvoice->type === 'invoice'
+                ? 'فاکتور'
+                : 'پیش‌فاکتور';
+
+            app(ActivityLogger::class)->log(
+                action: $lockedInvoice->type === 'invoice'
+                    ? 'invoice_voided'
+                    : 'proforma_voided',
+                description: $documentType
+                    . ' شماره «' . $lockedInvoice->document_number
+                    . '» باطل شد.',
+                subject: $lockedInvoice,
+                properties: [
+                    'document_number' => $lockedInvoice->document_number,
+                    'type' => $lockedInvoice->type,
+                    'previous_status' => 'valid',
+                    'new_status' => 'voided',
+                    'customer_id' => $lockedInvoice->customer_id,
+                ]
+            );
         }, 5);
 
         return redirect()
@@ -304,6 +343,24 @@ class InvoiceController extends Controller
                     'sort_order' => $note->sort_order,
                 ]);
             }
+
+            app(ActivityLogger::class)->log(
+                action: 'proforma_converted',
+                description: 'پیش‌فاکتور شماره «'
+                    . $source->document_number
+                    . '» به فاکتور شماره «'
+                    . $newInvoice->document_number
+                    . '» تبدیل شد.',
+                subject: $newInvoice,
+                properties: [
+                    'source_proforma_id' => $source->id,
+                    'source_document_number' => $source->document_number,
+                    'new_invoice_id' => $newInvoice->id,
+                    'new_document_number' => $newInvoice->document_number,
+                    'customer_id' => $source->customer_id,
+                    'is_formal' => (bool) $newInvoice->is_formal,
+                ]
+            );
 
             return $newInvoice;
         }, 5);

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Inquiry;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -60,7 +61,7 @@ class InquiryController extends Controller
             'message' => ['nullable', 'string', 'max:10000'],
         ]);
 
-        Inquiry::create([
+        $inquiry = Inquiry::create([
             'full_name' => trim($validated['fullName']),
             'phone' => trim($validated['phone']),
             'subject' => $validated['subject'],
@@ -68,6 +69,17 @@ class InquiryController extends Controller
                 ? trim($validated['message'])
                 : null,
         ]);
+
+        app(ActivityLogger::class)->log(
+            action: 'inquiry_received',
+            description: 'درخواست جدیدی از طریق وب‌سایت ثبت شد.',
+            subject: $inquiry,
+            properties: [
+                'inquiry_id' => $inquiry->id,
+                'subject' => $inquiry->subject,
+                'is_read' => $inquiry->is_read,
+            ]
+        );
 
         return redirect()
             ->to(url()->previous() . '#contact')
@@ -81,6 +93,17 @@ class InquiryController extends Controller
     {
         if (! $inquiry->is_read) {
             $inquiry->update(['is_read' => true]);
+
+            app(ActivityLogger::class)->log(
+                action: 'inquiry_marked_read',
+                description: 'درخواست ثبت‌شده به‌عنوان خوانده‌شده علامت‌گذاری شد.',
+                subject: $inquiry,
+                properties: [
+                    'inquiry_id' => $inquiry->id,
+                    'old_is_read' => false,
+                    'new_is_read' => true,
+                ]
+            );
         }
 
         return response()->json([

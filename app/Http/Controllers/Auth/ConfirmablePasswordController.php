@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,12 @@ class ConfirmablePasswordController extends Controller
         }
 
         $request->session()->put('auth.password_confirmed_at', time());
+
+        app(ActivityLogger::class)->log(
+            action: 'password_confirmed',
+            description: 'رمز عبور برای تأیید هویت مجدداً تأیید شد.',
+            actor: $request->user()
+        );
 
         return redirect()->intended(route('dashboard', absolute: false));
     }

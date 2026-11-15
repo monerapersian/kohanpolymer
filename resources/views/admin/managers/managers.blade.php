@@ -16,47 +16,8 @@
             'activity_logs' => 'گزارش فعالیت‌ها',
         ];
 
-        $managers = [
-            [
-                'id' => 1,
-                'name' => 'علی محمدی',
-                'email' => 'ali.mohammadi@example.com',
-                'image' => null,
-                'status' => 'active',
-                'permissions' => ['site_content', 'products', 'blog_posts', 'inquiries'],
-                'last_activity' => 'امروز، ساعت ۱۰:۳۰',
-            ],
-            [
-                'id' => 2,
-                'name' => 'محمد رضایی',
-                'email' => 'm.rezaei@example.com',
-                'image' => null,
-                'status' => 'active',
-                'permissions' => ['customers', 'invoices', 'financial_reports'],
-                'last_activity' => 'امروز، ساعت ۰۹:۱۵',
-            ],
-            [
-                'id' => 3,
-                'name' => 'سارا احمدی',
-                'email' => 's.ahmadi@example.com',
-                'image' => null,
-                'status' => 'active',
-                'permissions' => ['blog_posts', 'products', 'activity_logs'],
-                'last_activity' => 'دیروز، ساعت ۱۶:۴۵',
-            ],
-            [
-                'id' => 4,
-                'name' => 'رضا کریمی',
-                'email' => 'reza.karimi@example.com',
-                'image' => null,
-                'status' => 'inactive',
-                'permissions' => ['inquiries', 'customers'],
-                'last_activity' => '۳ روز پیش',
-            ],
-        ];
-
-        $totalManagers = count($managers);
-        $activeManagers = count(array_filter($managers, fn ($manager) => $manager['status'] === 'active'));
+        $totalManagers = $managers->count();
+        $activeManagers = $managers->where('status', 'active')->count();
         $totalPermissions = count($permissions);
     @endphp
 
@@ -69,7 +30,6 @@
         <div class="hero-ring hero-ring-one"></div>
         <div class="hero-ring hero-ring-two"></div>
         <div class="hero-grid"></div>
-        <!-- <div class="hero-shine"></div> -->
 
         <div class="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
             <div>
@@ -100,6 +60,24 @@
         </div>
     </div>
 
+    {{-- Flash Messages --}}
+    @if (session('success'))
+        <div class="rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+            <p class="kohan-bold mb-2">لطفاً خطاهای زیر را بررسی کنید:</p>
+            <ul class="list-inside list-disc space-y-1">
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
+
     {{-- Statistics --}}
     <section class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
 
@@ -125,7 +103,7 @@
                 <div>
                     <p class="text-xs text-[#827875]">مدیران فعال</p>
                     <p class="kohan-bold mt-3 text-3xl text-[#362727]">{{ $activeManagers }}</p>
-                    <p class="mt-2 text-[11px] text-[#9A8E89]">دارای وضعیت فعال</p>
+                    <p class="mt-2 text-[11px] text-[#9A8E89]">دارای حداقل یک دسترسی</p>
                 </div>
                 <div class="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#EAF3EC] text-[#477B55]">
                     <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
@@ -179,7 +157,7 @@
 
         <div id="managers-grid" class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
 
-            @foreach ($managers as $manager)
+            @forelse ($managers as $manager)
                 <article
                     class="manager-card group overflow-hidden rounded-2xl border border-[#E8E1DE] bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-[#BAADAD] hover:shadow-[0_14px_35px_rgba(54,39,39,0.08)]"
                     data-name="{{ $manager['name'] }}"
@@ -225,11 +203,13 @@
                         </div>
 
                         <div class="flex min-h-[66px] flex-wrap content-start gap-2">
-                            @foreach ($manager['permissions'] as $permission)
+                            @forelse ($manager['permissions'] as $permission)
                                 <span class="rounded-lg border border-[#E8E1DE] bg-[#FAF8F7] px-2.5 py-1.5 text-[10px] text-[#716966]">
-                                    {{ $permissions[$permission] }}
+                                    {{ $permissions[$permission] ?? $permission }}
                                 </span>
-                            @endforeach
+                            @empty
+                                <span class="text-[11px] text-[#A99D98]">هیچ دسترسی‌ای برای این مدیر ثبت نشده است.</span>
+                            @endforelse
                         </div>
 
                         <div class="mt-5 flex items-center justify-between border-t border-[#F0EBE8] pt-4">
@@ -239,7 +219,7 @@
                             </div>
 
                             <a
-                                href="#"
+                                href="{{ route('admin.managers.show', $manager['id']) }}"
                                 class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-[#F3E9E9] px-3 py-2 text-[11px] text-[#674040] transition-all hover:bg-[#674040] hover:text-white"
                             >
                                 <span>مشاهده پروفایل</span>
@@ -251,7 +231,19 @@
 
                     </div>
                 </article>
-            @endforeach
+            @empty
+                <div class="col-span-full rounded-2xl border border-dashed border-[#D8CBC7] bg-white px-5 py-12 text-center">
+                    <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#F3E9E9] text-[#8D6666]">
+                        <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="10" cy="7" r="4"/>
+                            <path d="M20 8v6M17 11h6"/>
+                        </svg>
+                    </div>
+                    <h3 class="kohan-bold mt-4 text-sm text-[#362727]">هنوز مدیری ثبت نشده است</h3>
+                    <p class="mt-2 text-xs text-[#9A8E89]">برای شروع، مدیر جدیدی به سیستم اضافه کنید.</p>
+                </div>
+            @endforelse
 
         </div>
 
@@ -301,7 +293,13 @@
             </button>
         </div>
 
-        <form id="manager-form" class="max-h-[calc(100vh-160px)] space-y-6 overflow-y-auto p-5 sm:p-6">
+        <form
+            id="manager-form"
+            method="POST"
+            action="{{ route('admin.managers.store') }}"
+            class="max-h-[calc(100vh-160px)] space-y-6 overflow-y-auto p-5 sm:p-6"
+        >
+            @csrf
 
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
 
@@ -311,6 +309,7 @@
                         type="text"
                         id="manager-name"
                         name="name"
+                        value="{{ old('name') }}"
                         required
                         placeholder="نام مدیر را وارد کنید"
                         class="w-full rounded-xl border border-[#E8E1DE] bg-white px-4 py-3 text-xs text-[#362727] outline-none transition-all placeholder:text-[#A99D98] focus:border-[#8D6666] focus:ring-4 focus:ring-[#8D6666]/10"
@@ -323,6 +322,7 @@
                         type="email"
                         id="manager-email"
                         name="email"
+                        value="{{ old('email') }}"
                         required
                         dir="ltr"
                         placeholder="manager@example.com"
@@ -330,7 +330,7 @@
                     >
                 </div>
 
-                <div class="sm:col-span-2">
+                <div>
                     <label for="manager-password" class="mb-2 block text-xs text-[#5F514D]">رمز عبور</label>
                     <input
                         type="password"
@@ -344,6 +344,20 @@
                     >
                 </div>
 
+                <div>
+                    <label for="manager-password-confirmation" class="mb-2 block text-xs text-[#5F514D]">تکرار رمز عبور</label>
+                    <input
+                        type="password"
+                        id="manager-password-confirmation"
+                        name="password_confirmation"
+                        required
+                        minlength="8"
+                        dir="ltr"
+                        placeholder="رمز عبور را دوباره وارد کنید"
+                        class="w-full rounded-xl border border-[#E8E1DE] bg-white px-4 py-3 text-left text-xs text-[#362727] outline-none transition-all placeholder:text-[#A99D98] focus:border-[#8D6666] focus:ring-4 focus:ring-[#8D6666]/10"
+                    >
+                </div>
+
             </div>
 
             <div class="border-t border-[#F0EBE8] pt-5">
@@ -351,7 +365,7 @@
                 <div class="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
                     <div>
                         <h3 class="kohan-bold text-sm text-[#362727]">تعیین سطح دسترسی</h3>
-                        <p class="mt-1 text-[11px] text-[#9A8E89]">بخش‌هایی را که مدیر مجاز به دسترسی است انتخاب کنید.</p>
+                        <p class="mt-1 text-[11px] text-[#9A8E89]">حداقل یک بخش را برای این مدیر انتخاب کنید.</p>
                     </div>
 
                     <span id="selected-permissions-count" class="rounded-lg bg-[#F3E9E9] px-3 py-1.5 text-[10px] text-[#674040]">
@@ -367,6 +381,7 @@
                                 type="checkbox"
                                 name="permissions[]"
                                 value="{{ $key }}"
+                                @checked(in_array($key, old('permissions', [])))
                                 class="manager-permission h-4 w-4 cursor-pointer accent-[#674040]"
                             >
                             <span class="text-xs text-[#5F514D]">{{ $label }}</span>
@@ -376,7 +391,7 @@
                 </div>
 
                 <div class="mt-3 flex items-center justify-between">
-                    <span class="text-[10px] text-[#9A8E89]">انتخاب دسترسی‌ها اختیاری است.</span>
+                    <span class="text-[10px] text-[#9A8E89]">انتخاب حداقل یک دسترسی الزامی است.</span>
                     <button type="button" id="clear-manager-permissions" class="cursor-pointer text-[10px] text-[#8D6666] transition-colors hover:text-[#362727]">
                         حذف همه انتخاب‌ها
                     </button>
@@ -416,7 +431,6 @@
         const openButton = document.getElementById('open-manager-modal');
         const closeButton = document.getElementById('close-manager-modal');
         const cancelButton = document.getElementById('cancel-manager-modal');
-        const form = document.getElementById('manager-form');
 
         const searchInput = document.getElementById('manager-search');
         const managerCards = Array.from(document.querySelectorAll('.manager-card'));
@@ -475,7 +489,7 @@
                 if (isVisible) visibleCount++;
             });
 
-            emptyState.classList.toggle('hidden', visibleCount !== 0);
+            emptyState?.classList.toggle('hidden', visibleCount !== 0);
         });
 
         const updatePermissionCount = () => {
@@ -496,11 +510,11 @@
             updatePermissionCount();
         });
 
-        form?.addEventListener('submit', (event) => {
-            event.preventDefault();
+        updatePermissionCount();
 
-            alert('قالب فرم آماده است؛ ثبت و ذخیره مدیر در مرحله اتصال به دیتابیس پیاده‌سازی می‌شود.');
-        });
+        @if ($errors->any())
+            openModal();
+        @endif
     })();
 </script>
 

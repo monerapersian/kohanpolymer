@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\BlogPost;
 use App\Models\Product;
 use App\Models\SiteContent;
+use App\Services\ActivityLogger;
 use App\Support\ImageConverter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -150,6 +151,34 @@ class SiteContentController extends Controller
 
         $content = SiteContent::first() ?? new SiteContent();
 
+        $trackedFields = [
+            'hero_slogan',
+            'industry_title',
+            'industry_text',
+            'difference_title',
+            'difference_text',
+            'about_title',
+            'about_text',
+            'activity_areas',
+            'phones',
+            'email',
+            'instagram',
+            'whatsapp',
+        ];
+
+        $oldValues = [];
+
+        foreach ($trackedFields as $field) {
+            $oldValues[$field] = $this->normalizeActivityValue(
+                $content->getAttribute($field)
+            );
+        }
+
+        $oldImageStates = [
+            'logo' => (bool) $content->logo,
+            'hero_image' => (bool) $content->hero_image,
+        ];
+
         foreach (['logo', 'hero_image'] as $imageField) {
             if (! $request->hasFile($imageField)) {
                 continue;
@@ -204,9 +233,70 @@ class SiteContentController extends Controller
         $content->fill($validated);
         $content->save();
 
+        $changes = [];
+
+        foreach ($trackedFields as $field) {
+            $oldValue = $oldValues[$field];
+
+            $newValue = $this->normalizeActivityValue(
+                $content->getAttribute($field)
+            );
+
+            if ($oldValue !== $newValue) {
+                $changes[$field] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+        }
+
+        foreach (['logo', 'hero_image'] as $imageField) {
+            $newImageState = (bool) $content->{$imageField};
+
+            if (
+                $oldImageStates[$imageField] !== $newImageState
+                || $request->hasFile($imageField)
+            ) {
+                $changes[$imageField] = [
+                    'old' => $oldImageStates[$imageField],
+                    'new' => $newImageState,
+                    'replaced' => $request->hasFile($imageField),
+                ];
+            }
+        }
+
+        if (! empty($changes)) {
+            app(ActivityLogger::class)->log(
+                action: 'site_content_updated',
+                description: 'محتوای اصلی سایت بروزرسانی شد.',
+                subject: $content,
+                properties: [
+                    'changes' => $changes,
+                ]
+            );
+        }
+
         return redirect()
             ->route('admin.site-content.edit')
             ->with('active_tab', 'main')
             ->with('success', 'محتوای اصلی سایت بروزرسانی شد.');
+    }
+
+    /**
+     * Normalize values before comparing and logging them.
+     */
+    private function normalizeActivityValue(mixed $value): mixed
+    {
+        if (! is_string($value)) {
+            return $value;
+        }
+
+        $decoded = json_decode($value, true);
+
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+
+        return $value;
     }
 }

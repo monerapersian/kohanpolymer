@@ -69,17 +69,18 @@
         </span>
     </a>
 
-    <!-- Settings: Not Available Yet -->
+    <!-- Settings -->
     <a
-        href="#"
-        aria-disabled="true"
-        title="بخش تنظیمات هنوز آماده نیست"
-        class="group flex min-w-0 flex-1 cursor-not-allowed flex-col items-center justify-center gap-1.5 rounded-2xl py-2 text-[#C3BAB6]"
+        href="{{ route('admin.settings.edit') }}"
+        @if (request()->routeIs('admin.settings.*')) aria-current="page" @endif
+        title="تنظیمات"
+        class="group flex min-w-0 flex-1 cursor-pointer flex-col items-center justify-center gap-1.5 rounded-2xl py-2 text-[#716966] transition-colors hover:bg-[#F3E9E9] hover:text-[#542b2e] {{ request()->routeIs('admin.settings.*') ? 'bg-[#F3E9E9] text-[#542b2e]' : '' }}"
     >
         <svg class="h-[22px] w-[22px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <circle cx="12" cy="12" r="3"/>
             <path d="m19.4 15 .1.1 1.4 1.1-1.5 2.6-1.7-.7a8 8 0 0 1-1.8 1l-.3 1.9h-3l-.3-1.9a8 8 0 0 1-1.8-1l-1.7.7-1.5-2.6 1.5-1.2a7 7 0 0 1 0-2l-1.5-1.2 1.5-2.6 1.7.7a8 8 0 0 1 1.8-1l.3-1.9h3l.3 1.9a8 8 0 0 1 1.8 1l1.7-.7 1.5 2.6-1.5 1.2a7 7 0 0 1 0 2Z"/>
         </svg>
+
         <span class="kohan-bold whitespace-nowrap text-[11px]">
             تنظیمات
         </span>

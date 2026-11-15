@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
+use App\Services\ActivityLogger;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -63,7 +64,18 @@ class CustomerController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
         ]);
 
-        Customer::create($validated);
+        $customer = Customer::create($validated);
+
+        app(ActivityLogger::class)->log(
+            action: 'customer_created',
+            description: 'مشتری جدید «' . $customer->name . '» ثبت شد.',
+            subject: $customer,
+            properties: [
+                'name' => $customer->name,
+                'type' => $customer->type,
+                'has_phone' => ! empty($customer->phone),
+            ]
+        );
 
         return redirect()
             ->route('admin.customers.index')
@@ -93,7 +105,45 @@ class CustomerController extends Controller
             'description' => ['nullable', 'string', 'max:5000'],
         ]);
 
+        $oldValues = [
+            'name' => $customer->name,
+            'type' => $customer->type,
+            'has_phone' => ! empty($customer->phone),
+        ];
+
         $customer->update($validated);
+
+        $changes = [];
+
+        foreach (['name', 'type'] as $field) {
+            $oldValue = $oldValues[$field];
+            $newValue = $customer->{$field};
+
+            if ($oldValue !== $newValue) {
+                $changes[$field] = [
+                    'old' => $oldValue,
+                    'new' => $newValue,
+                ];
+            }
+        }
+
+        $newHasPhone = ! empty($customer->phone);
+
+        if ($oldValues['has_phone'] !== $newHasPhone) {
+            $changes['phone'] = [
+                'old' => $oldValues['has_phone'],
+                'new' => $newHasPhone,
+            ];
+        }
+
+        app(ActivityLogger::class)->log(
+            action: 'customer_updated',
+            description: 'اطلاعات مشتری «' . $customer->name . '» ویرایش شد.',
+            subject: $customer,
+            properties: [
+                'changes' => $changes,
+            ]
+        );
 
         return redirect()
             ->route('admin.customers.show', $customer)
