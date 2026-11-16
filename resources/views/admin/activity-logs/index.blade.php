@@ -654,7 +654,7 @@
             {{-- Pagination --}}
             @if($activities->hasPages())
                 <div class="border-t border-[#EEE8E5] px-5 py-5 sm:px-6">
-                    {{ $activities->links() }}
+                    {{ $activities->links('vendor.pagination.kohan') }}
                 </div>
             @endif
 

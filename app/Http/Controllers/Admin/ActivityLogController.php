@@ -71,7 +71,7 @@ class ActivityLogController extends Controller
         $activities = $query
             ->latest('created_at')
             ->latest('id')
-            ->paginate(20)
+            ->paginate(10)
             ->withQueryString();
 
         // Get administrators who have activity records.
