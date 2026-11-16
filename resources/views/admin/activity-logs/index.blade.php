@@ -328,13 +328,13 @@
                         از تاریخ
                     </label>
 
-                    <input
-                        type="date"
-                        id="from"
+                    <x-admin.jalali-date-picker
                         name="from"
-                        value="{{ request('from') }}"
+                        id="from"
+                        :value="request('from')"
+                        placeholder="انتخاب تاریخ"
                         class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#5F514D] outline-none transition focus:border-[#8d6666] focus:bg-white"
-                    >
+                    />
                 </div>
 
                 <div>
@@ -342,14 +342,14 @@
                         تا تاریخ
                     </label>
 
-                    <input
-                        type="date"
-                        id="to"
+                    <x-admin.jalali-date-picker
                         name="to"
-                        value="{{ request('to') }}"
-                        min="{{ request('from') }}"
+                        id="to"
+                        :value="request('to')"
+                        :min="request('from')"
+                        placeholder="انتخاب تاریخ"
                         class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#5F514D] outline-none transition focus:border-[#8d6666] focus:bg-white"
-                    >
+                    />
                 </div>
 
             </div>
