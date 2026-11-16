@@ -159,13 +159,13 @@
                         معتبر تا تاریخ
                     </label>
 
-                    <input
-                        type="date"
-                        id="valid_until"
+                    <x-admin.jalali-date-picker
                         name="valid_until"
-                        value="{{ old('valid_until') }}"
+                        id="valid_until"
+                        :value="old('valid_until', now()->format('Y-m-d'))"
+                        placeholder="انتخاب تاریخ "
                         class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
-                    >
+                    />
 
                     <p class="mt-1 text-xs text-[#A99D98]">
                         فقط برای پیش‌فاکتور قابل استفاده است.

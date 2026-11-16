@@ -1025,7 +1025,7 @@
     {{-- Document Operations --}}
     <div class="flex flex-wrap gap-3">
 
-        @if($invoice->type === 'proforma'
+        <!-- @if($invoice->type === 'proforma'
             && $invoice->status !== 'voided'
             && !$invoice->isExpired()
             && $invoice->convertedTo->isEmpty())
@@ -1045,7 +1045,7 @@
                 </button>
             </form>
 
-        @endif
+        @endif -->
 
         @if($invoice->status !== 'voided')
 
@@ -1191,7 +1191,7 @@
             @if($invoice->is_formal)
                 <div class="print-document-number kohan-bold">
                     شماره {{ $invoice->type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور' }}:
-                    {{ $formatDigits($invoice->document_number) }}
+                    <span dir="ltr">{{ $formatDigits($invoice->document_number) }}</span>
                 </div>
             @endif
         </div>

@@ -12,12 +12,12 @@ class DocumentNumberService
     {
         $config = match ($type) {
             'invoice' => [
+                'initial' => 1,
                 'prefix' => '',
-                'initial' => 600001,
             ],
             'proforma' => [
-                'prefix' => 'P',
-                'initial' => 400001,
+                'initial' => 1001,
+                'prefix' => 'PF-',
             ],
             default => throw new InvalidArgumentException(
                 'Unsupported document type.'
@@ -52,7 +52,15 @@ class DocumentNumberService
                     'updated_at' => now(),
                 ]);
 
-            return $config['prefix'] . $number;
+            if ($type === 'proforma') {
+                return $config['prefix'] . $number;
+            }
+
+            $group = intdiv($number - 1, 99);
+            $sequenceNumber = (($number - 1) % 99) + 1;
+            $yearNumber = 2000 + $group;
+
+            return $yearNumber . '-' . $sequenceNumber;
         }, 5);
     }
 }
