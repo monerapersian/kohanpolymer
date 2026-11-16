@@ -60,13 +60,20 @@ class FinancialReportController extends Controller
 
         $sales = $officialSales + $unofficialSales;
 
-        $manualIncome = (float) ManualIncome::query()
+        $manualIncomes = ManualIncome::query()
             ->whereBetween('transaction_date', [$startDate, $endDate])
-            ->sum('amount');
+            ->latest('transaction_date')
+            ->latest('id')
+            ->get();
 
-        $expenses = (float) Expense::query()
+        $expenseRecords = Expense::query()
             ->whereBetween('transaction_date', [$startDate, $endDate])
-            ->sum('amount');
+            ->latest('transaction_date')
+            ->latest('id')
+            ->get();
+
+        $manualIncome = (float) $manualIncomes->sum('amount');
+        $expenses = (float) $expenseRecords->sum('amount');
 
         $financialStats = [
             'sales' => $sales,
@@ -97,7 +104,9 @@ class FinancialReportController extends Controller
             'chartData',
             'startDate',
             'endDate',
-            'includeUnofficial'
+            'includeUnofficial',
+            'manualIncomes',
+            'expenseRecords'
         ));
     }
 
@@ -271,6 +280,11 @@ class FinancialReportController extends Controller
         };
     }
 
+    private function dateExpression(string $column): string
+    {
+        return 'DATE(' . $column . ')';
+    }
+
     private function monthExpression(string $column): string
     {
         $driver = DB::connection()->getDriverName();
@@ -287,8 +301,10 @@ class FinancialReportController extends Controller
         string $endDate,
         bool $includeUnofficial
     ): array {
-        $start = Carbon::parse($startDate)->startOfMonth();
-        $end = Carbon::parse($endDate)->startOfMonth();
+        $start = Carbon::parse($startDate)->startOfDay();
+        $end = Carbon::parse($endDate)->startOfDay();
+
+        $isDaily = $start->diffInDays($end) + 1 < 100;
 
         $labels = [];
         $official = [];
@@ -296,66 +312,78 @@ class FinancialReportController extends Controller
         $manualIncome = [];
         $expenses = [];
 
-        $incomesByMonth = ManualIncome::query()
+        $expression = $isDaily
+            ? fn (string $column) => $this->dateExpression($column)
+            : fn (string $column) => $this->monthExpression($column);
+
+        $incomesByPeriod = ManualIncome::query()
             ->selectRaw(
-                $this->monthExpression('transaction_date') . ' as month, SUM(amount) as total'
+                $expression('transaction_date') . ' as period, SUM(amount) as total'
             )
             ->whereBetween('transaction_date', [$startDate, $endDate])
-            ->groupBy('month')
-            ->pluck('total', 'month');
+            ->groupBy('period')
+            ->pluck('total', 'period');
 
-        $expensesByMonth = Expense::query()
+        $expensesByPeriod = Expense::query()
             ->selectRaw(
-                $this->monthExpression('transaction_date') . ' as month, SUM(amount) as total'
+                $expression('transaction_date') . ' as period, SUM(amount) as total'
             )
             ->whereBetween('transaction_date', [$startDate, $endDate])
-            ->groupBy('month')
-            ->pluck('total', 'month');
+            ->groupBy('period')
+            ->pluck('total', 'period');
 
-        $officialByMonth = Invoice::query()
+        $officialByPeriod = Invoice::query()
             ->join('invoice_items', 'invoices.id', '=', 'invoice_items.invoice_id')
             ->selectRaw(
-                $this->monthExpression('invoices.issue_date') . ' as month, SUM(invoice_items.grand_total) as total'
+                $expression('invoices.issue_date') . ' as period, SUM(invoice_items.grand_total) as total'
             )
             ->where('invoices.type', 'invoice')
             ->where('invoices.status', 'valid')
             ->where('invoices.is_formal', true)
             ->whereBetween('invoices.issue_date', [$startDate, $endDate])
-            ->groupBy('month')
-            ->pluck('total', 'month');
+            ->groupBy('period')
+            ->pluck('total', 'period');
 
-        $unofficialByMonth = collect();
+        $unofficialByPeriod = collect();
 
         if ($includeUnofficial) {
-            $unofficialByMonth = Invoice::query()
+            $unofficialByPeriod = Invoice::query()
                 ->join('invoice_items', 'invoices.id', '=', 'invoice_items.invoice_id')
                 ->selectRaw(
-                    $this->monthExpression('invoices.issue_date') . ' as month, SUM(invoice_items.grand_total) as total'
+                    $expression('invoices.issue_date') . ' as period, SUM(invoice_items.grand_total) as total'
                 )
                 ->where('invoices.type', 'invoice')
                 ->where('invoices.status', 'valid')
                 ->where('invoices.is_formal', false)
                 ->whereBetween('invoices.issue_date', [$startDate, $endDate])
-                ->groupBy('month')
-                ->pluck('total', 'month');
+                ->groupBy('period')
+                ->pluck('total', 'period');
         }
 
-        for ($date = $start->copy(); $date->lte($end); $date->addMonth()) {
-            $month = $date->format('Y-m');
+        $format = $isDaily ? 'Y-m-d' : 'Y-m';
+
+        for ($date = $start->copy(); $date->lte($end);) {
+            $period = $date->format($format);
 
             $labels[] = \App\Support\DateHelper::toPersian(
-                $date->copy()->startOfMonth(),
-                'Y/m'
+                $date,
+                $isDaily ? 'Y/m/d' : 'Y/m'
             );
 
-            $official[] = (float) ($officialByMonth[$month] ?? 0);
+            $official[] = (float) ($officialByPeriod[$period] ?? 0);
 
             $unofficial[] = $includeUnofficial
-                ? (float) ($unofficialByMonth[$month] ?? 0)
+                ? (float) ($unofficialByPeriod[$period] ?? 0)
                 : 0;
 
-            $manualIncome[] = (float) ($incomesByMonth[$month] ?? 0);
-            $expenses[] = (float) ($expensesByMonth[$month] ?? 0);
+            $manualIncome[] = (float) ($incomesByPeriod[$period] ?? 0);
+            $expenses[] = (float) ($expensesByPeriod[$period] ?? 0);
+
+            if ($isDaily) {
+                $date->addDay();
+            } else {
+                $date->addMonth();
+            }
         }
 
         return [
@@ -364,6 +392,7 @@ class FinancialReportController extends Controller
             'unofficial' => $unofficial,
             'manual_income' => $manualIncome,
             'expenses' => $expenses,
+            'interval' => $isDaily ? 'daily' : 'monthly',
         ];
     }
 }

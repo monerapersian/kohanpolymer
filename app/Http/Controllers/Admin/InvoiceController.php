@@ -36,7 +36,7 @@ class InvoiceController extends Controller
                 fn ($query) => $query->where('type', $request->input('type'))
             )
             ->latest('id')
-            ->paginate(15)
+            ->paginate(10)
             ->withQueryString();
 
         return view('admin.invoices.index', compact('invoices'));

@@ -377,27 +377,27 @@
                         </button>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
+                    <div id="financial-chart-legend" class="flex flex-wrap items-center gap-x-5 gap-y-3">
 
-                        <div class="flex items-center gap-2">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#674040]"></span>
+                        <button type="button" data-series-index="0" aria-pressed="true" class="financial-legend-item inline-flex cursor-pointer items-center gap-2 transition">
+                            <span class="h-2.5 w-2.5 rounded-full bg-green-600"></span>
                             <span class="text-xs text-[#827875]">فاکتور رسمی</span>
-                        </div>
+                        </button>
 
-                        <div class="flex items-center gap-2">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#8d6666]"></span>
+                        <button type="button" data-series-index="1" aria-pressed="true" class="financial-legend-item inline-flex cursor-pointer items-center gap-2 transition">
+                            <span class="h-2.5 w-2.5 rounded-full bg-yellow-500"></span>
                             <span class="text-xs text-[#827875]">فاکتور غیررسمی</span>
-                        </div>
+                        </button>
 
-                        <div class="flex items-center gap-2">
-                            <span class="h-2.5 w-2.5 rounded-full bg-[#baadad]"></span>
+                        <button type="button" data-series-index="2" aria-pressed="true" class="financial-legend-item inline-flex cursor-pointer items-center gap-2 transition">
+                            <span class="h-2.5 w-2.5 rounded-full bg-blue-600"></span>
                             <span class="text-xs text-[#827875]">درآمد جانبی</span>
-                        </div>
+                        </button>
 
-                        <div class="flex items-center gap-2">
-                            <span class="h-2.5 w-2.5 rounded-full bg-red-500"></span>
+                        <button type="button" data-series-index="3" aria-pressed="true" class="financial-legend-item inline-flex cursor-pointer items-center gap-2 transition">
+                            <span class="h-2.5 w-2.5 rounded-full bg-red-600"></span>
                             <span class="text-xs text-[#827875]">هزینه‌ها</span>
-                        </div>
+                        </button>
 
                     </div>
 
@@ -418,6 +418,79 @@
                     </div>
                 </div>
 
+            </div>
+
+        </section>
+
+        {{-- Manual Income and Expense Records --}}
+        <section class="grid grid-cols-1 gap-5 xl:grid-cols-2">
+
+            {{-- Manual Incomes --}}
+            <div class="overflow-hidden rounded-2xl border border-[#E8E1DE] bg-white shadow-sm">
+                <div class="flex items-center justify-between border-b border-[#F0EBE8] px-5 py-4">
+                    <div>
+                        <h2 class="text-sm kohan-bold text-[#362727]">درآمدهای جانبی ثبت‌شده</h2>
+                        <p class="mt-1 text-xs text-[#9A8E89]">{{ $manualIncomes->count() }} رکورد در بازه انتخاب‌شده</p>
+                    </div>
+                    <span class="rounded-lg bg-blue-50 px-3 py-2 text-xs text-blue-700">درآمد</span>
+                </div>
+
+                <div class="divide-y divide-[#F0EBE8]">
+                    @forelse($manualIncomes as $incomeRecord)
+                        <div class="flex items-start justify-between gap-4 px-5 py-4">
+                            <div class="min-w-0">
+                                <p class="truncate text-sm text-[#362727]">{{ $incomeRecord->title }}</p>
+                                <p class="mt-1 text-xs text-[#9A8E89]">
+                                    {{ \App\Support\DateHelper::toPersian($incomeRecord->transaction_date, 'Y/m/d') }}
+                                </p>
+                                @if($incomeRecord->description)
+                                    <p class="mt-2 line-clamp-2 text-xs leading-6 text-[#827875]">{{ $incomeRecord->description }}</p>
+                                @endif
+                            </div>
+                            <p class="shrink-0 whitespace-nowrap text-sm kohan-bold text-blue-700" dir="rtl">
+                                {{ $formatMoney($incomeRecord->amount) }} <span class="text-[10px] font-normal">ریال</span>
+                            </p>
+                        </div>
+                    @empty
+                        <div class="px-5 py-10 text-center text-xs text-[#9A8E89]">
+                            در این بازه درآمد جانبی ثبت نشده است.
+                        </div>
+                    @endforelse
+                </div>
+            </div>
+
+            {{-- Expenses --}}
+            <div class="overflow-hidden rounded-2xl border border-[#E8E1DE] bg-white shadow-sm">
+                <div class="flex items-center justify-between border-b border-[#F0EBE8] px-5 py-4">
+                    <div>
+                        <h2 class="text-sm kohan-bold text-[#362727]">هزینه‌های ثبت‌شده</h2>
+                        <p class="mt-1 text-xs text-[#9A8E89]">{{ $expenseRecords->count() }} رکورد در بازه انتخاب‌شده</p>
+                    </div>
+                    <span class="rounded-lg bg-red-50 px-3 py-2 text-xs text-red-700">هزینه</span>
+                </div>
+
+                <div class="divide-y divide-[#F0EBE8]">
+                    @forelse($expenseRecords as $expenseRecord)
+                        <div class="flex items-start justify-between gap-4 px-5 py-4">
+                            <div class="min-w-0">
+                                <p class="truncate text-sm text-[#362727]">{{ $expenseRecord->title }}</p>
+                                <p class="mt-1 text-xs text-[#9A8E89]">
+                                    {{ \App\Support\DateHelper::toPersian($expenseRecord->transaction_date, 'Y/m/d') }}
+                                </p>
+                                @if($expenseRecord->description)
+                                    <p class="mt-2 line-clamp-2 text-xs leading-6 text-[#827875]">{{ $expenseRecord->description }}</p>
+                                @endif
+                            </div>
+                            <p class="shrink-0 whitespace-nowrap text-sm kohan-bold text-red-600" dir="rtl">
+                                {{ $formatMoney($expenseRecord->amount) }} <span class="text-[10px] font-normal">ریال</span>
+                            </p>
+                        </div>
+                    @empty
+                        <div class="px-5 py-10 text-center text-xs text-[#9A8E89]">
+                            در این بازه هزینه‌ای ثبت نشده است.
+                        </div>
+                    @endforelse
+                </div>
             </div>
 
         </section>
@@ -757,43 +830,107 @@
         const manualIncomeData = @json($chartManualIncome);
         const expensesData = @json($chartExpenses);
 
+        const seriesColors = ['#16A34A', '#EAB308', '#2563EB', '#DC2626'];
+        const seriesLabels = [
+            'فاکتور رسمی',
+            'فاکتور غیررسمی',
+            'درآمد جانبی',
+            'هزینه‌ها'
+        ];
+
         const lineDatasets = [
             {
-                label: 'فاکتور رسمی',
+                label: seriesLabels[0],
                 data: officialData,
-                borderColor: '#674040',
-                backgroundColor: '#674040',
-                tension: 0.45,
+                borderColor: seriesColors[0],
+                backgroundColor: seriesColors[0],
+                pointBackgroundColor: seriesColors[0],
+                pointBorderColor: seriesColors[0],
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                tension: 0.35,
                 borderWidth: 3,
             },
             {
-                label: 'فاکتور غیررسمی',
+                label: seriesLabels[1],
                 data: unofficialData,
-                borderColor: '#8d6666',
-                backgroundColor: '#8d6666',
-                tension: 0.45,
+                borderColor: seriesColors[1],
+                backgroundColor: seriesColors[1],
+                pointBackgroundColor: seriesColors[1],
+                pointBorderColor: seriesColors[1],
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                tension: 0.35,
                 borderWidth: 3,
             },
             {
-                label: 'درآمد جانبی',
+                label: seriesLabels[2],
                 data: manualIncomeData,
-                borderColor: '#baadad',
-                backgroundColor: '#baadad',
-                tension: 0.45,
+                borderColor: seriesColors[2],
+                backgroundColor: seriesColors[2],
+                pointBackgroundColor: seriesColors[2],
+                pointBorderColor: seriesColors[2],
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                tension: 0.35,
                 borderWidth: 3,
             },
             {
-                label: 'هزینه‌ها',
+                label: seriesLabels[3],
                 data: expensesData,
-                borderColor: '#dc5656',
-                backgroundColor: '#dc5656',
-                tension: 0.45,
+                borderColor: seriesColors[3],
+                backgroundColor: seriesColors[3],
+                pointBackgroundColor: seriesColors[3],
+                pointBorderColor: seriesColors[3],
+                pointRadius: 2,
+                pointHoverRadius: 5,
+                tension: 0.35,
                 borderWidth: 3,
             }
         ];
 
         let lineChart = null;
         let doughnutChart = null;
+        const visibleSeries = [true, true, true, true];
+
+        const updateLegendState = () => {
+            document.querySelectorAll('#financial-chart-legend [data-series-index]').forEach(button => {
+                const index = Number(button.dataset.seriesIndex);
+                const isVisible = visibleSeries[index];
+
+                button.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+                button.classList.toggle('opacity-40', !isVisible);
+                button.classList.toggle('grayscale', !isVisible);
+                button.classList.toggle('line-through', !isVisible);
+            });
+        };
+
+        const toggleSeries = (index) => {
+            visibleSeries[index] = !visibleSeries[index];
+
+            if (lineChart) {
+                lineChart.setDatasetVisibility(index, visibleSeries[index]);
+                lineChart.update();
+            }
+
+            if (doughnutChart) {
+                const currentlyVisible = doughnutChart.getDataVisibility(index);
+
+                if (currentlyVisible !== visibleSeries[index]) {
+                    doughnutChart.toggleDataVisibility(index);
+                }
+
+                doughnutChart.update();
+            }
+
+            updateLegendState();
+        };
+
+        document.querySelectorAll('#financial-chart-legend [data-series-index]').forEach(button => {
+            button.addEventListener('click', () => {
+                toggleSeries(Number(button.dataset.seriesIndex));
+            });
+        });
 
         const createCharts = () => {
             if (typeof Chart === 'undefined') return;
@@ -825,20 +962,10 @@
                 doughnutChart = new Chart(canvas, {
                     type: 'doughnut',
                     data: {
-                        labels: [
-                            'فاکتور رسمی',
-                            'فاکتور غیررسمی',
-                            'درآمد جانبی',
-                            'هزینه‌ها'
-                        ],
+                        labels: seriesLabels,
                         datasets: [{
                             data: totals,
-                            backgroundColor: [
-                                '#674040',
-                                '#8d6666',
-                                '#baadad',
-                                '#dc5656'
-                            ],
+                            backgroundColor: seriesColors,
                             borderWidth: 0,
                             hoverOffset: 8
                         }]
@@ -849,19 +976,25 @@
                         cutout: '68%',
                         plugins: {
                             legend: {
-                                display: true,
-                                position: 'bottom',
+                                display: false
+                            },
+                            tooltip: {
                                 rtl: true,
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 18,
-                                    font: {
-                                        family: 'sans-serif',
-                                        size: 11
+                                callbacks: {
+                                    label: (context) => {
+                                        return context.label + ': ' +
+                                            new Intl.NumberFormat('fa-IR').format(context.raw) +
+                                            ' ریال';
                                     }
                                 }
                             }
                         }
+                    }
+                });
+
+                visibleSeries.forEach((isVisible, index) => {
+                    if (!isVisible && doughnutChart.getDataVisibility(index)) {
+                        doughnutChart.toggleDataVisibility(index);
                     }
                 });
 
@@ -904,8 +1037,11 @@
                                     display: false
                                 },
                                 ticks: {
+                                    autoSkip: false,
+                                    maxRotation: 60,
+                                    minRotation: 45,
                                     font: {
-                                        size: 11
+                                        size: 9
                                     }
                                 }
                             },
@@ -926,7 +1062,13 @@
                         }
                     }
                 });
+
+                visibleSeries.forEach((isVisible, index) => {
+                    lineChart.setDatasetVisibility(index, isVisible);
+                });
             }
+
+            updateLegendState();
         };
 
         createCharts();

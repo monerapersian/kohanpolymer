@@ -188,7 +188,7 @@
         {{-- Pagination --}}
         @if ($invoices->hasPages())
             <div class="border-t border-[#EEE8E5] px-5 py-4">
-                {{ $invoices->links() }}
+                {{ $invoices->links('vendor.pagination.kohan') }}
             </div>
         @endif
 
