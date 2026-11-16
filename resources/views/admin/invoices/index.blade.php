@@ -133,7 +133,7 @@
 
                             {{-- Issue Date --}}
                             <td class="px-5 py-4">
-                                {{ $invoice->issue_date?->format('Y/m/d') }}
+                                {{ $invoice->issue_date ? \App\Support\NumberHelper::toPersian(\App\Support\DateHelper::toPersian($invoice->issue_date, 'Y/m/d')) : '—' }}
                             </td>
 
                             {{-- Status --}}

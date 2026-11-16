@@ -143,15 +143,15 @@
                         تاریخ صدور
                     </label>
 
-                    <input
-                        type="date"
-                        id="issue_date"
+                    <x-admin.jalali-date-picker
                         name="issue_date"
-                        value="{{ old('issue_date', now()->format('Y-m-d')) }}"
-                        required
+                        id="issue_date"
+                        :value="old('issue_date', now()->format('Y-m-d'))"
+                        placeholder="انتخاب تاریخ صدور"
                         class="w-full rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] px-4 py-3 text-sm text-[#362727] outline-none transition focus:border-[#8d6666]"
-                    >
+                    />
                 </div>
+
 
                 {{-- Valid Until --}}
                 <div id="valid-until-wrapper">

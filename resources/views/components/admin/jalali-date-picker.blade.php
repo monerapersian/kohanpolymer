@@ -13,7 +13,9 @@
     $targetId = $fieldId . '-gregorian';
 
     $jalaliValue = $value
-        ? \App\Support\DateHelper::toPersian($value, 'Y/m/d')
+        ? \App\Support\NumberHelper::toPersian(
+            \App\Support\DateHelper::toPersian($value, 'Y/m/d')
+        )
         : '';
 @endphp
 

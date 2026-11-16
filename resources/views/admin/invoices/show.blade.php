@@ -615,6 +615,11 @@
             break-inside: avoid;
             page-break-inside: avoid;
         }
+        #invoice-print-sheet .print-overview.print-overview-informal {
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 14px;
+        }
     }
 </style>
 
@@ -702,15 +707,16 @@
             خروجی اکسل
         </a>
 
-        <a
-            href="{{ $verificationUrl }}"
-            target="_blank"
-            rel="noopener noreferrer"
-            class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#baadad] bg-white px-5 py-3 text-sm text-[#674040] transition hover:border-[#674040] hover:bg-[#F4F0EE]"
-        >
-            مشاهده صفحه تأیید سند
-        </a>
-
+        @if($invoice->is_formal)
+            <a
+                href="{{ $verificationUrl }}"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#baadad] bg-white px-5 py-3 text-sm text-[#674040] transition hover:border-[#674040] hover:bg-[#F4F0EE]"
+            >
+                مشاهده صفحه تأیید سند
+            </a>
+        @endif
     </div>
 
 
@@ -969,49 +975,51 @@
 
 
     {{-- QR Verification --}}
-    <section class="rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-sm sm:p-6">
+    @if($invoice->is_formal)
+        <section class="rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-sm sm:p-6">
 
-        <h2 class="mb-5 text-lg text-[#362727] kohan-bold">
-            تأیید اصالت سند با QR
-        </h2>
+            <h2 class="mb-5 text-lg text-[#362727] kohan-bold">
+                تأیید اصالت سند با QR
+            </h2>
 
-        <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
+            <div class="flex flex-col items-start gap-5 sm:flex-row sm:items-center">
 
-            @if(!empty($qrCodeDataUri))
-                <img
-                    src="{{ $qrCodeDataUri }}"
-                    alt="QR تأیید سند"
-                    class="h-40 w-40 rounded-xl border border-[#E8E1DE] bg-white p-2"
-                >
-            @else
-                <div class="flex h-40 w-40 items-center justify-center rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 text-center text-sm text-[#9A8E89]">
-                    کد QR تولید نشده است
+                @if(!empty($qrCodeDataUri))
+                    <img
+                        src="{{ $qrCodeDataUri }}"
+                        alt="QR تأیید سند"
+                        class="h-40 w-40 rounded-xl border border-[#E8E1DE] bg-white p-2"
+                    >
+                @else
+                    <div class="flex h-40 w-40 items-center justify-center rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 text-center text-sm text-[#9A8E89]">
+                        کد QR تولید نشده است
+                    </div>
+                @endif
+
+                <div class="min-w-0 space-y-3">
+
+                    <p class="text-sm text-[#362727] kohan-bold">
+                        وضعیت فعلی: {{ $statusText }}
+                    </p>
+
+                    <p class="text-sm leading-7 text-[#827875]">
+                        با اسکن این کد، صفحه عمومی بررسی اعتبار همین سند باز می‌شود.
+                    </p>
+
+                    <a
+                        href="{{ $verificationUrl }}"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        class="block cursor-pointer break-all text-sm text-[#674040] transition hover:text-[#362727] hover:underline"
+                    >
+                        {{ $verificationUrl }}
+                    </a>
+
                 </div>
-            @endif
-
-            <div class="min-w-0 space-y-3">
-
-                <p class="text-sm text-[#362727] kohan-bold">
-                    وضعیت فعلی: {{ $statusText }}
-                </p>
-
-                <p class="text-sm leading-7 text-[#827875]">
-                    با اسکن این کد، صفحه عمومی بررسی اعتبار همین سند باز می‌شود.
-                </p>
-
-                <a
-                    href="{{ $verificationUrl }}"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="block cursor-pointer break-all text-sm text-[#674040] transition hover:text-[#362727] hover:underline"
-                >
-                    {{ $verificationUrl }}
-                </a>
-
             </div>
-        </div>
 
-    </section>
+        </section>
+    @endif
 
 
     {{-- Document Operations --}}
@@ -1079,14 +1087,18 @@
         }
 
         if ($printNotes->isEmpty()) {
-            $printNotes = collect([
-                'این سند بر اساس اطلاعات ثبت‌شده در سامانه کهن پلیمر البرز صادر شده است.',
-                'برای بررسی اصالت سند، کد QR را اسکن کنید.',
-            ]);
+            $printNotes = $invoice->is_formal
+                ? collect([
+                    'این سند بر اساس اطلاعات ثبت‌شده در سامانه کهن پلیمر البرز صادر شده است.',
+                    'برای بررسی اصالت سند، کد QR را اسکن کنید.',
+                ])
+                : collect([
+                    'این سند بر اساس اطلاعات ثبت‌شده صادر شده است.',
+                ]);
         }
     @endphp
 
-    <header class="print-header">
+    <!-- <header class="print-header">
         <div class="print-brand">
             @if($logoUrl)
                 <img src="{{ $logoUrl }}"
@@ -1120,27 +1132,68 @@
                 <span>{{ $printWebsite }}</span>
             </div>
         </div>
-    </header>
+    </header> -->
+    @if($invoice->is_formal)
+        <header class="print-header">
+            <div class="print-brand">
+                @if($logoUrl)
+                    <img src="{{ $logoUrl }}"
+                         alt="لوگوی کهن پلیمر البرز"
+                         class="print-logo">
+                @endif
 
-    <section class="print-overview">
-        <div class="print-qr-card">
-            @if(!empty($qrCodeDataUri))
-                <img src="{{ $qrCodeDataUri }}" alt="QR اعتبارسنجی فاکتور">
-            @endif
-
-            <div class="print-qr-copy kohan-bold">
-                <strong>کد اعتبارسنجی سند</strong>
-                <div>برای بررسی اصالت سند، کد QR را اسکن کنید.</div>
+                <div>
+                    <div class="print-brand-name kohan-bold">کهن پلیمر البرز</div>
+                    <div class="print-subtitle">KOHAN POLYMER ALBORZ</div>
+                </div>
             </div>
-        </div>
+
+            <div class="print-company-info" style="direction: ltr;">
+                @if($printPhone)
+                    <div class="print-company-line kohan-bold">
+                        <span class="print-company-icon">☎</span>
+                        <span>{{ $formatDigits($printPhone) }}</span>
+                    </div>
+                @endif
+
+                @if($printEmail)
+                    <div class="print-company-line kohan-bold">
+                        <span class="print-company-icon">✉</span>
+                        <span>{{ $printEmail }}</span>
+                    </div>
+                @endif
+
+                <div class="print-company-line kohan-bold">
+                    <span class="print-company-icon">◎</span>
+                    <span>{{ $printWebsite }}</span>
+                </div>
+            </div>
+        </header>
+    @endif
+
+    <!-- <section class="print-overview"> -->
+    <section class="print-overview {{ !$invoice->is_formal ? 'print-overview-informal' : '' }}">
+        @if($invoice->is_formal)
+            <div class="print-qr-card">
+                @if(!empty($qrCodeDataUri))
+                    <img src="{{ $qrCodeDataUri }}" alt="QR اعتبارسنجی فاکتور">
+                @endif
+
+                <div class="print-qr-copy kohan-bold">
+                    <strong>کد اعتبارسنجی سند</strong>
+                    <div>برای بررسی اصالت سند، کد QR را اسکن کنید.</div>
+                </div>
+            </div>
+        @endif
 
         <div class="print-main-title">
             <h1 class="print-document-heading kohan-bold">{{ $documentType }}</h1>
-
-            <div class="print-document-number kohan-bold">
-                شماره {{ $invoice->type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور' }}:
-                {{ $formatDigits($invoice->document_number) }}
-            </div>
+            @if($invoice->is_formal)
+                <div class="print-document-number kohan-bold">
+                    شماره {{ $invoice->type === 'invoice' ? 'فاکتور' : 'پیش‌فاکتور' }}:
+                    {{ $formatDigits($invoice->document_number) }}
+                </div>
+            @endif
         </div>
 
         <div class="print-document-meta">
@@ -1160,14 +1213,16 @@
                 </div>
             @endif
 
-            <div class="print-meta-row kohan-bold">
-                <strong>وضعیت:</strong>
-                <span class="print-meta-value">
-                    <span class="print-status {{ $isVoided || $isExpired ? 'is-invalid' : '' }}">
-                        {{ $statusText }}
+            @if($invoice->is_formal)
+                <div class="print-meta-row kohan-bold">
+                    <strong>وضعیت:</strong>
+                    <span class="print-meta-value">
+                        <span class="print-status {{ $isVoided || $isExpired ? 'is-invalid' : '' }}">
+                            {{ $statusText }}
+                        </span>
                     </span>
-                </span>
-            </div>
+                </div>
+            @endif
 
             <div class="print-meta-row kohan-bold">
                 <strong>نوع پرداخت:</strong>
@@ -1214,12 +1269,14 @@
             </div>
 
             <div class="print-card-body kohan-bold">
-                <div class="print-info-row">
-                    <span class="print-info-label">شماره سند:</span>
-                    <span class="print-info-value">
-                        {{ $formatDigits($invoice->document_number) }}
-                    </span>
-                </div>
+                @if($invoice->is_formal)
+                    <div class="print-info-row">
+                        <span class="print-info-label">شماره سند:</span>
+                        <span class="print-info-value">
+                            {{ $formatDigits($invoice->document_number) }}
+                        </span>
+                    </div>
+                @endif
 
                 <div class="print-info-row">
                     <span class="print-info-label">تاریخ صدور:</span>
@@ -1358,7 +1415,7 @@
         </div>
     </section>
 
-    <footer class="print-footer print-page-break kohan-bold">
+    <!-- <footer class="print-footer print-page-break kohan-bold">
         <div class="print-footer-brand">
             <div>کهن پلیمر البرز</div>
             <div class="print-subtitle">تامین کننده مواد اولیه و محصولات پلیمری</div>
@@ -1386,12 +1443,49 @@
 
             <strong>اسکن برای بررسی اصالت</strong>
         </div>
-    </footer>
+    </footer> -->
+    @if($invoice->is_formal)
+        <footer class="print-footer print-page-break kohan-bold">
+            <div class="print-footer-brand">
+                <div>کهن پلیمر البرز</div>
+                <div class="print-subtitle">تامین کننده مواد اولیه و محصولات پلیمری</div>
+            </div>
 
-    <div class="print-bottom-bar kohan-bold">
+            <div class="print-verification-badge">
+                <span class="print-shield">✓</span>
+                <div>
+                    <strong>
+                        @if($isVoided)
+                            این سند باطل شده است
+                        @elseif($isExpired)
+                            اعتبار این سند به پایان رسیده است
+                        @else
+                            وضعیت سند: معتبر
+                        @endif
+                    </strong>
+                </div>
+            </div>
+
+            <div class="print-footer-qr kohan-bold">
+                @if(!empty($qrCodeDataUri))
+                    <img src="{{ $qrCodeDataUri }}" alt="QR بررسی اصالت">
+                @endif
+
+                <strong>اسکن برای بررسی اصالت</strong>
+            </div>
+        </footer>
+
+        <div class="print-bottom-bar kohan-bold">
+            کهن پلیمر البرز
+            &nbsp; | &nbsp;
+            کیفیت امروز، اعتماد فردا
+        </div>
+    @endif
+
+    <!-- <div class="print-bottom-bar kohan-bold">
         کهن پلیمر البرز
         &nbsp; | &nbsp;
         کیفیت امروز، اعتماد فردا
-    </div>
+    </div> -->
 </div>
 @endsection
