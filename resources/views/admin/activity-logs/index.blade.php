@@ -530,7 +530,7 @@
                                     </p>
 
                                     <p class="mt-1 text-[11px] text-[#A99D98]" dir="ltr">
-                                        {{ \App\Support\NumberHelper::toPersian($activity->created_at->format('H:i')) }}
+                                        {{ \App\Support\NumberHelper::toPersian($activity->created_at->timezone('Asia/Tehran')->format('H:i')) }}
                                     </p>
                                 </td>
 
