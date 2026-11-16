@@ -83,11 +83,18 @@ class CustomerController extends Controller
     }
 
     /**
-     * Display customer details.
+     * Display customer details and their documents.
      */
     public function show(Customer $customer): View
     {
-        return view('admin.customers.show', compact('customer'));
+        $documents = $customer->documents()
+            ->latest()
+            ->paginate(10);
+
+        return view('admin.customers.show', compact(
+            'customer',
+            'documents'
+        ));
     }
 
     /**
