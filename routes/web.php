@@ -53,6 +53,15 @@ Route::get('/', function () {
     ));
 });
 
+// Public About Page
+Route::get('/about', function () {
+    Visit::record('about');
+
+    $content = SiteContent::first();
+
+    return view('about', compact('content'));
+})->name('about');
+
 // Public Products Page
 Route::get('/products', [ProductController::class, 'publicIndex'])
     ->name('products.index');

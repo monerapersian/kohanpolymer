@@ -27,7 +27,7 @@
             <a href="{{ url('/') }}#home">صفحه اصلی</a>
             <a href="{{ route('products.index') }}">محصولات</a>
             <a href="{{ route('blog.index') }}">دانش و مقالات</a>
-            <a href="{{ url('/') }}#about">درباره ما</a>
+            <a href="{{ route('about') }}">درباره ما</a>
             <a href="{{ url('/') }}#contact">تماس با ما</a>
         </nav>
 

@@ -137,7 +137,7 @@
                                         {{ $product->description ?: 'برای دریافت اطلاعات بیشتر درباره مشخصات و کاربرد این محصول با کارشناسان ما در ارتباط باشید.' }}
                                     </p>
 
-                                    <a href="{{ url('/#contact') }}" class="product-card-link">
+                                    <a href="{{ route('products.show', $product) }}" class="product-card-link">
                                         درخواست اطلاعات محصول
                                         <span>←</span>
                                     </a>

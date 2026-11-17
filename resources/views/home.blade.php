@@ -268,9 +268,9 @@
                                 loading="lazy"
                             >
 
-                            <span class="home-product-number">
+                            <!-- <span class="home-product-number">
                                 <strong>{{ sprintf('%02d', $products->count()) }}</strong>
-                            </span>
+                            </span> -->
 
                             <div class="home-product-image-shade"></div>
 
@@ -289,7 +289,7 @@
                                 {{ $product->description ?: 'برای آشنایی بیشتر با ویژگی‌ها و کاربردهای این محصول با ما در ارتباط باشید.' }}
                             </p>
 
-                            <a href="#contact" class="home-product-link">
+                            <a href="{{ route('products.show', $product) }}" class="home-product-link">
                                 <span>اطلاعات بیشتر</span>
 
                                 <span class="home-product-link-arrow">
@@ -519,7 +519,7 @@
 
                     <article class="article-card reveal">
 
-                        <a href="#articles" class="article-image">
+                        <a href="{{ route('blog.show', $post) }}" class="article-image">
                             <img
                                 src="{{ $post->image ? \Illuminate\Support\Facades\Storage::url($post->image) : asset('img/product-1.jpg') }}"
                                 alt="{{ $post->title }}"
@@ -545,7 +545,7 @@
                                 {{ $post->summary ?: \Illuminate\Support\Str::limit(strip_tags($post->body ?? ''), 100) }}
                             </p>
 
-                            <a href="#articles" class="article-read">
+                            <a href="{{ route('blog.show', $post) }}" class="article-read">
                                 ادامه مطلب
                                 <span>←</span>
                             </a>
