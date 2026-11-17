@@ -1,9 +1,16 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+
 use App\Models\SiteContent;
 use App\Models\Product;
 use App\Models\BlogPost;
+use App\Models\Customer;
+use App\Models\Invoice;
+use App\Models\User;
+use App\Models\Visit;
+use App\Models\Inquiry;
+use App\Models\ActivityLog;
 
 use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\CustomerController;
@@ -20,6 +27,8 @@ use App\Http\Controllers\InquiryController;
 
 // Public Website Routes
 Route::get('/', function () {
+    Visit::record('home');
+
     $content = SiteContent::first();
 
     $products = Product::query()
@@ -80,7 +89,82 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
     // Dashboard
     Route::get('/admin', function () {
-        return view('admin.dashboard');
+
+        $validPermissions = [
+            'site_content',
+            'products',
+            'blog_posts',
+            'inquiries',
+            'customers',
+            'invoices',
+            'financial_reports',
+            'activity_logs',
+        ];
+
+        $activeManagers = User::query()
+            ->where('role', 'admin')
+            ->get()
+            ->filter(function (User $manager) use ($validPermissions) {
+                $permissions = $manager->permissions ?? [];
+
+                return is_array($permissions)
+                    && count(array_intersect($validPermissions, $permissions)) > 0;
+            })
+            ->count();
+
+        $activeProformas = Invoice::query()
+            ->where('type', 'proforma')
+            ->where('status', 'valid')
+            ->where(function ($query) {
+                $query->whereNull('valid_until')
+                    ->orWhereDate('valid_until', '>=', today());
+            })
+            ->count();
+
+        $totalCustomers = Customer::query()->count();
+
+        $totalProducts = Product::query()->count();
+
+        // Website visit statistics for the last 30 days
+        $since = now()->subDays(30);
+
+        $siteVisits30Days = Visit::query()
+            ->where('created_at', '>=', $since)
+            ->count();
+
+        $productVisits30Days = Visit::query()
+            ->whereIn('type', ['products', 'product'])
+            ->where('created_at', '>=', $since)
+            ->count();
+
+        $blogVisits30Days = Visit::query()
+            ->whereIn('type', ['blogs', 'blog_post'])
+            ->where('created_at', '>=', $since)
+            ->count();
+
+        $unreadInquiries = Inquiry::query()
+            ->where('is_read', false)
+            ->count();
+
+        // Get the four latest administrative activities
+        $recentActivities = ActivityLog::query()
+            ->latest('created_at')
+            ->latest('id')
+            ->take(4)
+            ->get();
+
+        return view('admin.dashboard', compact(
+            'activeManagers',
+            'activeProformas',
+            'totalCustomers',
+            'totalProducts',
+            'siteVisits30Days',
+            'productVisits30Days',
+            'blogVisits30Days',
+            'unreadInquiries',
+            'recentActivities'
+        ));
+
     })->name('admin.dashboard');
 
     // Admin Management Routes
@@ -154,12 +238,6 @@ Route::middleware(['auth', 'permission'])->group(function () {
     Route::middleware('permission:customers')->group(function () {
         Route::get('/admin/customers', [CustomerController::class, 'index'])
             ->name('admin.customers.index');
-
-        Route::post('/admin/customers', [CustomerController::class, 'store'])
-            ->name('admin.customers.store');
-
-        Route::get('/admin/customers/{customer}', [CustomerController::class, 'show'])
-            ->name('admin.customers.show');
 
         Route::post('/admin/customers', [CustomerController::class, 'store'])
             ->name('admin.customers.store');

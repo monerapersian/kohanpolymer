@@ -57,7 +57,7 @@
 
                             <!-- Primary Action -->
                             <a
-                                href="#quick-actions"
+                                href="{{ route('admin.invoices.create') }}"
                                 class="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-xl border border-white/15 bg-[#a66f72] px-5 py-3 text-sm text-white shadow-[0_6px_20px_rgba(0,0,0,0.2)] transition duration-300 hover:-translate-y-1 hover:border-white/25 hover:bg-[#b77d80] hover:shadow-[0_10px_25px_rgba(0,0,0,0.25)] kohan-bold"
                             >
                                 <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -69,7 +69,7 @@
 
                             <!-- Secondary Action -->
                             <a
-                                href="#recent-activity"
+                                href="{{ route('admin.activity-logs.index') }}"
                                 class="inline-flex min-h-[48px] cursor-pointer items-center gap-2.5 rounded-xl border border-white/20 bg-white/[0.08] px-5 py-3 text-sm text-white/90 shadow-[0_4px_15px_rgba(0,0,0,0.08)] backdrop-blur-md transition duration-300 hover:-translate-y-1 hover:border-white/40 hover:bg-white/[0.16] hover:text-white"
                             >
                                 مشاهده فعالیت‌ها
@@ -134,7 +134,7 @@
 
                     <span class="inline-flex items-center gap-2 rounded-xl border border-[#E8E1DE] bg-white px-4 py-2.5 text-xs text-[#8d6666] shadow-[0_3px_12px_rgba(54,39,39,0.03)]">
                         <span class="h-1.5 w-1.5 rounded-full bg-[#a66f72]"></span>
-                        آمار نمونه
+                        آمار به روز
                     </span>
 
                 </div>
@@ -151,15 +151,15 @@
 
                             <div>
                                 <p class="text-sm text-[#77716F]">
-                                    فاکتورهای فعال
+                                    مدیران فعال
                                 </p>
 
                                 <p class="kohan-bold mt-4 text-3xl tracking-tight text-[#362727]">
-                                    ۱۲
+                                    {{ \App\Support\NumberHelper::toPersian($activeManagers) }}
                                 </p>
 
                                 <p class="mt-3 text-xs text-[#a49a95]">
-                                    فاکتورهای دارای اعتبار
+                                    مدیران دارای دسترسی فعال
                                 </p>
                             </div>
 
@@ -177,10 +177,10 @@
                         <div class="relative mt-5 flex items-center justify-between border-t border-[#F0ECEA] pt-4">
 
                             <span class="text-xs text-[#918783]">
-                                مدیریت فاکتورها
+                                لیست مدیران و دسترسی ها
                             </span>
 
-                            <a href="#" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-emerald-700 transition hover:text-emerald-900 kohan-bold">
+                            <a href="{{ route('admin.managers.index') }}" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-emerald-700 transition hover:text-emerald-900 kohan-bold">
                                 مشاهده
                                 <svg class="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -205,7 +205,7 @@
                                 </p>
 
                                 <p class="kohan-bold mt-4 text-3xl tracking-tight text-[#362727]">
-                                    ۸
+                                    {{ \App\Support\NumberHelper::toPersian($activeProformas) }}
                                 </p>
 
                                 <p class="mt-3 text-xs text-[#a49a95]">
@@ -230,7 +230,7 @@
                                 مدیریت پیش‌فاکتورها
                             </span>
 
-                            <a href="#" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-amber-700 transition hover:text-amber-900 kohan-bold">
+                            <a href="{{ route('admin.invoices.index') }}" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-amber-700 transition hover:text-amber-900 kohan-bold">
                                 مشاهده
                                 <svg class="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -255,7 +255,7 @@
                                 </p>
 
                                 <p class="kohan-bold mt-4 text-3xl tracking-tight text-[#362727]">
-                                    ۱۲۶
+                                    {{ \App\Support\NumberHelper::toPersian($totalCustomers) }}
                                 </p>
 
                                 <p class="mt-3 text-xs text-[#a49a95]">
@@ -280,7 +280,7 @@
                                 بانک اطلاعات مشتریان
                             </span>
 
-                            <a href="#" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-sky-700 transition hover:text-sky-900 kohan-bold">
+                            <a href="{{ route('admin.customers.index') }}" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-sky-700 transition hover:text-sky-900 kohan-bold">
                                 مشاهده
                                 <svg class="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -305,7 +305,7 @@
                                 </p>
 
                                 <p class="kohan-bold mt-4 text-3xl tracking-tight text-[#362727]">
-                                    ۳۴
+                                    {{ \App\Support\NumberHelper::toPersian($totalProducts) }}
                                 </p>
 
                                 <p class="mt-3 text-xs text-[#a49a95]">
@@ -330,7 +330,7 @@
                                 مدیریت محصولات
                             </span>
 
-                            <a href="#" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#8d555a] transition hover:text-[#542b2e] kohan-bold">
+                            <a href="{{ route('admin.site-content.edit', ['tab' => 'products']) }}" class="inline-flex cursor-pointer items-center gap-1.5 text-xs text-[#8d555a] transition hover:text-[#542b2e] kohan-bold">
                                 مشاهده
                                 <svg class="h-3.5 w-3.5 transition-transform group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
                                     <path d="M5 12h14m-6-6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -346,10 +346,10 @@
             </section>
 
 
-            <!-- Financial Summary -->
+            <!-- Website Visits -->
             <section class="grid grid-cols-1 gap-4 lg:grid-cols-3">
 
-                <!-- Sales -->
+                <!-- Visits Summary -->
                 <div class="relative overflow-hidden rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-[0_5px_20px_rgba(54,39,39,0.035)] sm:p-6 lg:col-span-2">
 
                     <!-- Decorative Background -->
@@ -360,11 +360,11 @@
 
                         <div>
                             <h2 class="kohan-bold text-lg text-[#362727]">
-                                خلاصه مالی
+                                بازدید سایت
                             </h2>
 
                             <p class="mt-2 text-sm text-[#918783]">
-                                مروری بر عملکرد فروش مجموعه
+                                آمار بازدیدکنندگان و صفحات پربازدید مجموعه
                             </p>
                         </div>
 
@@ -375,13 +375,13 @@
                                 <path d="M16 3v4M8 3v4M3 11h18"/>
                             </svg>
 
-                            آمار نمونه
+                            ۳۰ روز گذشته
 
                         </div>
 
                     </div>
 
-                    <!-- Total Sales -->
+                    <!-- Total Website Visits -->
                     <div class="relative mt-6 overflow-hidden rounded-2xl border border-[#674040]/20 bg-gradient-to-l from-[#362727] via-[#542b2e] to-[#674040] p-5 shadow-[0_8px_25px_rgba(84,43,46,0.12)] sm:p-6">
 
                         <div class="pointer-events-none absolute -left-10 -top-16 h-48 w-48 rounded-full bg-[#baadad]/20 blur-3xl"></div>
@@ -389,17 +389,17 @@
                         <div class="relative">
 
                             <p class="text-sm text-white/65">
-                                مجموع مبلغ فاکتورهای صادرشده
+                                تعداد کل بازدید سایت در ۳۰ روز گذشته
                             </p>
 
                             <div class="mt-4 flex flex-wrap items-baseline gap-2">
 
                                 <span class="kohan-bold text-3xl tracking-tight text-white sm:text-4xl">
-                                    ۸,۴۵۰,۰۰۰,۰۰۰
+                                    {{ \App\Support\NumberHelper::toPersian(number_format($siteVisits30Days ?? 0)) }}
                                 </span>
 
                                 <span class="text-sm text-white/65">
-                                    تومان
+                                    بازدید
                                 </span>
 
                             </div>
@@ -412,7 +412,7 @@
                                 </svg>
 
                                 <p class="text-xs leading-6 text-white/60">
-                                    این مبلغ صرفاً جهت نمایش قالب است و لزوماً معادل مبلغ وصول‌شده نیست.
+                                    آمار بازدید صفحات عمومی سایت در بازه ۳۰ روز گذشته
                                 </p>
 
                             </div>
@@ -421,19 +421,22 @@
 
                     </div>
 
-                    <!-- Invoice Statistics -->
+                    <!-- Website Visit Statistics -->
                     <div class="relative mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
 
                         <div class="rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:border-emerald-200 hover:bg-emerald-50/40">
 
                             <div class="flex items-center gap-2 text-xs text-[#77716F]">
                                 <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
-                                فاکتورهای صادرشده
+                                بازدید از محصولات
                             </div>
 
                             <p class="kohan-bold mt-3 text-2xl text-[#362727]">
-                                ۲۴
-                                <span class="text-xs text-[#918783]">فاکتور</span>
+                                {{ \App\Support\NumberHelper::toPersian(number_format($productVisits30Days ?? 0)) }}
+
+                                <span class="text-xs text-[#918783]">
+                                    بازدید
+                                </span>
                             </p>
 
                         </div>
@@ -442,12 +445,15 @@
 
                             <div class="flex items-center gap-2 text-xs text-[#77716F]">
                                 <span class="h-2 w-2 rounded-full bg-amber-500"></span>
-                                پیش‌فاکتورهای در انتظار
+                                بازدید از مقالات
                             </div>
 
                             <p class="kohan-bold mt-3 text-2xl text-[#362727]">
-                                ۵
-                                <span class="text-xs text-[#918783]">پیش‌فاکتور</span>
+                                {{ \App\Support\NumberHelper::toPersian(number_format($blogVisits30Days ?? 0)) }}
+
+                                <span class="text-xs text-[#918783]">
+                                    بازدید
+                                </span>
                             </p>
 
                         </div>
@@ -473,7 +479,8 @@
                     <div class="mt-6 space-y-3">
 
                         <!-- Expiring Proformas -->
-                        <a href="#" class="group flex cursor-pointer items-center gap-3 rounded-xl border border-amber-200/70 bg-amber-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50">
+                        <a href="{{ route('admin.invoices.index') }}"
+                           class="group flex cursor-pointer items-center gap-3 rounded-xl border border-amber-200/70 bg-amber-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-amber-300 hover:bg-amber-50">
 
                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-100 bg-white text-amber-600 shadow-sm transition group-hover:scale-105">
 
@@ -503,14 +510,15 @@
                         </a>
 
 
-                        <!-- Invoices to Review -->
-                        <a href="#" class="group flex cursor-pointer items-center gap-3 rounded-xl border border-rose-200/70 bg-rose-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-50">
+                        <!-- Unread Inquiries -->
+                        <a href="{{ route('admin.inquiries.index') }}"
+                           class="group flex cursor-pointer items-center gap-3 rounded-xl border border-rose-200/70 bg-rose-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-rose-300 hover:bg-rose-50">
 
                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-rose-100 bg-white text-rose-600 shadow-sm transition group-hover:scale-105">
 
                                 <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                                    <path d="M12 3 2.8 19h18.4L12 3Z" stroke-linejoin="round"/>
-                                    <path d="M12 9v4m0 3h.01" stroke-linecap="round"/>
+                                    <path d="M4 5h16v12H8l-4 3V5Z" stroke-linejoin="round"/>
+                                    <path d="M8 9h8m-8 4h5" stroke-linecap="round"/>
                                 </svg>
 
                             </div>
@@ -518,24 +526,25 @@
                             <div class="min-w-0 flex-1">
 
                                 <p class="text-sm text-[#362727] kohan-bold">
-                                    فاکتورهای نیازمند بررسی
+                                    درخواست‌های مشاهده‌نشده
                                 </p>
 
                                 <p class="mt-1 text-xs text-[#918783]">
-                                    موارد علامت‌گذاری‌شده
+                                    منتظر مشاهده و بررسی
                                 </p>
 
                             </div>
 
                             <span class="kohan-bold text-xl text-rose-700">
-                                ۲
+                                {{ \App\Support\NumberHelper::toPersian(number_format($unreadInquiries ?? 0)) }}
                             </span>
 
                         </a>
 
 
                         <!-- New Customers -->
-                        <a href="#" class="group flex cursor-pointer items-center gap-3 rounded-xl border border-sky-200/70 bg-sky-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-sky-300 hover:bg-sky-50">
+                        <a href="{{ route('admin.customers.index') }}"
+                           class="group flex cursor-pointer items-center gap-3 rounded-xl border border-sky-200/70 bg-sky-50/60 p-3 transition duration-300 hover:-translate-y-0.5 hover:border-sky-300 hover:bg-sky-50">
 
                             <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-100 bg-white text-sky-600 shadow-sm transition group-hover:scale-105">
 
@@ -571,10 +580,10 @@
             </section>
 
 
-            <!-- Recent Activity + Quick Actions -->
+            {{-- Recent Activity + Quick Actions --}}
             <section class="grid grid-cols-1 gap-4 xl:grid-cols-5">
 
-                <!-- Recent Activity -->
+                {{-- Recent Activity --}}
                 <div
                     id="recent-activity"
                     class="rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-[0_5px_20px_rgba(54,39,39,0.035)] sm:p-6 xl:col-span-3"
@@ -588,143 +597,92 @@
                             </h2>
 
                             <p class="mt-2 text-sm text-[#918783]">
-                                نمونه‌ای از رویدادهای پنل مدیریت
+                                چهار رویداد اخیر پنل مدیریت
                             </p>
                         </div>
 
                         <a
-                            href="#"
-                            class="cursor-pointer rounded-lg px-3 py-2 text-xs text-[#8d6666] transition duration-300 hover:bg-[#F3E9E9] hover:text-[#542b2e]"
+                            href="{{ route('admin.activity-logs.index') }}"
+                            class="rounded-lg px-3 py-2 text-xs text-[#8d6666] transition duration-300 hover:bg-[#F3E9E9] hover:text-[#542b2e]"
                         >
                             همه فعالیت‌ها ←
                         </a>
 
                     </div>
 
-
-                    <!-- Activity List -->
+                    {{-- Activity List --}}
                     <div class="mt-5 divide-y divide-[#E8E1DE]">
 
-                        <!-- Invoice Activity -->
-                        <div class="flex items-start gap-3 py-4 first:pt-0">
+                        @forelse($recentActivities as $activity)
 
-                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-emerald-100 bg-emerald-50 text-emerald-700">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                                    <path d="M7 3h7l5 5v13H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/>
-                                    <path d="M14 3v5h5M9 13h6M9 17h4"/>
-                                </svg>
-                            </div>
+                            <div class="flex items-start gap-3 py-4 first:pt-0 last:pb-0">
 
-                            <div class="min-w-0 flex-1">
+                                <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] text-[#8d6666]">
 
-                                <p class="text-sm leading-7 text-[#362727] kohan-bold">
-                                    یک فاکتور جدید صادر شد
-                                </p>
+                                    <svg
+                                        class="h-5 w-5"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.7"
+                                        aria-hidden="true"
+                                    >
+                                        <circle cx="12" cy="12" r="9"/>
+                                        <path d="M12 7v5l3 2"/>
+                                    </svg>
 
-                                <p class="mt-1 text-xs leading-6 text-[#918783]">
-                                    توسط مدیر سیستم · شماره نمونه: INV-1025
-                                </p>
+                                </div>
 
-                            </div>
+                                <div class="min-w-0 flex-1">
 
-                            <span class="shrink-0 rounded-lg bg-[#FAF8F7] px-2.5 py-1.5 text-[11px] text-[#918783]">
-                                ۱۰:۳۵
-                            </span>
+                                    <p class="kohan-bold text-sm leading-7 text-[#362727]">
+                                        {{ $activity->description ?: $activity->action }}
+                                    </p>
 
-                        </div>
+                                    <p class="mt-1 text-xs leading-6 text-[#918783]">
+                                        توسط {{ $activity->actor_name ?: 'سیستم' }}
+                                    </p>
 
+                                </div>
 
-                        <!-- Proforma Activity -->
-                        <div class="flex items-start gap-3 py-4">
-
-                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-amber-100 bg-amber-50 text-amber-700">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                                    <path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2Z"/>
-                                    <path d="M9 8h6M9 12h6"/>
-                                </svg>
-                            </div>
-
-                            <div class="min-w-0 flex-1">
-
-                                <p class="text-sm leading-7 text-[#362727] kohan-bold">
-                                    یک پیش‌فاکتور ثبت شد
-                                </p>
-
-                                <p class="mt-1 text-xs leading-6 text-[#918783]">
-                                    توسط مدیر فروش · شماره نمونه: PRO-1082
-                                </p>
+                                <span class="shrink-0 rounded-lg bg-[#FAF8F7] px-2.5 py-1.5 text-[11px] text-[#918783]">
+                                    {{ $activity->created_at?->diffForHumans() }}
+                                </span>
 
                             </div>
 
-                            <span class="shrink-0 rounded-lg bg-[#FAF8F7] px-2.5 py-1.5 text-[11px] text-[#918783]">
-                                ۰۹:۵۰
-                            </span>
+                        @empty
 
-                        </div>
+                            <div class="py-10 text-center">
 
+                                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#FAF8F7] text-[#B9A9A5]">
+                                    <svg
+                                        class="h-6 w-6"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        stroke-width="1.6"
+                                        aria-hidden="true"
+                                    >
+                                        <path d="M12 8v4l2.5 2.5"/>
+                                        <circle cx="12" cy="12" r="9"/>
+                                    </svg>
+                                </div>
 
-                        <!-- Customer Activity -->
-                        <div class="flex items-start gap-3 py-4">
-
-                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-sky-100 bg-sky-50 text-sky-700">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                                    <circle cx="9" cy="8" r="4"/>
-                                    <path d="M2 21v-2a7 7 0 0 1 14 0v2M17 4.5a4 4 0 0 1 0 7.5"/>
-                                </svg>
-                            </div>
-
-                            <div class="min-w-0 flex-1">
-
-                                <p class="text-sm leading-7 text-[#362727] kohan-bold">
-                                    اطلاعات یک مشتری ثبت شد
-                                </p>
-
-                                <p class="mt-1 text-xs leading-6 text-[#918783]">
-                                    توسط مدیر سیستم · بخش مشتریان
+                                <p class="mt-3 text-sm text-[#918783]">
+                                    هنوز فعالیتی ثبت نشده است.
                                 </p>
 
                             </div>
 
-                            <span class="shrink-0 rounded-lg bg-[#FAF8F7] px-2.5 py-1.5 text-[11px] text-[#918783]">
-                                دیروز
-                            </span>
-
-                        </div>
-
-
-                        <!-- Product Activity -->
-                        <div class="flex items-start gap-3 py-4 last:pb-0">
-
-                            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-rose-100 bg-rose-50 text-rose-700">
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
-                                    <path d="M12 3v18M17 7H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" stroke-linecap="round"/>
-                                </svg>
-                            </div>
-
-                            <div class="min-w-0 flex-1">
-
-                                <p class="text-sm leading-7 text-[#362727] kohan-bold">
-                                    اطلاعات یک محصول ویرایش شد
-                                </p>
-
-                                <p class="mt-1 text-xs leading-6 text-[#918783]">
-                                    توسط مدیر محتوا · بخش محصولات
-                                </p>
-
-                            </div>
-
-                            <span class="shrink-0 rounded-lg bg-[#FAF8F7] px-2.5 py-1.5 text-[11px] text-[#918783]">
-                                دیروز
-                            </span>
-
-                        </div>
+                        @endforelse
 
                     </div>
 
                 </div>
 
 
-                <!-- Quick Actions -->
+                {{-- Quick Actions --}}
                 <div
                     id="quick-actions"
                     class="rounded-2xl border border-[#E8E1DE] bg-white p-5 shadow-[0_5px_20px_rgba(54,39,39,0.035)] sm:p-6 xl:col-span-2"
@@ -740,18 +698,24 @@
                         </p>
                     </div>
 
-
                     <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
 
-                        <!-- New Invoice -->
+                        {{-- New Invoice --}}
                         <a
-                            href="#"
-                            class="group cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-[#542b2e]/30 hover:bg-[#F3E9E9] hover:shadow-[0_8px_20px_rgba(84,43,46,0.07)]"
+                            href="{{ route('admin.invoices.create') }}"
+                            class="group rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-[#542b2e]/30 hover:bg-[#F3E9E9] hover:shadow-[0_8px_20px_rgba(84,43,46,0.07)]"
                         >
 
                             <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-[#542b2e]/10 bg-white text-[#542b2e] shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-[#542b2e] group-hover:text-white">
 
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <svg
+                                    class="h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
                                     <path d="M12 5v14M5 12h14" stroke-linecap="round"/>
                                 </svg>
 
@@ -768,41 +732,55 @@
                         </a>
 
 
-                        <!-- New Proforma -->
+                        {{-- New Blog Post --}}
                         <a
-                            href="#"
-                            class="group cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-amber-300 hover:bg-amber-50/60 hover:shadow-[0_8px_20px_rgba(180,120,30,0.06)]"
+                            href="{{ route('admin.site-content.edit', ['tab' => 'blog']) }}"
+                            class="group rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-amber-300 hover:bg-amber-50/60 hover:shadow-[0_8px_20px_rgba(180,120,30,0.06)]"
                         >
 
                             <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-100 bg-white text-amber-700 shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-amber-600 group-hover:text-white">
 
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <svg
+                                    class="h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
                                     <path d="M7 3h10a2 2 0 0 1 2 2v16l-7-4-7 4V5a2 2 0 0 1 2-2Z"/>
-                                    <path d="M9 8h6"/>
+                                    <path d="M9 8h6M9 12h6"/>
                                 </svg>
 
                             </div>
 
                             <p class="kohan-bold mt-4 text-sm text-[#362727]">
-                                پیش‌فاکتور جدید
+                                ثبت مقاله
                             </p>
 
                             <p class="mt-1 text-xs leading-6 text-[#918783]">
-                                ایجاد پیش‌فاکتور
+                                مدیریت و افزودن مقاله
                             </p>
 
                         </a>
 
 
-                        <!-- New Customer -->
+                        {{-- New Customer --}}
                         <a
-                            href="#"
-                            class="group cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-sky-300 hover:bg-sky-50/60 hover:shadow-[0_8px_20px_rgba(30,120,180,0.06)]"
+                            href="{{ route('admin.customers.index') }}"
+                            class="group rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-sky-300 hover:bg-sky-50/60 hover:shadow-[0_8px_20px_rgba(30,120,180,0.06)]"
                         >
 
                             <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-sky-100 bg-white text-sky-700 shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-sky-600 group-hover:text-white">
 
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <svg
+                                    class="h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
                                     <circle cx="9" cy="8" r="4"/>
                                     <path d="M2 21v-2a7 7 0 0 1 14 0v2"/>
                                     <path d="M19 8v6m-3-3h6" stroke-linecap="round"/>
@@ -821,15 +799,22 @@
                         </a>
 
 
-                        <!-- New Product -->
+                        {{-- New Product --}}
                         <a
-                            href="#"
-                            class="group cursor-pointer rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-50/60 hover:shadow-[0_8px_20px_rgba(30,140,90,0.06)]"
+                            href="{{ route('admin.site-content.edit', ['tab' => 'products']) }}"
+                            class="group rounded-xl border border-[#E8E1DE] bg-[#FAF8F7] p-4 transition duration-300 hover:-translate-y-1 hover:border-emerald-300 hover:bg-emerald-50/60 hover:shadow-[0_8px_20px_rgba(30,140,90,0.06)]"
                         >
 
                             <div class="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-100 bg-white text-emerald-700 shadow-sm transition duration-300 group-hover:scale-105 group-hover:bg-emerald-600 group-hover:text-white">
 
-                                <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <svg
+                                    class="h-5 w-5"
+                                    viewBox="0 0 24 24"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    stroke-width="1.7"
+                                    aria-hidden="true"
+                                >
                                     <path d="m12 3 9 5-9 5-9-5 9-5Z"/>
                                     <path d="m3 12 9 5 9-5M3 16l9 5 9-5"/>
                                 </svg>

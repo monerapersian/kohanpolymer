@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\SiteContent;
+use App\Models\Visit;
 use App\Services\ActivityLogger;
 use App\Support\ImageConverter;
 use Illuminate\Http\Request;
@@ -45,6 +46,8 @@ class ProductController extends Controller
      */
     public function publicIndex(Request $request)
     {
+        Visit::record('products');
+
         $content = SiteContent::first();
         $siteContent = $content;
 
@@ -319,6 +322,8 @@ class ProductController extends Controller
     public function show(Product $product)
     {
         abort_unless($product->status === 'published', 404);
+
+        Visit::record('product', $product->id);
 
         $product->load('details');
 

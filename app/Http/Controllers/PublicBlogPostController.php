@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\BlogPost;
 use App\Models\SiteContent;
+use App\Models\Visit;
 use Illuminate\Http\Request;
 
 class PublicBlogPostController extends Controller
@@ -13,6 +14,8 @@ class PublicBlogPostController extends Controller
      */
     public function index(Request $request)
     {
+        Visit::record('blogs');
+
         $content = SiteContent::first();
         $siteContent = $content;
 
@@ -46,6 +49,8 @@ class PublicBlogPostController extends Controller
     public function show(BlogPost $blogPost)
     {
         abort_unless($blogPost->status === 'published', 404);
+
+        Visit::record('blog_post', $blogPost->id);
 
         $content = SiteContent::first();
         $siteContent = $content;
