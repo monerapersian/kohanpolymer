@@ -109,30 +109,12 @@
                 <!-- Brand Visual -->
                 <aside class="intro-brand-panel reveal">
 
-                    <div class="intro-panel-top">
-                        <span class="intro-brand-name">KOHAN POLYMER</span>
-                        <span class="intro-brand-code">ALBORZ / IRAN</span>
-                    </div>
-
-                    <div class="intro-brand-art">
-                        <div class="intro-art-circle intro-art-circle-one"></div>
-                        <div class="intro-art-circle intro-art-circle-two"></div>
-                        <div class="intro-art-circle intro-art-circle-three"></div>
-
-                        <div class="intro-brand-symbol">K</div>
-
-                        <div class="intro-brand-monogram">KPA</div>
-                    </div>
-
-                    <div class="intro-panel-bottom">
-                        <div class="intro-panel-line"></div>
-
-                        <div class="intro-panel-caption">
-                            <span>OUR APPROACH</span>
-                            <strong>فراتر از یک تأمین‌کننده</strong>
-                        </div>
-
-                        <span class="intro-panel-number">01 / 03</span>
+                    <div class="intro-brand-image">
+                        <img
+                            src="{{ $content?->intro_brand_image ? \Illuminate\Support\Facades\Storage::url($content->intro_brand_image) : asset('img/hero-img.jpg') }}"
+                            alt="Kohan Polymer Alborz"
+                            loading="lazy"
+                        >
                     </div>
 
                 </aside>
@@ -321,7 +303,7 @@
                     <span>محصول منتخب</span>
                 </div>
 
-                <a href="/products" class="home-products-more">
+                <a href="/products" class="home-products-more kohan-bold">
                     <span>مشاهده همه محصولات</span>
 
                     <span class="home-products-more-arrow">
@@ -361,16 +343,19 @@
                     </div>
 
                     <div class="statement-side reveal reveal-delay-1">
-                        <span class="statement-side-index">A DIFFERENT PERSPECTIVE</span>
 
-                        <p>
-                            {{ $content?->difference_text ?: 'انتخاب مواد، شناخت کاربرد و توجه به جزئیات، هرکدام در کیفیت نتیجه نهایی نقش دارند. ما به ارزش تصمیم‌گیری آگاهانه در این مسیر باور داریم.' }}
-                        </p>
+                        <div class="statement-side-image">
+                            <img
+                                src="{{ $content?->statement_image
+                                    ? \Illuminate\Support\Facades\Storage::url($content->statement_image)
+                                    : ($content?->hero_image
+                                        ? \Illuminate\Support\Facades\Storage::url($content->hero_image)
+                                        : asset('img/hero-img.jpg')) }}"
+                                alt="Kohan Polymer Alborz"
+                                loading="lazy"
+                            >
+                        </div>
 
-                        <a href="#about" class="statement-link">
-                            <span>بیشتر درباره ما</span>
-                            <span class="statement-link-arrow">←</span>
-                        </a>
                     </div>
 
                 </div>

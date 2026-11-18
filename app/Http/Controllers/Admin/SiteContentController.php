@@ -78,14 +78,24 @@ class SiteContentController extends Controller
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:5120',
+                'max:15120',
             ],
+
             'hero_image' => [
                 'nullable',
                 'image',
                 'mimes:jpg,jpeg,png,webp',
-                'max:5120',
+                'max:15120',
             ],
+
+            'intro_brand_image' => [
+                'nullable',
+                'image',
+                'mimes:jpg,jpeg,png,webp',
+                'max:15120',
+            ],
+
+            'statement_image' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:15120'],
 
             'hero_slogan' => ['nullable', 'string', 'max:2000'],
 
@@ -133,6 +143,10 @@ class SiteContentController extends Controller
             'hero_image.mimes' => 'فرمت تصویر هدر باید JPG، PNG یا WebP باشد.',
             'hero_image.max' => 'حجم تصویر هدر نباید بیشتر از ۵ مگابایت باشد.',
 
+            'intro_brand_image.image' => 'فایل تصویر معرفی برند باید یک تصویر معتبر باشد.',
+            'intro_brand_image.mimes' => 'فرمت تصویر معرفی برند باید JPG، PNG یا WebP باشد.',
+            'intro_brand_image.max' => 'حجم تصویر معرفی برند نباید بیشتر از ۵ مگابایت باشد.',
+
             'activity_areas.array' => 'حوزه‌های فعالیت ارسالی معتبر نیستند.',
             'activity_areas.max' => 'حداکثر ۳۰ حوزه فعالیت می‌توانید ثبت کنید.',
             'activity_areas.*.string' => 'هر حوزه فعالیت باید متن معتبر باشد.',
@@ -174,12 +188,20 @@ class SiteContentController extends Controller
             );
         }
 
-        $oldImageStates = [
-            'logo' => (bool) $content->logo,
-            'hero_image' => (bool) $content->hero_image,
+        $imageFields = [
+            'logo',
+            'hero_image',
+            'intro_brand_image',
+            'statement_image',
         ];
 
-        foreach (['logo', 'hero_image'] as $imageField) {
+        $oldImageStates = [];
+
+        foreach ($imageFields as $imageField) {
+            $oldImageStates[$imageField] = (bool) $content->{$imageField};
+        }
+
+        foreach ($imageFields as $imageField) {
             if (! $request->hasFile($imageField)) {
                 continue;
             }
@@ -250,7 +272,7 @@ class SiteContentController extends Controller
             }
         }
 
-        foreach (['logo', 'hero_image'] as $imageField) {
+        foreach ($imageFields as $imageField) {
             $newImageState = (bool) $content->{$imageField};
 
             if (

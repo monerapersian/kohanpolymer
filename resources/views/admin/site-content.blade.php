@@ -193,12 +193,14 @@
                                     لوگو و بخش ابتدایی سایت
                                 </h2>
                                 <p class="mt-1 text-sm leading-6 text-[#948784]">
-                                    لوگو، تصویر اصلی و شعار صفحه نخست را مدیریت کنید.
+                                    لوگو، تصویر اصلی، تصویر معرفی برند و شعار صفحه نخست را مدیریت کنید.
                                 </p>
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+
+                            {{-- Logo --}}
                             <div>
                                 <label for="logo" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     لوگوی سایت
@@ -231,6 +233,7 @@
                                 </p>
                             </div>
 
+                            {{-- Hero Image --}}
                             <div>
                                 <label for="hero_image" class="mb-2 block text-sm text-[#554744] kohan-bold">
                                     تصویر Hero
@@ -259,6 +262,43 @@
                                     JPG، PNG یا WebP؛ حداکثر ۵ مگابایت.
                                 </p>
                             </div>
+
+                            {{-- Intro Brand Image --}}
+                            <div class="md:col-span-2">
+                                <label for="intro_brand_image" class="mb-2 block text-sm text-[#554744] kohan-bold">
+                                    تصویر معرفی برند
+                                </label>
+
+                                <p class="mb-3 text-xs leading-6 text-[#948784]">
+                                    این تصویر در بخش گرافیکی معرفی برند در صفحه اصلی نمایش داده می‌شود و مستقل از تصویر Hero است.
+                                </p>
+
+                                @if ($content?->intro_brand_image)
+                                    <div class="mb-4 rounded-xl border border-[#EAE3E0] bg-[#FAF8F7] p-3">
+                                        <img
+                                            src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->intro_brand_image) }}"
+                                            alt="تصویر فعلی معرفی برند"
+                                            class="h-48 w-full max-w-xl rounded-lg object-cover"
+                                        >
+                                        <p class="mt-2 text-xs text-[#948784]">
+                                            تصویر فعلی معرفی برند
+                                        </p>
+                                    </div>
+                                @endif
+
+                                <input
+                                    type="file"
+                                    id="intro_brand_image"
+                                    name="intro_brand_image"
+                                    accept=".jpg,.jpeg,.png,.webp"
+                                    class="block w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] text-sm text-[#776966] file:ml-4 file:cursor-pointer file:border-0 file:bg-[#F0E8E6] file:px-4 file:py-3 file:text-[#542b2e] file:kohan-bold hover:file:bg-[#E9DAD9]"
+                                >
+
+                                <p class="mt-2 text-xs leading-6 text-[#A19692]">
+                                    JPG، PNG یا WebP؛ حداکثر ۵ مگابایت. تصویر پس از بارگذاری به WebP تبدیل می‌شود.
+                                </p>
+                            </div>
+
                         </div>
 
                         <div class="mt-6 border-t border-[#F0EBE9] pt-6">
@@ -369,6 +409,37 @@
                                     placeholder="توضیحات مربوط به تفاوت‌ها و مزیت‌های مجموعه..."
                                     class="w-full rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] px-4 py-3.5 text-sm leading-7 text-[#362727] outline-none transition placeholder:text-[#B4A9A5] focus:border-[#8d6666] focus:bg-white focus:ring-2 focus:ring-[#8d6666]/10"
                                 >{{ old('difference_text', $content?->difference_text) }}</textarea>
+                                <div class="border-t border-[#F0EBE9] pt-6">
+                                    <label for="statement_image" class="mb-2 block text-sm text-[#554744] kohan-bold">
+                                        تصویر بخش نگاه متفاوت
+                                    </label>
+
+                                    @if ($content?->statement_image)
+                                        <div class="mb-4 rounded-xl border border-[#EAE3E0] bg-[#FAF8F7] p-3">
+                                            <img
+                                                src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($content->statement_image) }}"
+                                                alt="تصویر فعلی بخش نگاه متفاوت"
+                                                class="h-48 w-full rounded-lg object-cover"
+                                            >
+                                            <p class="mt-2 text-xs text-[#948784]">
+                                                تصویر فعلی بخش نگاه متفاوت
+                                            </p>
+                                        </div>
+                                    @endif
+
+                                    <input
+                                        type="file"
+                                        id="statement_image"
+                                        name="statement_image"
+                                        accept=".jpg,.jpeg,.png,.webp"
+                                        class="block w-full cursor-pointer rounded-xl border border-[#E5DCDA] bg-[#FAF8F7] text-sm text-[#776966] file:ml-4 file:cursor-pointer file:border-0 file:bg-[#F0E8E6] file:px-4 file:py-3 file:text-[#542b2e] file:kohan-bold hover:file:bg-[#E9DAD9]"
+                                    >
+
+                                    <p class="mt-2 text-xs leading-6 text-[#A19692]">
+                                        JPG، PNG یا WebP؛ حداکثر ۵ مگابایت. تصویر پس از بارگذاری به WebP تبدیل می‌شود.
+                                        در صورت انتخاب‌نکردن تصویر جدید، تصویر فعلی حفظ خواهد شد.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     </section>

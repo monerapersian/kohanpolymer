@@ -74,7 +74,7 @@
                 <div class="products-section-heading">
                     <div>
                         <span class="products-section-kicker">منتخب کهن پلیمر</span>
-                        <h2>محصولات <span>ویژه</span></h2>
+                        <h2>محصولات  و خدمات <span>ویژه</span></h2>
                         <p>
                             نگاهی به محصولات منتخب و ویژه مجموعه کهن پلیمر البرز
                         </p>
@@ -165,7 +165,7 @@
             <div class="products-section-heading all-products-heading">
                 <div>
                     <span class="products-section-kicker">کاتالوگ محصولات</span>
-                    <h2>همه <span>محصولات</span></h2>
+                    <h2>همه <span>محصولات و خدمات</span></h2>
                     <p>
                         محصولات منتشرشده کهن پلیمر البرز را بررسی کنید.
                     </p>

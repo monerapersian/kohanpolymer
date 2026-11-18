@@ -9,6 +9,8 @@ class SiteContent extends Model
     protected $fillable = [
         'logo',
         'hero_image',
+        'intro_brand_image',
+        'statement_image',
         'hero_slogan',
         'industry_title',
         'industry_text',

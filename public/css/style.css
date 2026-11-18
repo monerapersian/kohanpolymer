@@ -730,11 +730,11 @@ a, button {
 .statement-number {
     position: absolute;
     left: 35px;
-    bottom: -95px;
+    bottom: -35px;
     color: rgba(244, 240, 238, 0.045);
     font-family: Arial, sans-serif;
-    font-size: clamp(220px, 30vw, 420px);
-    font-weight: 700;
+    font-size: clamp(180px, 26vw, 200px);
+    font-weight: 800;
     line-height: 1;
     letter-spacing: -25px;
 }
@@ -824,6 +824,10 @@ a, button {
     position: relative;
     padding: 25px 28px 25px 0;
     border-right: 1px solid rgba(186, 173, 173, 0.35);
+}
+
+.statement-side-image img{
+    border-radius: 15px;
 }
 
 .statement-side-index {
@@ -1937,7 +1941,7 @@ a, button {
     min-height: 570px;
     padding: 35px;
     overflow: hidden;
-    border-radius: 8px 100px 8px 8px;
+    border-radius: 8px 50px 50px 8px;
     background:
         radial-gradient(
             circle at 25% 65%,
@@ -2922,10 +2926,10 @@ a, button {
     gap: 18px;
     padding: 10px 12px 10px 17px;
     border: 1px solid rgba(186, 173, 173, 0.65);
-    border-radius: 4px 17px 4px 4px;
+    border-radius: 4px 4px 4px 4px;
     color: #F4F0EE;
     background: rgba(255, 255, 255, 0.04);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     text-decoration: none;
     transition: all 0.3s ease;
@@ -4395,4 +4399,93 @@ a, button {
         transition: none;
     }
 }
+
+/* Brand Visual Image */
+.intro-brand-panel {
+    position: relative;
+    min-height: 430px;
+    height: 100%;
+    overflow: hidden;
+    isolation: isolate;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.intro-brand-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+
+    /* Fade the left edge */
+    -webkit-mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, .12) 12%,
+        rgba(0, 0, 0, .5) 25%,
+        #000 48%
+    );
+
+    mask-image: linear-gradient(
+        to right,
+        transparent 0%,
+        rgba(0, 0, 0, .12) 12%,
+        rgba(0, 0, 0, .5) 25%,
+        #000 48%
+    );
+}
+
+.intro-brand-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 430px;
+    object-fit: cover;
+    object-position: center;
+
+    filter: saturate(.75) contrast(.95);
+}
+
+/* Brand Color Overlay */
+.intro-brand-image::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(103, 64, 64, .72),
+        rgba(54, 39, 39, .48)
+    );
+    mix-blend-mode: multiply;
+    pointer-events: none;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .intro-brand-panel {
+        min-height: 300px;
+    }
+
+    .intro-brand-image img {
+        min-height: 300px;
+    }
+
+    .intro-brand-image {
+        -webkit-mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            rgba(0, 0, 0, .25) 15%,
+            #000 55%
+        );
+
+        mask-image: linear-gradient(
+            to right,
+            transparent 0%,
+            rgba(0, 0, 0, .25) 15%,
+            #000 55%
+        );
+    }
+}
+
 
