@@ -105,7 +105,7 @@
                     <div class="featured-slider" id="featured-slider">
 
                         @foreach($featuredProducts as $product)
-                            <article class="featured-card">
+                            <a href="{{ route('products.show', $product) }}" class="featured-card">
 
                                 <div class="featured-card-image">
                                     @if($product->image)
@@ -120,13 +120,10 @@
                                             <small>KOHAN POLYMER ALBORZ</small>
                                         </div>
                                     @endif
-
-                                    <!-- <span class="featured-badge">
-                                        محصول ویژه
-                                    </span> -->
                                 </div>
 
                                 <div class="featured-card-content">
+
                                     <span class="featured-card-number">
                                         محصول منتخب
                                     </span>
@@ -137,13 +134,14 @@
                                         {{ $product->description ?: 'برای دریافت اطلاعات بیشتر درباره مشخصات و کاربرد این محصول با کارشناسان ما در ارتباط باشید.' }}
                                     </p>
 
-                                    <a href="{{ route('products.show', $product) }}" class="product-card-link">
+                                    <span class="product-card-link">
                                         درخواست اطلاعات محصول
                                         <span>←</span>
-                                    </a>
+                                    </span>
+
                                 </div>
 
-                            </article>
+                            </a>
                         @endforeach
 
                     </div>
@@ -715,63 +713,63 @@
     }
 
     .featured-card {
-        display: grid;
-        grid-template-columns: .9fr 1.1fr;
+        display: flex;
+        flex-direction: column;
         flex: 0 0 calc((100% - 40px) / 3);
         min-width: 340px;
-        min-height: 255px;
+        min-height: 390px;
         overflow: hidden;
-        border: 1px solid rgba(103,64,64,.1);
+        border: 1px solid rgba(103, 64, 64, .1);
         border-radius: 18px;
         background: #f8f4f1;
         scroll-snap-align: start;
-        box-shadow: 0 10px 30px rgba(54,39,39,.04);
-        transition: transform .3s, box-shadow .3s;
+        box-shadow: 0 10px 30px rgba(54, 39, 39, .04);
+        text-decoration: none;
+        transition: transform .3s, box-shadow .3s, border-color .3s;
     }
 
     .featured-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 18px 35px rgba(54,39,39,.1);
+        box-shadow: 0 18px 35px rgba(54, 39, 39, .1);
+        border-color: rgba(103, 64, 64, .25);
     }
 
     .featured-card-image {
         position: relative;
-        min-width: 0;
-        min-height: 255px;
+        width: 100%;
+        height: 215px;
+        min-height: 215px;
         overflow: hidden;
         background: #ded3ce;
     }
 
-    .featured-card-image > img,
-    .catalog-product-image > img {
+    /*.featured-card-image > img {
+        display: block;
         width: 100%;
         height: 100%;
         object-fit: cover;
         transition: transform .7s ease;
-    }
+    }*/
 
-    .featured-card:hover .featured-card-image > img,
-    .catalog-product-card:hover .catalog-product-image > img {
+    .featured-card:hover .featured-card-image > img {
         transform: scale(1.06);
     }
 
-    .featured-badge {
-        position: absolute;
-        top: 13px;
-        right: 13px;
-        padding: 7px 11px;
-        border-radius: 7px;
-        color: #fff;
-        background: var(--wine);
-        font-size: 9px;
-        font-weight: 800;
+    .featured-card-image .product-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
     }
 
     .featured-card-content {
         display: flex;
+        flex: 1;
         flex-direction: column;
         align-items: flex-start;
-        padding: 23px 18px;
+        padding: 22px 20px;
         min-width: 0;
     }
 
@@ -782,7 +780,7 @@
     }
 
     .featured-card-content h3 {
-        margin-top: 13px;
+        margin-top: 12px;
         color: var(--dark);
         font-size: 17px;
         font-weight: 900;
@@ -800,6 +798,35 @@
         -webkit-box-orient: vertical;
     }
 
+    .featured-card .product-card-link {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        width: 100%;
+        margin-top: auto;
+        padding-top: 18px;
+        color: var(--wine);
+        font-size: 11px;
+        font-weight: 800;
+    }
+
+    .featured-card .product-card-link span {
+        font-size: 17px;
+        transition: transform .3s ease;
+    }
+
+    .featured-card:hover .product-card-link span {
+        transform: translateX(-5px);
+    }
+
+    .featured-card-image > img, .catalog-product-image > img {
+        width: 100%;
+        height: 100%;
+        /* object-fit: cover; */
+        transition: transform .7s ease;
+    }
+    
     .product-card-link {
         display: inline-flex;
         align-items: center;

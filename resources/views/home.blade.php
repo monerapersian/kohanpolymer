@@ -340,6 +340,12 @@
                         <h2 class="statement-title">
                             {{ $content?->difference_title ?: 'محصول خوب، نتیجه تصمیم‌های درست در تمام مسیر است.' }}
                         </h2>
+
+                        @if ($content?->difference_text)
+                            <p class="statement-description">
+                                {{ $content->difference_text }}
+                            </p>
+                        @endif
                     </div>
 
                     <div class="statement-side reveal reveal-delay-1">
