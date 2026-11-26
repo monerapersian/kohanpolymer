@@ -10,7 +10,8 @@ class ImageConverter
 {
     public static function convertToWebp(
         UploadedFile $file,
-        string $directory = 'uploads'
+        string $directory = 'uploads',
+        string $disk = 'public'
     ): string {
         $source = $file->getRealPath();
 
@@ -58,12 +59,12 @@ class ImageConverter
                 throw new RuntimeException('تبدیل تصویر به WebP ناموفق بود.');
             }
 
-            $path = trim($directory, '/').'/'.bin2hex(random_bytes(16)).'.webp';
+            $path = trim($directory, '/') . '/' . bin2hex(random_bytes(16)) . '.webp';
 
-            if (! Storage::disk('public')->put($path, $contents)) {
+            if (! Storage::disk($disk)->put($path, $contents)) {
                 throw new RuntimeException('ذخیره تصویر تبدیل‌شده ناموفق بود.');
             }
-            
+
             return $path;
         } finally {
             imagedestroy($image);

@@ -1615,9 +1615,7 @@
                     return;
                 }
 
-                const percentage = (
-                    slider.scrollLeft / maxScroll
-                ) * 100;
+                const percentage = (slider.scrollLeft / maxScroll) * 100;
 
                 progress.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
             };
@@ -1641,7 +1639,7 @@
             });
 
             slider.addEventListener('pointerdown', (event) => {
-                if (event.pointerType === 'touch') return;
+                if (event.pointerType === 'touch' || event.button !== 0) return;
 
                 isDragging = true;
                 moved = false;
@@ -1649,10 +1647,9 @@
                 scrollStart = slider.scrollLeft;
 
                 slider.classList.add('is-dragging');
-                slider.setPointerCapture(event.pointerId);
             });
 
-            slider.addEventListener('pointermove', (event) => {
+            window.addEventListener('pointermove', (event) => {
                 if (!isDragging) return;
 
                 const distance = event.clientX - startX;
@@ -1661,7 +1658,9 @@
                     moved = true;
                 }
 
-                slider.scrollLeft = scrollStart - distance;
+                if (moved) {
+                    slider.scrollLeft = scrollStart - distance;
+                }
             });
 
             const stopDragging = () => {
@@ -1671,9 +1670,8 @@
                 slider.classList.remove('is-dragging');
             };
 
-            slider.addEventListener('pointerup', stopDragging);
-            slider.addEventListener('pointercancel', stopDragging);
-            slider.addEventListener('lostpointercapture', stopDragging);
+            window.addEventListener('pointerup', stopDragging);
+            window.addEventListener('pointercancel', stopDragging);
 
             slider.addEventListener('click', (event) => {
                 if (moved) {
@@ -1682,6 +1680,10 @@
                     moved = false;
                 }
             }, true);
+
+            slider.addEventListener('dragstart', (event) => {
+                event.preventDefault();
+            });
 
             window.addEventListener('resize', updateProgress);
 

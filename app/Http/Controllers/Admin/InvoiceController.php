@@ -167,6 +167,7 @@ class InvoiceController extends Controller
             'notes',
             'convertedFrom',
             'convertedTo',
+            'payments.createdBy',
         ]);
 
         $verificationUrl = route('invoices.verify', $invoice->qr_token);

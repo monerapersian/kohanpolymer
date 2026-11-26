@@ -49,6 +49,21 @@ class Invoice extends Model
             ->orderBy('sort_order');
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(InvoicePayment::class)
+            ->with('createdBy')
+            ->orderByDesc('payment_date')
+            ->orderByDesc('id');
+    }
+
+    public function commissions(): HasMany
+    {
+        return $this->hasMany(InvoiceCommission::class)
+            ->with(['user', 'creator'])
+            ->orderBy('id');
+    }
+
     public function convertedFrom(): BelongsTo
     {
         return $this->belongsTo(self::class, 'converted_from_id');

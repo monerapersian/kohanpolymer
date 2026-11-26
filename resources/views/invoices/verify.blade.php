@@ -933,7 +933,9 @@
 
                 <div class="print-document-number">
                     شماره {{ $documentType }}:
-                    {{ $formatDigits($invoice->document_number) }}
+                    <span class="text-white/90" style="direction: ltr; unicode-bidi: isolate; display: inline-block;">
+                        {{ $formatDigits($invoice->document_number) }}
+                    </span>
                 </div>
             </div>
 

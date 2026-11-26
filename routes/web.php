@@ -15,6 +15,9 @@ use App\Models\ActivityLog;
 use App\Http\Controllers\Admin\SiteContentController;
 use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\InvoiceController;
+use App\Http\Controllers\Admin\InvoicePaymentController;
+use App\Http\Controllers\Admin\InvoiceProfitController;
+use App\Http\Controllers\Admin\InvoiceCommissionController;
 use App\Http\Controllers\Admin\ManagerController;
 use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\AccountSettingsController;
@@ -251,6 +254,9 @@ Route::middleware(['auth', 'permission'])->group(function () {
         Route::post('/admin/customers', [CustomerController::class, 'store'])
             ->name('admin.customers.store');
 
+        Route::get('/admin/customers/{customer}/report', [CustomerController::class, 'printReport'])
+            ->name('admin.customers.report');
+
         Route::get('/admin/customers/{customer}', [CustomerController::class, 'show'])
             ->name('admin.customers.show');
 
@@ -271,6 +277,23 @@ Route::middleware(['auth', 'permission'])->group(function () {
 
         Route::get('/admin/invoices/{invoice}/export', [InvoiceController::class, 'export'])
             ->name('admin.invoices.export');
+
+        // Invoice Payment Routes
+        Route::post('/admin/invoices/{invoice}/payments', [InvoicePaymentController::class, 'store'])
+            ->name('admin.invoices.payments.store');
+
+        Route::get('/admin/invoices/{invoice}/payments/{payment}/document', [InvoicePaymentController::class, 'download'])
+            ->name('admin.invoices.payments.document');
+
+        // Invoice Profit Routes
+        Route::middleware('role:super_admin')->group(function () {
+            Route::put('/admin/invoices/{invoice}/profit', [InvoiceProfitController::class, 'update'])
+                ->name('admin.invoices.profit.update');
+        });
+
+        // Invoice Commission Routes
+        Route::put('/admin/invoices/{invoice}/commissions', [InvoiceCommissionController::class, 'update'])
+            ->name('admin.invoices.commissions.update');
 
         Route::get('/admin/invoices/{invoice}', [InvoiceController::class, 'show'])
             ->name('admin.invoices.show');
